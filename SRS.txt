@@ -1,0 +1,178 @@
+ESPECIFICACIÓN DE REQUERIMIENTOS 
+
+Ingeniería del Software I 
+
+Ferrero German, Ferri Federico, Haag Karen, Reyes Martín
+
+Universidad Nacional de Córdoba
+FaMAF 
+Año 2014
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+CONTENIDO 
+
+1. INTRODUCCIÓN 
+1.1. Propósito
+1.2. Alcance 
+1.3. Definiciones, acrónimos y abreviaciones
+1.4. Referencias
+1.5. Visión general
+
+2. DESCRIPCIÓN GENERAL 
+2.1. Perspectiva del producto
+2.2. Funciones del producto 
+2.3. Características del usuario
+2.4. Restricciones generales
+2.5. Suposiciones y dependencias
+
+3. REQUERIMIENTOS ESPECÍFICOS
+3.1. Requerimientos específicas
+3.2. Requerimientos funcionales
+3.3. Requerimientos de desempeño
+3.4. Restricciones de diseño
+3.5. Atributos
+3.6. Otros requisitos
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+1. INTRODUCCIÓN
+
+
+
+1.1 PROPÓSITO
+
+   Una parte importante en el proceso de desarrollo de software es el análisis y
+la especificación de los requisitos del software, dentro del cuál se permite
+entender de una mejor manera las especificaciones deseadas por el cliente. Se
+pueden identificar los objetivos de la aplicación, el alcance y usuarios de la misma.
+
+   Este documento pretende dejar en claro las descripciones preeliminares de la
+aplicación web “TRUCO”, dejando responsabilidad tanto al grupo de desarrolladores
+como al cliente, que la aplicación mantendra las carácteristicas acordadas con
+el cliente previamente.
+   “TRUCO” se caracterizará por ser una aplicación de juego a través de internet
+para dos personas, basado en el famoso juego popular.
+
+
+
+1.2 ALCANCE DEL PRODUCTO 
+
+   La aplicación está diseñada para poder ser utilizada por usuarios con
+conectividad a internet, donde se enfrentarán en partidas “uno contra uno”, de
+manera aleatoria con los contrincantes que se encuentren en la situación de
+estar en espera para poder jugar.
+
+
+
+1.3 DEFINICIONES, ACRÓNIMOS Y ABREVIATURAS
+
+* USUARIO: persona que utilizará la aplicación.
+* CUADRO DE DIÁLOGO: herramienta utilizada por dos usuarios jugando una misma
+                     partida, dentro de la cuál pueden comunicarse a través de
+                     mensajes de texto.
+* CANTAR (CANTO): sinónimo de la acción de señalar que se ha dicho algo.
+* PUNTOS OBJETIVO: meta a alcanzar por los jugadores para poder ganar el juego.
+* PARTIDA: juego entre dos personas hasta alcanzar los puntos objetivo.
+* REGISTRO DE PARTIDA: historial de la partida en curso, la cuál involucra tanto
+                       el historial de puntos ya anotados, puntos a anotar al
+                       finalizar la ronda y registro de la ronda actual(cartas
+                       de cada jugador, instante dentro de la ronda, cantos realizados)
+* GESTION DE CUENTA: procesos de registrar un usuario o modificar contraseña. 
+* USUARIO EN ESPERA: usuario que ha señalado iniciar una partida, y está
+                     esperando para poder ser emparejado con otro usuario en
+                     espera, para poder iniciar una partida.
+* MANO: el primer jugador de la ronda.
+
+
+
+1.4 REFERENCIAS
+
+* Enunciado provisto por la cátedra:
+      http://www.famaf.proed.unc.edu.ar/pluginfile.php/14560/mod_resource/content/1/2014/Proyecto%20Ingenier%C3%ADa%20Truco.pdf
+* Reglas de truco:
+      http://www.mundomatero.com/truco.html
+      http://www.ludoteka.com/truco.html
+      http://www.juegos.gba.gov.ar/archivos/trash/reglamentos_2012/Reglamentos%20Tecnicos/Adultos%20Mayores/TRUCO.pdf
+
+
+
+1.5 VISIÓN GENERAL
+
+   En la siguiente sección (sección 2) de este documento se realiza una
+descripción general del producto de software, presentando sus características
+generales, sin entrar en demasiados detalles. Dentro de las cuales se definirán
+las principales funciones que debe realizar la aplicación, caraterísticas que
+tiene el usuario, restricciones generales, supuestos y dependencias que afectan
+al desarrollo.
+
+   En la sección 3 se definen con mas detalles los requerimientos específicos,
+entre los que se encuentran los requerimientos de interfaz externa y requerimientos
+funcionales del software, requerimientos de desempeño, restricciones de diseño,
+atributos y otros requisitos.
+
+
+
+
+--------------------------------------------------------------------------------
+
+
+
+
+2. DESCRIPCIÓN GLOBAL
+
+
+
+2.1 PERSPECTIVA DEL PRODUCTO 
+
+   La aplicación esta diseñada para funcionar a través de la web, y para ser
+utilizada por pares de personas. Se lleva un registro general donde se muestra
+el ranking de las personas que mas partidas han ganado, por lo cual es necesario
+la creación de una cuenta dentro de la página.
+
+
+
+2.2 FUNCIONES DEL PRODUCTO 
+
+   La aplicación de “TRUCO” debe cumplir con las siguientes funciones básicas
+para cada usuario:
+      * Gestionar una cuenta. Ya sea para crear una cuenta de usuario o para
+        modificar la misma cambiando la contraseña.
+      * Llevar a cabo una partida de truco.
+      * Interactuar con los contrincantes a través de un chat privado en la mesa.
+      * Verificar el ranking general de la aplicación, y la posición donde se
+        encuentra en el mismo.
+
+
+
+2.3 CARACTERÍSTICAS DEL USUARIO
+
+   Los usuarios potenciales del sistema son todas aquellas personas interesadas
+en el juego de truco que deseen jugar partidas uno-a-uno contra otras personas
+en diferentes partes del mundo a través de la web.
+   Todos los usuarios se ubican dentro de un mismo nivel jerárquico y pueden
+realizar las funciones descriptas en el inciso 2.2.
+
+
+
+2.4 RESTRICCIONES GENERALES
+
+   ________COMPLETAR_________________________________________________
+
+
+
+2.5 SUPOSICIONES Y DEPENDENCIAS
+
+   ________COMPLETAR_________________________________________________
