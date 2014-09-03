@@ -162,6 +162,100 @@ realizar las funciones descriptas en el inciso 2.2.
 
     * La aplicación tiene que estar desarrollada en Django.
     * Fecha límite de entrega del software es 02 de Septiembre de 2014
+    * El juego será regido por las siguientes reglas:
+
+    El juego consiste en emplear las tres cartas que se poseen, de la mejor manera posible, para
+ganar al menos dos de las tres partes que componen cada ronda.
+    El objetivo es ser el primero en llegar a los quince o treinta puntos, meta establecida
+antes de iniciar el partido.
+
+__Cartas
+    El truco se juega con una baraja española sin ochos, nueves ni comodines.
+Las cartas tienen una jerarquía determinada, y sólo pueden ganarle a una carta de menor
+jerarquía en un enfrentamiento.
+A continuación se listan las cartas en orden jerárquico.
+
+1 de espadas
+1 de bastos
+7 de espadas
+7 de oros
+3 de cualquier palo
+2 de cualquier palo
+1 de copas y 1 de oros
+12 de cualquier palo
+11 de cualquier palo
+10 de cualquier palo
+7 de copas y de bastos
+6 de cualquier palo
+5 de cualquier palo
+4 de cualquier palo
+
+
+__Envido
+    Si alguien canta Envido, el oponente tiene que responder "quiero" o "no quiero" . En caso de que
+acepte, entonces el jugador mano debe cantar los puntos de envido que tiene en su
+mano y el oponente le responde con sus puntos en caso de tener mayor puntaje, o
+con el mensaje "son buenas" donde se le dará por ganado el Envido al jugador mano.
+    El jugador con mas puntos será el ganador. En caso de empate gana el jugador que
+es mano
+    Al terminar la ronda, si el envido se quiso, quien lo haya ganado deberá mostrar las cartas
+que conformaron su envido.
+    Los puntos en caso de aceptar el enfrentamiento de Envido son 2 puntos, en caso
+de no quererse el ganador recibe 1 punto.
+
+
+__Tantos para el envido
+    Además del orden jerárquico de las cartas, éstas tienen un puntaje determinado,
+que es empleado en el envido. El puntaje de una carta coincide con su valor nominal
+excepto para los diez, los onces, y los doces. El valor de estas tres cartas es cero.
+    Los tantos o puntos para el envido se calculan de la siguiente forma:
+Si se poseen dos o más cartas de igual palo, los tantos equivalen a la suma del puntaje de
+dos cartas del mismo palo elegidas por el jugador más veinte puntos. Si se poseen tres
+cartas de diferente palo, los tantos equivalen al puntaje de mayor jerarquía.
+
+
+
+__Juego
+    Se mezclan las cartas al azar y luego se reparten, una por vez, comenzando por el
+jugador que es mano, tres cartas a cada jugador.
+    Empieza jugando el jugador mano, quien puede bajar una carta, o cantar Envido o Truco.
+   (Si canta truco, el otro jugador puede responderle que antes se debe jugar el envido,
+y entonces el mano debe responder si acepta el envido o no)
+    Si se cantó el envido entonces se entra en la fase del Envido mismo y luego el mano
+tiene la posibilidad de cantar truco o bajar una carta.(Si canta truco, el oponente
+debe contestar "quiero" o "no quiero" y despues bajar una carta).
+    Una vez que el mano baja una carta, el oponente puede cantar Envido y/o Truco (en caso de
+que no los haya cantado la mano, o que no se haya querido todavia el truco), y luego bajar una carta.
+    Luego se verifica el ganador del primer enfrentamiento, y comienza el segundo
+enfrentamiento el ganador del primero. En caso de empate coninúa la mano.
+    Se repiten los pasos anteriores a excepción de la parte del Envido.
+    Una vez que uno de los jugadores gana dos de los tres enfrentamientos, dá por
+ganador al jugador que más enfrentamientos haya ganado. En el poco probable caso
+de un empate, se procede de esta manera:
+
+
+
+Ganador del primer      Ganador del segundo       Ganador del tercer        Ganador
+ enfrentamiento             enfrentamiento           enfrentamiento
+
+    A                           B                       Empate                A
+
+    A                        Empate                       -                   A
+
+  Empate                        A                         -                   A
+
+  Empate                     Empate                       A                   A
+
+  Empate                     Empate                     Empate              Mano
+
+
+    Una vez que se termina la ronda, se suman los puntos correspondientes a cada
+jugador.
+    Cuando uno de los jugadores llegue a los puntos establecidos como objetivo,
+entonces se lo considera ganador de la partida.
+    Si ambos jugadores llegan en la misma ronda al puntaje objetivo, entonces el
+ganador será el que llegó con los puntos del Envido.
+
 
 
 2.5 SUPOSICIONES Y DEPENDENCIAS
