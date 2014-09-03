@@ -54,26 +54,20 @@ CONTENIDO
 
 1.1 PROPÓSITO
 
-   Una parte importante en el proceso de desarrollo de software es el análisis y
-la especificación de los requisitos del software, dentro del cuál se permite
-entender de una mejor manera las especificaciones deseadas por el cliente. Se
-pueden identificar los objetivos de la aplicación, el alcance y usuarios de la misma.
-
-   Este documento pretende dejar en claro las descripciones preeliminares de la
-aplicación web “TRUCO”, dejando responsabilidad tanto al grupo de desarrolladores
-como al cliente, que la aplicación mantendra las carácteristicas acordadas con
-el cliente previamente.
-   “TRUCO” se caracterizará por ser una aplicación de juego a través de internet
-para dos personas, basado en el famoso juego popular.
-
+    Este documento pretende dejar en claro las descripciones preeliminares de la
+aplicación web “TRUCO”, dejando asentados los requerimientos para el desarrollo de la misma,
+ cumpliendo las características de una buena SRS según norma IEEE 830,
+ a modo de contrato entre el cliente y el desarrollador.
+    El mismo está dirigido a los desarrolladores de la aplicación, el grupo FFHR,
+y a los clientes interesados en el software, profesores de la cátedra de 
+Ingeniería del Software I.
 
 
 1.2 ALCANCE DEL PRODUCTO 
 
-   La aplicación está diseñada para poder ser utilizada por usuarios con
-conectividad a internet, donde se enfrentarán en partidas “uno contra uno”, de
-manera aleatoria con los contrincantes que se encuentren en la situación de
-estar en espera para poder jugar.
+   La aplicación "Truco" será un simulador del juego de cartas omónimo popular argentino.
+Diseñada para ser utilizada por usuarios con conectividad a internet, 
+donde se enfrentarán en partidas “uno contra uno”.
 
 
 
@@ -83,18 +77,15 @@ estar en espera para poder jugar.
 * CUADRO DE DIÁLOGO: herramienta utilizada por dos usuarios jugando una misma
                      partida, dentro de la cuál pueden comunicarse a través de
                      mensajes de texto.
-* CANTAR (CANTO): sinónimo de la acción de señalar que se ha dicho algo.
+* CANTAR: sinónimo de la acción de proponer Envido, Truco, o cualquier derivado.
 * PUNTOS OBJETIVO: meta a alcanzar por los jugadores para poder ganar el juego.
 * PARTIDA: juego entre dos personas hasta alcanzar los puntos objetivo.
 * REGISTRO DE PARTIDA: historial de la partida en curso, la cuál involucra tanto
                        el historial de puntos ya anotados, puntos a anotar al
-                       finalizar la ronda y registro de la ronda actual(cartas
-                       de cada jugador, instante dentro de la ronda, cantos realizados)
-* GESTION DE CUENTA: procesos de registrar un usuario o modificar contraseña. 
-* USUARIO EN ESPERA: usuario que ha señalado iniciar una partida, y está
-                     esperando para poder ser emparejado con otro usuario en
-                     espera, para poder iniciar una partida.
-* MANO: el primer jugador de la ronda.
+                       finalizar la ronda y registro del estado de la ronda actual.
+* MANO: el usuario al que le toca jugar primero en la ronda.
+* LOBBY: pantalla principal del juego donde se puede crear una nueva partida o 
+         unirse a una ya creada.
 
 
 
@@ -169,92 +160,168 @@ realizar las funciones descriptas en el inciso 2.2.
 
 2.4 RESTRICCIONES GENERALES
 
-   ________COMPLETAR_________________________________________________
-
+    * La aplicación tiene que estar desarrollada en Django.
+    * Fecha límite de entrega del software es 02 de Septiembre de 2014
 
 
 2.5 SUPOSICIONES Y DEPENDENCIAS
 
-   ________COMPLETAR_________________________________________________
+   ________COMPLETAR________
 
 
 3. REQUERIMIENTOS ESPECÍFICOS
-3.1 REQUQRIMIENTOS DE INTERFAZ EXTERNA
+3.1 REQUERIMIENTOS DE INTERFAZ EXTERNA
 3.1.1 INTERFACES DE USUARIO
 3.1.2 INTERFACES DE HARDWARE
 3.1.3 INTERFACES DE SOFTWARE
 3.1.4 INTERFACES DE COMUNICACIÓN
 3.2. REQUERIMIENTOS FUNCIONALES
   En esta sección se especifican los distintos casos de uso por los que puede
-pasar un usuario durante el uso del juego.
-3.2.1 INICIO DE PARTIDA
-  ·Caso de uso: Inicio de una nueva partida.
-  ·Actor primario: El jugador.
-  ·Precondición: El jugador debe tener una cuenta a la cual debe haber accedido.
-  ·Escenario exitoso principal:
-    1. El jugador indica que quiere jugar una nueva partida.
-    2. El sistema empareja al jugador con un contrincante.
-    3. El sistema los ubica en una misma mesa y comienza la partida.
-  ·Escenarios excepcionales:
-    2.a No hay nadie más que haya iniciado la sesión.
-      · Se le comunica al jugador y se lo deja en espera.
+pasar un usuario durante el juego.
 
-3.2.2 PARTIDA
-  ·Caso de uso: Se juega una partida.
-  ·Actor primario: Ej jugador.
-  ·Precondición: Se ha iniciado una partida satisfactoriamente.
-  ·Escenario exitoso principal:
-    1. Se verifica que la mano deba jugarse (No se ganó la partida aún).
-    2. Se reparten las cartas.
-    3. Se entra en las fases del juego.
-    4. Se calculan los puntos.
-    5. Se verifica si hay un ganador. Si hay uno, se actualiza el ranking.
+3.2.1 HOME
+    ·Caso de uso: Ingreso al home de la aplicación.
+    ·Actores primarios: Usuario y sistema.
+    ·Precondición: El usuario debe tener un navegador con conexión a internet.
+    ·Escenario exitoso principal:
+     1. El usuario ingresa la url del juego.
+     2. El sistema muestra al usuario la pantalla de home que contiene los campos
+        de inicio de sesión o la posibilidad de registrarse como un nuevo usuario.
+
+
+3.2.2 REGISTRO DE CUENTA
+    ·Caso de uso: El usuario crea una cuenta nueva.
+    ·Actores primarios: El usuario y el sistema. 
+    ·Precondición: El usuario fue redirigido a la url de registro de cuenta.
+    ·Escenario exitoso principal:
+         1. El sistema muestra el formulario de registro de cuenta.
+         2· El usuario rellena el formulario con sus datos.
+         3· El usuario hace click en el boton de "Crear Cuenta".
+         4. El sistema verifica los datos ingresados.
+         5· El sistema crea la nueva cuenta en la base de datos.
+         6. El sistema loguea al nuevo usuario y lo redirecciona al lobby.
+    ·Escenarios excepcionales:
+         4.a El formulario no está completo o hay datos incorrectos.
+           · El sistema indica que campos estan incompletos o incorrectos.
+
+3.2.3 INICIAR SESIÓN
+    Caso de uso: Inicio de sesión.
+    Actores primarios: Usuario y el sistema.
+    Precondición: El usuario debe tener una cuenta activa y debe estar situado en
+                  la pantalla de home.
+    Escenario exitoso principal:
+    1. El jugador ingresa su nombre de usuario y contraseña y hace click
+        en el botón de "Iniciar Sesión".
+    2. El sistema verifica los datos y redirige al lobby.
   ·Escenarios excepcionales:
+    2.a No existe un usuario con el nombre ingresado.
+      · Se le comunica al jugador mediante un mensaje de error.
+    2.b El usuario ingresó una contraseña incorrecta.
+      · Se le comunica al jugador mediante el mismo mensaje de error del inciso 2a.
+
+
+3.2.4  CREAR PARTIDA
+    ·Caso de uso: Un usuario crea una partida.
+    ·Actores primarios: El usuario y el sistema.
+    ·Precondición: El usuario ha iniciado sesión, y a ingresado a "Crear Partida".
+    ·Escenario exitoso principal:
+        1. El usuario elige un nombre para su partida.
+        2. El usuario elige una contraseña para su partida (opcional).
+        3. El usuario elige entre 15 o 30 puntos objetivos para su partida.
+        4. El usuario hace click en "Crear".
+        5. El sistema registra la nueva partida y la muestra en el lobby.
+        6. El sistema redirige al usuario a la mesa de juego.
+    ·Escenarios excepcionales:
+        4.a El usuario no ingresó los datos obligatorios.
+            · El sistema muestra un mensaje de error.
+
+3.2.5 UNIRSE A PARTIDA
+    ·Caso de uso: Un usuario se une a una partida ya creada
+    ·Actores primarios: El usuario que se une a la partida,
+                        El usuario dueño de la partida,
+                        El sistema.
+    ·Precondición: El usuario que se une a la partida debe haber seleccionado
+                    una partida ya creada en la cual todavía hay espacio para
+                    un jugador más.
+    ·Escenario exitoso pricipal:
+        1. El usuario hace click en "Unirse a partida".
+        2. El usuario ingresa la contraseña de la partida (si existe).
+        3. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
+        4. El sistema avisa al usuario dueño de la partida.
+        5. El sistema inicia la primera ronda.
+    ·Escenarios excepcionales:
+        2.a La contraseña ingresada es incorrecta.
+            El sistema muestra un mensaje de error.
+        3.a En medio del proceso la partida es cerrada por su dueño.
+            El sistema muestra un mensaje de error y redirecciona al lobby.
+
+3.2.6 RONDA
+    ·Caso de uso: Se juega una ronda.
+    ·Actores primarios: Los jugadores y el sistema.
+    ·Precondición: Hay una partida en curso, ambos jugadores están en la mesa de juego.
+    ·Escenario Principal:
+    1. El sistema determina quién es mano, mirando en registros quien fue el ultimo
+       que ocupo este rol antes. En caso de ser la primera ronda, el sistema elige
+       como mano al creador de la partida.
+    2. El sistema actualiza el registro, señalando que es el último en ocupar el rol de mano.
+    3. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
+       (empezando por el jugador que es mano).
+    4. El sistema da el turno al jugador que es mano.
+    5. El sistema verifica en los registros que opciones tiene el jugador de turno 
+       disponible para jugar y se las muestra en pantalla.
+    6. El jugador de turno puede jugar una carta, cantar envido(sólo en el primer
+       enfrentamiento), cantar truco, contestar un canto hecho por el otro jugador
+       o irse al mazo, dependiendo de las opciones mostradas por el sistema.
+    7. El sistema guarda en un registro las opciones seleccionadas en el punto anterior.
+    8. El sistema verifica si las últimas dos opciones fueron 'Envido' y 'Quiero'. Entonces
+       se juega el 'Envido'. Si fueron 'Envido' y 'No quiero', entonces el sistema guarda
+       en registro el punto que le corresponde al usuario que cantó.
+    9. El sistema verifica si las últimas opciones del registro fueron 'Truco' y 'Quiero'.
+       En este caso, guarda el puntaje que le corresponde al ganador de la ronda.
+    10. El sistema determina el ganador del enfrentamiento, si lo hay y lo guarda en
+       un registro.
+    11. El sistema verifica si hay un ganador de la ronda. Si lo hay actualiza el registro
+        y termina la ronda. Caso contrario da el turno al jugador de la derecha del
+        que lo tiene actualmente, y se vuelve al punto 5.
+     Escenarios excepcionales:
     · Si hay una desconexión se le da por ganada la partida al jugador que
       está activo.
+    6.a El jugador de turno no responde por un tiempo determinado de 30 segundos
+        El sistema termina la partida y redirecciona a los jugadores al lobby.
 
-3.2.3 ENVIDO
+3.2.7 PARTIDA
+    ·Caso de uso: Se juega una partida.
+    ·Actores primarios: Los jugadores y el sistema.
+    ·Precondición: Ambos jugadores están en la mesa de juego.
+    ·Escenario Principal:
+    1. El sistema verifica en los registros si se alcanzaron los puntos objetivo.
+    2. El sistema inicia una nueva ronda.
+    3. El sistema verifica de los registros de la ronda, los puntos que le
+       corresponden a cada jugador y actualiza los puntajes. y se vuelve al punto 1.
+     Escenarios excepcionales:
+    1.a Se alcanzaron los puntos objetivo
+        El sistema informa a los jugadores el ganador y los redirecciona de nuevo al lobby.
+
+3.2.8 ENVIDO
   ·Caso de uso: Procedimiento del envido.
-  ·Actor primario: Los dos jugadores de la partida.
-  ·Precondición: Se debe haber iniciado la partida y no se debe haber llegado
-  aún al segundo enfrentamiento.
+  ·Actor primario: El sistema y los usuarios de una partida
+  ·Precondición: Se debe haber iniciado la partida y se tiene que haber cantado y
+                 aceptado el Envido.
   ·Escenario exitoso principal:
-    1. Un jugador canta envido durante su turno.
-    2. El otro jugador acepta el envido.
-    3. Se dicen los puntos que se tienen o se miente. __ver__
-    4. Se evalúa el ganador y se espera a que termine la ronda.
-    5. El jugador que perdió puede pedir ver las cartas del ganador
-    por un tiempo determinado.
-    6. Se calculan los puntos.
+    1. El sistema verifica el registro para identificar quien es mano.
+    2. El sistema le da el turno al jugador mano.
+    3. El sistema verifica los puntos de Envido que tiene el jugador en turno y
+       le habilita las opción correspondientes(para mostrar los puntos, y para decir
+       'Son Buenas' en caso correspondiente).
+    4. El jugador en turno hace click en la opción en pantalla.
+    5. El sistema evalúa si hay un ganador y si lo hay, guarda en registro los puntos que le
+       corresponden al ganador y que este debe mostrar las cartas. Caso contrario le da el turno
+       al jugador de la derecha y vuelve al punto 3.
   ·Escenarios excepcionales:
-    2.a El otro jugador no quiere.
-      · Se continúa la ronda y se le da 1 punto al jugador que cantó.
-    2.b El jugador recanta.
-      · Ahora el jugador que cantó inicialmente pasa al punto 2 del escenario
-	exitoso principal, pero se añaden puntos al resultado del envido.
-    5.a El jugador olvida pedir las cartas del ganador.
-      · Los puntos del envido se suman al presunto ganador.
-    5.b El jugador pide ver las cartas pero el presunto gandor había mentido.
-      · Los puntos del envido se le suman al jugador que pidió ver las cartas.
+    4.a El jugador no responde en 30 segundos.
+      · El sistema anuncia los puntos como si el jugador hubiera echo click.
 
-3.2.4 TRUCO
-  ·Caso de uso: Procedimiento del truco.
-  ·Actor primario: Los dos jugadores de la partida.
-  ·Precondición: Se debe haber iniciado la partida.
-  ·Escenario exitoso principal:
-    1. Un jugador canta truco durante su turno.
-    2. El otro jugador acepta el truco.
-    3. Se siguen los enfrentamientos hasta que haya un ganador.
-  ·Escenarios excepcionales:
-    2.a El otro jugador no acepta el truco.
-      · Se termina la ronda, dándosela por ganada al jugador que cantó truco.
-    2.b El otro jugador quiere recantar antes de que el jugador que cantó juege su carta.
-      · El jugador que cantó inicialmente decide si acepta o no. Si no acepta, se
-	termina la ronda, dándosela por ganada al jugador que recantó.
-    3.a El otro jugador quiere recantar durande su truno.
-      · El otro jugador recanta y espera la respuesta del jugador que había cantado antes.
-	Si no se acepta, se le da por ganada la partida al que recantó. Si se acepta, se sigue
-	la partida, pero se suma un punto al valor del resultado final.
+
 
 3.3 REQUERIMIENTOS DE PERFORMANCE
 3.4 RESTRICCIONES DE DISEÑO
