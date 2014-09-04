@@ -259,7 +259,7 @@ ganador será el que llegó con los puntos del Envido.
 
 
 2.5 SUPOSICIONES Y DEPENDENCIAS
-
+version django
    ________COMPLETAR________
 
 
@@ -295,8 +295,14 @@ pasar un usuario durante el juego.
          5· El sistema crea la nueva cuenta en la base de datos.
          6. El sistema loguea al nuevo usuario y lo redirecciona al lobby.
     ·Escenarios excepcionales:
-         4.a El formulario no está completo o hay datos incorrectos.
-           · El sistema indica que campos estan incompletos o incorrectos.
+         4.a El formulario no está completo.
+           · El sistema muestra un mensaje de error indicando que campos estan incompletos.
+         4.b El nombre de usuario ya existe.
+           · El sistema muestra un mensaje de error indicando que el nombre de usuario
+             ya se encuentra en uso.
+         4.c El usuario ingreso una contraseña diferente en el campo de verificación
+             de contraseña.
+           · El sistema muestra un mensaje de error indicando que las contraseñas no coinciden.
 
 3.2.3 INICIAR SESIÓN
     Caso de uso: Inicio de sesión.
@@ -314,7 +320,7 @@ pasar un usuario durante el juego.
       · Se le comunica al jugador mediante el mismo mensaje de error del inciso 2a.
 
 
-3.2.4  CREAR PARTIDA
+3.2.4 CREAR PARTIDA
     ·Caso de uso: Un usuario crea una partida.
     ·Actores primarios: El usuario y el sistema.
     ·Precondición: El usuario ha iniciado sesión, y a ingresado a "Crear Partida".
@@ -349,18 +355,85 @@ pasar un usuario durante el juego.
         3.a En medio del proceso la partida es cerrada por su dueño.
             El sistema muestra un mensaje de error y redirecciona al lobby.
 
-3.2.6 RONDA
-    ·Caso de uso: Se juega una ronda.
+
+3.2.6 INICIAR UNA PARTIDA
+    ·Caso de uso: Se inicia una partida.
+    ·Actores primarios: Los jugadores y el sistema.
+    ·Precondición: Ambos jugadores están en la mesa de juego.
+    ·Escenario exitoso principal:
+    1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
+    2. El sistema inicia una nueva ronda.
+
+
+3.2.7 INICIAR RONDA
+    ·Caso de uso: Se inicia una ronda.
     ·Actores primarios: Los jugadores y el sistema.
     ·Precondición: Hay una partida en curso, ambos jugadores están en la mesa de juego.
-    ·Escenario Principal:
-    1. El sistema determina quién es mano, mirando en registros quien fue el ultimo
-       que ocupo este rol antes. En caso de ser la primera ronda, el sistema elige
-       como mano al creador de la partida.
-    2. El sistema actualiza el registro, señalando que es el último en ocupar el rol de mano.
-    3. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
-       (empezando por el jugador que es mano).
-    4. El sistema da el turno al jugador que es mano.
+    ·Escenario exitoso principal:
+    1. El sistema verifica en los registros quién el jugador mano.
+    2. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
+       (empezando por el jugador que es mano y siguiendo por el de la derecha).
+    3. El sistema dá el turno al jugador que es mano.
+
+
+3.2.7 CANTAR ENVIDO
+    ·Caso de uso: Un jugador canta envido.
+    ·Actores primarios: Los jugadores y el sistema.
+    ·Precondiciónes: · Hay una partida en curso
+                     · El jugador que canta se encuentra en el primer enfrentamiento.
+                     · No se tiene que haber aceptado antes el truco.
+                     · No se tiene que haber cantado antes el envido.
+    ·Escenario exitoso principal:
+    1. El usuario hace click en el botón 'Envido'
+    2. El sistema registra el canto y por quién fue cantado.
+    3. El sistema le da el turno al oponente.
+
+
+3.2.7 CONTESTAR ENVIDO
+    ·Caso de uso: Un jugador responde al envido.
+    ·Actores primarios: Un jugador y el sistema.
+    ·Precondiciónes: · Hay una partida en curso
+                     · El oponente tiene que haber cantado envido en el turno anterior.
+    ·Escenario exitoso principal:
+    1. El sistema le muestre al jugador en turno las opciones 'Quiero' y 'No Quiero'.
+    2. El jugador hace click en una de las opciones.
+    3. El sistema registra la respuesta.
+
+
+3.2.7 ACEPTAR ENVIDO
+    ·Caso de uso: Se juega el envido.
+    ·Actores primarios: El sistema.
+    ·Precondiciónes: · Hay una partida en curso
+                     · El envido tiene que haber sido cantado y aceptado.
+    ·Escenario exitoso principal:
+    1. El sistema calcula los puntos de todos los jugadores.
+    2. El sistema muestra los puntos del jugador mano al otro jugador.
+    3. El sistema muestra los puntos del ganador al otro jugador.
+    4. El sistema registra al ganador del envido.
+    5. El sistema verifica quién canto el envido.
+    6. El sistema le cede el turno al jugador que cantó el envido.
+
+
+
+3.2.7 RECHAZAR ENVIDO
+    ·Caso de uso: Se rechaza el envido.
+    ·Actores primarios: El sistema.
+    ·Precondiciónes: · Hay una partida en curso
+                     · El envido tiene que haber sido cantado y rechazado.
+    ·Escenario exitoso principal:
+    1. El sistema guarda en registro al ganador
+    2. El sistema verifica quién canto el envido.
+    3. El sistema le cede el turno al jugador que cantó el envido.
+
+
+El usuario hace click en la opción 'Quiero'.
+    3. El sistema registra que el envido fue aceptado.
+    4. El sistema 
+ 
+
+CERRAR SESION
+
+
     5. El sistema verifica en los registros que opciones tiene el jugador de turno 
        disponible para jugar y se las muestra en pantalla.
     6. El jugador de turno puede jugar una carta, cantar envido(sólo en el primer
@@ -383,18 +456,6 @@ pasar un usuario durante el juego.
     6.a El jugador de turno no responde por un tiempo determinado de 30 segundos
         El sistema termina la partida y redirecciona a los jugadores al lobby.
 
-3.2.7 PARTIDA
-    ·Caso de uso: Se juega una partida.
-    ·Actores primarios: Los jugadores y el sistema.
-    ·Precondición: Ambos jugadores están en la mesa de juego.
-    ·Escenario Principal:
-    1. El sistema verifica en los registros si se alcanzaron los puntos objetivo.
-    2. El sistema inicia una nueva ronda.
-    3. El sistema verifica de los registros de la ronda, los puntos que le
-       corresponden a cada jugador y actualiza los puntajes. y se vuelve al punto 1.
-     Escenarios excepcionales:
-    1.a Se alcanzaron los puntos objetivo
-        El sistema informa a los jugadores el ganador y los redirecciona de nuevo al lobby.
 
 3.2.8 ENVIDO
   ·Caso de uso: Procedimiento del envido.
