@@ -33,7 +33,7 @@ CONTENIDO
 2.5. Suposiciones y dependencias
 
 3. REQUERIMIENTOS ESPECÍFICOS
-3.1. Requerimientos específicas
+3.1. Requerimientos específicos
 3.2. Requerimientos funcionales
 3.3. Requerimientos de desempeño
 3.4. Restricciones de diseño
@@ -130,7 +130,7 @@ atributos y otros requisitos.
 
    La aplicación esta diseñada para funcionar a través de la web, y para ser
 utilizada por pares de personas. Se lleva un registro general donde se muestra
-el ranking de las personas que mas partidas han ganado, por lo cual es necesario
+el ranking de las personas que más partidas han ganado, por lo cual es necesario
 la creación de una cuenta dentro de la página.
 
 
@@ -275,17 +275,20 @@ pasar un usuario durante el juego.
 
 3.2.1 HOME
     ·Caso de uso: Ingreso al home de la aplicación.
-    ·Actores primarios: Usuario y sistema.
+    ·Actor primario: Usuario
+    ·Actor secundario: Sistema.
     ·Precondición: El usuario debe tener un navegador con conexión a internet.
     ·Escenario exitoso principal:
      1. El usuario ingresa la url del juego.
      2. El sistema muestra al usuario la pantalla de home que contiene los campos
-        de inicio de sesión o la posibilidad de registrarse como un nuevo usuario.
+        de inicio de sesión o la posibilidad de registrarse como un nuevo usuario
+        mediante un botón de "Registrarse".
 
 
 3.2.2 REGISTRO DE CUENTA
     ·Caso de uso: El usuario crea una cuenta nueva.
-    ·Actores primarios: El usuario y el sistema. 
+    ·Actor primario: Usuario
+    ·Actor secundario: Sistema.
     ·Precondición: El usuario fue redirigido a la url de registro de cuenta.
     ·Escenario exitoso principal:
          1. El sistema muestra el formulario de registro de cuenta.
@@ -296,7 +299,7 @@ pasar un usuario durante el juego.
          6. El sistema loguea al nuevo usuario y lo redirecciona al lobby.
     ·Escenarios excepcionales:
          4.a El formulario no está completo.
-           · El sistema muestra un mensaje de error indicando que campos estan incompletos.
+           · El sistema muestra un mensaje de error indicando qué campos están incompletos.
          4.b El nombre de usuario ya existe.
            · El sistema muestra un mensaje de error indicando que el nombre de usuario
              ya se encuentra en uso.
@@ -305,60 +308,66 @@ pasar un usuario durante el juego.
            · El sistema muestra un mensaje de error indicando que las contraseñas no coinciden.
 
 3.2.3 INICIAR SESIÓN
-    Caso de uso: Inicio de sesión.
-    Actores primarios: Usuario y el sistema.
-    Precondición: El usuario debe tener una cuenta activa y debe estar situado en
-                  la pantalla de home.
-    Escenario exitoso principal:
-    1. El jugador ingresa su nombre de usuario y contraseña y hace click
-        en el botón de "Iniciar Sesión".
-    2. El sistema verifica los datos y redirige al lobby.
-  ·Escenarios excepcionales:
-    2.a No existe un usuario con el nombre ingresado.
-      · Se le comunica al jugador mediante un mensaje de error.
-    2.b El usuario ingresó una contraseña incorrecta.
-      · Se le comunica al jugador mediante el mismo mensaje de error del inciso 2a.
+    ·Caso de uso: Inicio de sesión.
+    ·Actor primario: Usuario
+    ·Actor secundario: Sistema.
+    ·Precondición: El usuario debe tener una cuenta activa.
+    ·Escenario exitoso principal:
+        1. El jugador ingresa su nombre de usuario y contraseña y hace click
+            en el botón de "Iniciar Sesión".
+        2. El sistema verifica los datos y redirige al lobby.
+    ·Escenarios excepcionales:
+        2.a No existe un usuario con el nombre ingresado.
+          · Se le comunica al jugador mediante un mensaje de error.
+        2.b El usuario ingresó una contraseña incorrecta.
+          · Se le comunica al jugador mediante el mismo mensaje de error del inciso 2a.
 
 
 3.2.4 CREAR PARTIDA
     ·Caso de uso: Un usuario crea una partida.
-    ·Actores primarios: El usuario y el sistema.
-    ·Precondición: El usuario ha iniciado sesión, y a ingresado a "Crear Partida".
+    ·Actor primario: Usuario
+    ·Actor secundario: Sistema.
+    ·Precondición: El usuario ha iniciado sesión.
     ·Escenario exitoso principal:
-        1. El usuario elige un nombre para su partida.
-        2. El usuario elige una contraseña para su partida (opcional).
-        3. El usuario elige entre 15 o 30 puntos objetivos para su partida.
-        4. El usuario hace click en "Crear".
-        5. El sistema registra la nueva partida y la muestra en el lobby.
-        6. El sistema redirige al usuario a la mesa de juego.
+        1. El usuario hace click en el botón "Crear Patida" situado en el lobby.
+        2. El usuario elige un nombre para su partida.
+        3. El usuario elige una contraseña para su partida (opcional).
+        4. El usuario elige entre 15 o 30 puntos objetivos para su partida.
+        5. El usuario hace click en "Crear".
+        6. El sistema registra la nueva partida y la muestra en el lobby.
+        7. El sistema redirige al usuario a la mesa de juego.
     ·Escenarios excepcionales:
-        4.a El usuario no ingresó los datos obligatorios.
-            · El sistema muestra un mensaje de error.
+        5.a El usuario no ingresó los datos obligatorios.
+            · El sistema muestra un mensaje de error indicando qué campos obligatorios
+              no han sido ingresados.
+
 
 3.2.5 UNIRSE A PARTIDA
     ·Caso de uso: Un usuario se une a una partida ya creada
-    ·Actores primarios: El usuario que se une a la partida,
-                        El usuario dueño de la partida,
-                        El sistema.
+    ·Actor primario: Usuario que se une a la partida.
+    ·Actor secundario: Sistema.
+    ·Actor terciario: Usuario dueño de la partida.
     ·Precondición: El usuario que se une a la partida debe haber seleccionado
-                    una partida ya creada en la cual todavía hay espacio para
-                    un jugador más.
+                   del lobby, una partida ya creada en la cual todavía hay espacio
+                   para un jugador más.
     ·Escenario exitoso pricipal:
         1. El usuario hace click en "Unirse a partida".
         2. El usuario ingresa la contraseña de la partida (si existe).
-        3. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
-        4. El sistema avisa al usuario dueño de la partida.
-        5. El sistema inicia la primera ronda.
+        3. El sistema avisa al usuario dueño de la partida.
+        4. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
     ·Escenarios excepcionales:
         2.a La contraseña ingresada es incorrecta.
-            El sistema muestra un mensaje de error.
-        3.a En medio del proceso la partida es cerrada por su dueño.
-            El sistema muestra un mensaje de error y redirecciona al lobby.
+            El sistema muestra un mensaje de error pidiendo reingresar
+            la contraseña correcta.
+        4.a En medio del proceso la partida es eliminada por su dueño.
+            El sistema notifica al usuario que intentaba unirse a la partida y 
+            lo redirecciona al lobby.
 
 
 3.2.6 INICIAR UNA PARTIDA
     ·Caso de uso: Se inicia una partida.
-    ·Actores primarios: Los jugadores y el sistema.
+    ·Actor primario: Sistema.
+    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).
     ·Precondición: Ambos jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
     1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
@@ -367,72 +376,106 @@ pasar un usuario durante el juego.
 
 3.2.7 INICIAR RONDA
     ·Caso de uso: Se inicia una ronda.
-    ·Actores primarios: Los jugadores y el sistema.
+    ·Actor primario: Sistema.
+    ·Actores secundarios: Jugadores
     ·Precondición: Hay una partida en curso, ambos jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
-    1. El sistema verifica en los registros quién el jugador mano.
+    1. El sistema verifica en los registros quién es el jugador mano.
     2. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
        (empezando por el jugador que es mano y siguiendo por el de la derecha).
-    3. El sistema dá el turno al jugador que es mano.
+    3. El sistema cede el turno al jugador que es mano.
 
 
-3.2.7 CANTAR ENVIDO
+3.2.8 CANTAR ENVIDO
     ·Caso de uso: Un jugador canta envido.
-    ·Actores primarios: Los jugadores y el sistema.
-    ·Precondiciónes: · Hay una partida en curso
-                     · El jugador que canta se encuentra en el primer enfrentamiento.
-                     · No se tiene que haber aceptado antes el truco.
-                     · No se tiene que haber cantado antes el envido.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · Hay una ronda en curso
+                     · La partida se encuentra en el primer enfrentamiento.
+                     · No se aceptó antes en la ronda el truco.
+                     · No se cantó antes en la ronda el envido.
     ·Escenario exitoso principal:
-    1. El usuario hace click en el botón 'Envido'
+    1. El jugador hace click en el botón 'Envido'
     2. El sistema registra el canto y por quién fue cantado.
-    3. El sistema le da el turno al oponente.
+    3. El sistema le muestra al oponente las opciones "Quiero" y "No quiero"
+       a través de botones.
+    3. El sistema le cede el turno al oponente.
 
 
-3.2.7 CONTESTAR ENVIDO
-    ·Caso de uso: Un jugador responde al envido.
-    ·Actores primarios: Un jugador y el sistema.
-    ·Precondiciónes: · Hay una partida en curso
-                     · El oponente tiene que haber cantado envido en el turno anterior.
-    ·Escenario exitoso principal:
-    1. El sistema le muestre al jugador en turno las opciones 'Quiero' y 'No Quiero'.
-    2. El jugador hace click en una de las opciones.
-    3. El sistema registra la respuesta.
-
-
-3.2.7 ACEPTAR ENVIDO
+3.2.9 ACEPTAR ENVIDO
     ·Caso de uso: Se juega el envido.
-    ·Actores primarios: El sistema.
-    ·Precondiciónes: · Hay una partida en curso
-                     · El envido tiene que haber sido cantado y aceptado.
+    ·Actor primario: Jugador en turno.
+    .Actor secundario: Sistema
+    ·Precondiciones: · Hay una ronda en curso
+                     · El oponente cantó envido en el turno anterior y consecuentemente
+                       el sistema muestra al jugador en turno las opciones 
+                       "Quiero" y "No quiero".
     ·Escenario exitoso principal:
-    1. El sistema calcula los puntos de todos los jugadores.
-    2. El sistema muestra los puntos del jugador mano al otro jugador.
-    3. El sistema muestra los puntos del ganador al otro jugador.
-    4. El sistema registra al ganador del envido.
-    5. El sistema verifica quién canto el envido.
-    6. El sistema le cede el turno al jugador que cantó el envido.
+        1. El jugador en turno hace click en "Quiero".
+        1. El sistema calcula los puntos de todos los jugadores.
+        2. El sistema muestra los puntos del jugador mano al otro jugador.
+        3. El sistema muestra los puntos del ganador al otro jugador.
+        4. El sistema registra al ganador del envido.
+        5. El sistema verifica quién canto el envido.
+        6. El sistema le cede el turno al jugador que cantó el envido.
 
 
-
-3.2.7 RECHAZAR ENVIDO
+3.2.10 RECHAZAR ENVIDO
     ·Caso de uso: Se rechaza el envido.
-    ·Actores primarios: El sistema.
-    ·Precondiciónes: · Hay una partida en curso
-                     · El envido tiene que haber sido cantado y rechazado.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · Hay una ronda en curso.
+                     · El oponente cantó envido en el turno anterior y consecuentemente
+                       el sistema muestra al jugador en turno las opciones 
+                       "Quiero" y "No quiero".
     ·Escenario exitoso principal:
-    1. El sistema guarda en registro al ganador
-    2. El sistema verifica quién canto el envido.
-    3. El sistema le cede el turno al jugador que cantó el envido.
+        1. El sistema guarda en registro al oponente como ganador.
+        2. El sistema verifica quién canto el envido.
+        3. El sistema le cede el turno al jugador que cantó el envido.
 
+3.2.11 JUGAR CARTA
+    ·Caso de uso: Jugador tira carta en la mesa.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · Hay una ronda en curso.
+                     · El jugador en turno aún posee alguna de sus tres cartas.
+                     · No hubo un canto en el turno anterior.
+    ·Escenario exitoso principal:
+        1. El jugador selecciona una carta de su haber.
+        2. El jugador hace click en "Jugar carta".
+        3. El sistema verifica si se terminó un enfrentamiento, si se terminó,
+           entonces registra al ganador del enfrentamiento, o registra un empate,
+           según las reglas del juego.
+        4. El sistema verifica si se terminó la ronda, si se terminó, calcula los
+           puntos y los registra.
+        5. El sistema verifica si se casi terminó la partida
+    ·Extensiones:
+        5.a La partida no se terminó:
+            1. El sistema registra que el jugador a la derecha del jugador mano
+               actual, será mano en la siguiente ronda.
+            2. El sistema inicia una nueva ronda.
+        5.b La partida se terminó:
+            1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
+            2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
+            3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
+            4. El sistema redirige al lobby a ambos jugadores.
 
-El usuario hace click en la opción 'Quiero'.
-    3. El sistema registra que el envido fue aceptado.
-    4. El sistema 
- 
+CANTAR TRUCO
+
+--COMPLETAR--
+
+ACEPTAR TRUCO
+
+--COMPLETAR--
+
+RECHAZAR TRUCO
+
+--COMPLETAR--
+
 
 CERRAR SESION
 
+--COMPLETAR--
 
     5. El sistema verifica en los registros que opciones tiene el jugador de turno 
        disponible para jugar y se las muestra en pantalla.
