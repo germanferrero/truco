@@ -63,6 +63,7 @@ y a los clientes interesados en el software, profesores de la cátedra de
 Ingeniería del Software I.
 
 
+
 1.2 ALCANCE DEL PRODUCTO 
 
    La aplicación "Truco" será un simulador del juego de cartas omónimo popular argentino.
@@ -164,16 +165,17 @@ realizar las funciones descriptas en el inciso 2.2.
     * Fecha límite de entrega del software es 02 de Septiembre de 2014
     * El juego será regido por las siguientes reglas:
 
-    El juego consiste en emplear las tres cartas que se poseen, de la mejor manera posible, para
-ganar al menos dos de las tres partes que componen cada ronda.
-    El objetivo es ser el primero en llegar a los quince o treinta puntos, meta establecida
-antes de iniciar el partido.
+    El juego consiste en emplear las tres cartas que se poseen, de la mejor manera
+posible, para ganar al menos dos de las tres partes que componen cada ronda.
+    El objetivo es ser el primero en llegar a los quince o treinta puntos, meta
+establecida antes de iniciar el partido.
+
 
 __Cartas
     El truco se juega con una baraja española sin ochos, nueves ni comodines.
-Las cartas tienen una jerarquía determinada, y sólo pueden ganarle a una carta de menor
-jerarquía en un enfrentamiento.
-A continuación se listan las cartas en orden jerárquico.
+Las cartas tienen una jerarquía determinada, y sólo pueden ganarle a una carta de
+menor jerarquía en un enfrentamiento.
+    A continuación se listan las cartas en orden jerárquico.
 
 1 de espadas
 1 de bastos
@@ -212,7 +214,6 @@ excepto para los diez, los onces, y los doces. El valor de estas tres cartas es 
 Si se poseen dos o más cartas de igual palo, los tantos equivalen a la suma del puntaje de
 dos cartas del mismo palo elegidas por el jugador más veinte puntos. Si se poseen tres
 cartas de diferente palo, los tantos equivalen al puntaje de mayor jerarquía.
-
 
 
 __Juego
@@ -263,15 +264,44 @@ version django
    ________COMPLETAR________
 
 
+
+
+--------------------------------------------------------------------------------
+
+
+
+
 3. REQUERIMIENTOS ESPECÍFICOS
+
+
+
 3.1 REQUERIMIENTOS DE INTERFAZ EXTERNA
+
 3.1.1 INTERFACES DE USUARIO
-3.1.2 INTERFACES DE HARDWARE
+________COMPLETAR________
+
+
+
 3.1.3 INTERFACES DE SOFTWARE
+
+    La aplicación debe contar con las pantallas de 'Home', 'Lobby', 'Crear Partida',
+'Unirse a Partida' y 'Mesa'.
+
+
+
 3.1.4 INTERFACES DE COMUNICACIÓN
+
+    El usuario debe poder manejar la aplicación con la utilización de un
+mouse y un teclado(para poder ingresar los datos necesarios para la creación y loggin
+de una cuenta, y para poder crear una partida).
+
+
+
 3.2. REQUERIMIENTOS FUNCIONALES
-  En esta sección se especifican los distintos casos de uso por los que puede
+
+    En esta sección se especifican los distintos casos de uso por los que puede
 pasar un usuario durante el juego.
+
 
 3.2.1 HOME
     ·Caso de uso: Ingreso al home de la aplicación.
@@ -307,29 +337,30 @@ pasar un usuario durante el juego.
              de contraseña.
            · El sistema muestra un mensaje de error indicando que las contraseñas no coinciden.
 
+
 3.2.3 INICIAR SESIÓN
     ·Caso de uso: Inicio de sesión.
     ·Actor primario: Usuario
     ·Actor secundario: Sistema.
     ·Precondición: El usuario debe tener una cuenta activa.
     ·Escenario exitoso principal:
-        1. El jugador ingresa su nombre de usuario y contraseña y hace click
+        1. El usuario ingresa su nombre de usuario y contraseña y hace click
             en el botón de "Iniciar Sesión".
         2. El sistema verifica los datos y redirige al lobby.
     ·Escenarios excepcionales:
         2.a No existe un usuario con el nombre ingresado.
-          · Se le comunica al jugador mediante un mensaje de error.
+          · Se le comunica al usuario mediante un mensaje de error.
         2.b El usuario ingresó una contraseña incorrecta.
-          · Se le comunica al jugador mediante el mismo mensaje de error del inciso 2a.
+          · Se le comunica al usuario mediante el mismo mensaje de error del inciso 2a.
 
 
 3.2.4 CREAR PARTIDA
     ·Caso de uso: Un usuario crea una partida.
     ·Actor primario: Usuario
     ·Actor secundario: Sistema.
-    ·Precondición: El usuario ha iniciado sesión.
+    ·Precondición: El usuario ha iniciado sesión y se encuentra en el lobby.
     ·Escenario exitoso principal:
-        1. El usuario hace click en el botón "Crear Patida" situado en el lobby.
+        1. El usuario hace click en el botón "Crear Patida".
         2. El usuario elige un nombre para su partida.
         3. El usuario elige una contraseña para su partida (opcional).
         4. El usuario elige entre 15 o 30 puntos objetivos para su partida.
@@ -412,12 +443,12 @@ pasar un usuario durante el juego.
                        "Quiero" y "No quiero".
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "Quiero".
-        1. El sistema calcula los puntos de todos los jugadores.
-        2. El sistema muestra los puntos del jugador mano al otro jugador.
-        3. El sistema muestra los puntos del ganador al otro jugador.
-        4. El sistema registra al ganador del envido.
-        5. El sistema verifica quién canto el envido.
-        6. El sistema le cede el turno al jugador que cantó el envido.
+        2. El sistema calcula los puntos de todos los jugadores.
+        3. El sistema muestra los puntos del jugador mano al otro jugador.
+        4. El sistema muestra los puntos del ganador al otro jugador.
+        5. El sistema registra al ganador del envido.
+        6. El sistema verifica quién canto el envido.
+        7. El sistema le cede el turno al jugador que cantó el envido.
 
 
 3.2.10 RECHAZAR ENVIDO
@@ -429,9 +460,11 @@ pasar un usuario durante el juego.
                        el sistema muestra al jugador en turno las opciones 
                        "Quiero" y "No quiero".
     ·Escenario exitoso principal:
-        1. El sistema guarda en registro al oponente como ganador.
-        2. El sistema verifica quién canto el envido.
-        3. El sistema le cede el turno al jugador que cantó el envido.
+        1. El jugador en turno hace click en "No Quiero".
+        2. El sistema guarda en registro al oponente como ganador.
+        3. El sistema verifica quién canto el envido.
+        4. El sistema le cede el turno al jugador que cantó el envido.
+
 
 3.2.11 JUGAR CARTA
     ·Caso de uso: Jugador tira carta en la mesa.
@@ -442,13 +475,13 @@ pasar un usuario durante el juego.
                      · No hubo un canto en el turno anterior.
     ·Escenario exitoso principal:
         1. El jugador selecciona una carta de su haber.
-        2. El jugador hace click en "Jugar carta".
-        3. El sistema verifica si se terminó un enfrentamiento, si se terminó,
+        2. El jugador hace click en "Jugar carta" y selecciona la carta que desea jugar.
+        3. El sistema verifica si se terminó un enfrentamiento. Si se terminó,
            entonces registra al ganador del enfrentamiento, o registra un empate,
            según las reglas del juego.
-        4. El sistema verifica si se terminó la ronda, si se terminó, calcula los
+        4. El sistema verifica si se terminó la ronda. Si se terminó, calcula los
            puntos y los registra.
-        5. El sistema verifica si se casi terminó la partida
+        5. El sistema verifica si se terminó la partida
     ·Extensiones:
         5.a La partida no se terminó:
             1. El sistema registra que el jugador a la derecha del jugador mano
@@ -460,68 +493,66 @@ pasar un usuario durante el juego.
             3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
             4. El sistema redirige al lobby a ambos jugadores.
 
-CANTAR TRUCO
 
---COMPLETAR--
-
-ACEPTAR TRUCO
-
---COMPLETAR--
-
-RECHAZAR TRUCO
-
---COMPLETAR--
-
-
-CERRAR SESION
-
---COMPLETAR--
-
-    5. El sistema verifica en los registros que opciones tiene el jugador de turno 
-       disponible para jugar y se las muestra en pantalla.
-    6. El jugador de turno puede jugar una carta, cantar envido(sólo en el primer
-       enfrentamiento), cantar truco, contestar un canto hecho por el otro jugador
-       o irse al mazo, dependiendo de las opciones mostradas por el sistema.
-    7. El sistema guarda en un registro las opciones seleccionadas en el punto anterior.
-    8. El sistema verifica si las últimas dos opciones fueron 'Envido' y 'Quiero'. Entonces
-       se juega el 'Envido'. Si fueron 'Envido' y 'No quiero', entonces el sistema guarda
-       en registro el punto que le corresponde al usuario que cantó.
-    9. El sistema verifica si las últimas opciones del registro fueron 'Truco' y 'Quiero'.
-       En este caso, guarda el puntaje que le corresponde al ganador de la ronda.
-    10. El sistema determina el ganador del enfrentamiento, si lo hay y lo guarda en
-       un registro.
-    11. El sistema verifica si hay un ganador de la ronda. Si lo hay actualiza el registro
-        y termina la ronda. Caso contrario da el turno al jugador de la derecha del
-        que lo tiene actualmente, y se vuelve al punto 5.
-     Escenarios excepcionales:
-    · Si hay una desconexión se le da por ganada la partida al jugador que
-      está activo.
-    6.a El jugador de turno no responde por un tiempo determinado de 30 segundos
-        El sistema termina la partida y redirecciona a los jugadores al lobby.
+3.2.12 CANTAR TRUCO
+    ·Caso de uso: Un jugador canta truco.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · Hay una ronda en curso
+                     · No se aceptó antes en la ronda el truco.
+    ·Escenario exitoso principal:
+    1. El jugador hace click en el botón 'Truco'
+    2. El sistema registra el canto y por quién fue cantado.
+    3. El sistema le muestra al oponente las opciones "Quiero" y "No quiero"
+       a través de botones.
+    3. El sistema le cede el turno al oponente.
+    Excenarios Exepcionales:
+    3.a El sistma le muestra al oponente las opciones "Quiero" y "No quiero"
+        a través de botones:
+        1. Si el que cantó el truco es el jugador mano, y los jugadores se encuentran
+           en el primer enfrentamiento, entonces el sistema le muestra también al
+           oponente la opción "Envido".
 
 
-3.2.8 ENVIDO
-  ·Caso de uso: Procedimiento del envido.
-  ·Actor primario: El sistema y los usuarios de una partida
-  ·Precondición: Se debe haber iniciado la partida y se tiene que haber cantado y
-                 aceptado el Envido.
-  ·Escenario exitoso principal:
-    1. El sistema verifica el registro para identificar quien es mano.
-    2. El sistema le da el turno al jugador mano.
-    3. El sistema verifica los puntos de Envido que tiene el jugador en turno y
-       le habilita las opción correspondientes(para mostrar los puntos, y para decir
-       'Son Buenas' en caso correspondiente).
-    4. El jugador en turno hace click en la opción en pantalla.
-    5. El sistema evalúa si hay un ganador y si lo hay, guarda en registro los puntos que le
-       corresponden al ganador y que este debe mostrar las cartas. Caso contrario le da el turno
-       al jugador de la derecha y vuelve al punto 3.
-  ·Escenarios excepcionales:
-    4.a El jugador no responde en 30 segundos.
-      · El sistema anuncia los puntos como si el jugador hubiera echo click.
+3.2.13 ACEPTAR TRUCO
+    ·Caso de uso: Se juega el truco.
+    ·Actor primario: Jugador en turno.
+    .Actor secundario: Sistema
+    ·Precondiciones: · Hay una ronda en curso
+                     · El oponente cantó truco en el turno anterior y consecuentemente
+                       el sistema muestra al jugador en turno las opciones 
+                       "Quiero" y "No quiero".
+    ·Escenario exitoso principal:
+        1. El jugador en turno hace click en "Quiero".
+        2. El sistema registra que el jugador en turno aceptó el truco.
+        3. El sistema le cede el turno al jugador que cantó el truco
 
 
+3.2.14 RECHAZAR ENVIDO
+    ·Caso de uso: Se rechaza el truco.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · Hay una ronda en curso.
+                     · El oponente cantó truco en el turno anterior y consecuentemente
+                       el sistema muestra al jugador en turno las opciones 
+                       "Quiero" y "No quiero".
+    ·Escenario exitoso principal:
+        1. El jugador en turno hace click en "No Quiero".
+        2. El sistema guarda en registro al oponente como ganador.
 
-3.3 REQUERIMIENTOS DE PERFORMANCE
-3.4 RESTRICCIONES DE DISEÑO
-3.5 ATRIBUTOS
-3.6 OTROS REQUERIMIENTOS
+
+3.2.15 CERRAR SESIÓN
+    ·Caso de uso: Cerrar sesión.
+    ·Actor primario: Usuario
+    ·Actor secundario: Sistema.
+    ·Precondiciones: · El usuario debe tener una cuenta activa.
+                     · El usuario debe estar en la pantalla de lobby
+    ·Escenario exitoso principal:
+        1. El usuario hace click en el botón de "Cerrar Sesión".
+        2. El sistema registra al usuaruio como desconectado y lo redirige al lobby.
+
+
+JUGAR RONDA
+________COMPLETAR________
+
+
