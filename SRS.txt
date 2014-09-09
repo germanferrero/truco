@@ -398,7 +398,7 @@ pasar un usuario durante el juego.
 3.2.6 INICIAR UNA PARTIDA
     ·Caso de uso: Se inicia una partida.
     ·Actor primario: Sistema.
-    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).
+    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).-------------------------------------------------
     ·Precondición: Ambos jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
@@ -445,11 +445,15 @@ pasar un usuario durante el juego.
         1. El jugador en turno hace click en "Quiero".
         2. El sistema calcula los puntos de todos los jugadores.
         3. El sistema muestra los puntos del jugador mano al otro jugador.
-        4. El sistema muestra los puntos del ganador al otro jugador.
+        4. El sistema muestra un mensaje al jugador mano según si ganó o no.
         5. El sistema registra al ganador del envido.
         6. El sistema verifica quién canto el envido.
         7. El sistema le cede el turno al jugador que cantó el envido.
-
+    ·Extensiones:
+        4.a El jugador mano ganó el envido:
+          1. El sistema muestra al jugador mano el mensaje "son buenas"
+          b El jugador mano perdió el envido:
+          1. El sistema muestra al jugador mano los puntos del adversario.
 
 3.2.10 RECHAZAR ENVIDO
     ·Caso de uso: Se rechaza el envido.
@@ -475,10 +479,25 @@ pasar un usuario durante el juego.
                      · No hubo un canto en el turno anterior.
     ·Escenario exitoso principal:
         1. El jugador selecciona una carta de su haber.
-        2. El jugador hace click en "Jugar carta" y selecciona la carta que desea jugar.
-        3. El sistema verifica si se terminó un enfrentamiento. Si se terminó,
-           entonces registra al ganador del enfrentamiento, o registra un empate,
+        2. El jugador selecciona la carta que desea jugar y hace click en "jugar carta".
+        3. El sistema verifica si se terminó un enfrentamiento. 
+        4. El sistema verifica si se terminó la ronda. Si se terminó, calcula los
+-          puntos y los registra.
+-       5. El sistema verifica si se terminó la partida
+-   ·Extensiones:
+        3.a El enfrentamiento se terminó:
+          1. El sistema registra al ganador del enfrentamiento, o registra un empate,
            según las reglas del juego.
+          2. El sistema cede el turno al otro jugador.
+-       5.a La partida no se terminó:
+-         1. El sistema registra que el jugador a la derecha del jugador mano
+-            actual, será mano en la siguiente ronda.
+-         2. El sistema inicia una nueva ronda.
+-       5.b La partida se terminó:
+-         1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
+-         2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
+-         3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
+-         4. El sistema redirige al lobby a ambos jugadores.
 
 
 3.2.12 CANTAR TRUCO
@@ -525,7 +544,8 @@ pasar un usuario durante el juego.
                        "Quiero" y "No quiero".
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "No Quiero".
-        2. El sistema guarda en registro al oponente como ganador de la ronda.
+        2. El sistema guarda en registro al oponente como ganador del envido.
+
 
 
 3.2.15 CERRAR SESIÓN
@@ -536,11 +556,11 @@ pasar un usuario durante el juego.
                      · El usuario debe estar en la pantalla de lobby
     ·Escenario exitoso principal:
         1. El usuario hace click en el botón de "Cerrar Sesión".
-        2. El sistema registra al usuaruio como desconectado y lo redirige al lobby.
+        2. El sistema registra al usuario como desconectado y lo redirige al lobby.
 
 3.2.16 IRSE AL MAZO
 
-    ·Caso de uso: Un jugador quiere abandonar la ronda ("isre al mazo").
+    ·Caso de uso: Un jugador quiere abandonar la ronda ("irse al mazo").
     ·Actor primario: Usuario.
     ·Actor secundario: Sistema.
     ·Precondición: ·Hay una ronda en curso.
@@ -551,39 +571,4 @@ pasar un usuario durante el juego.
         3. El sistema actualiza el puntaje de los jugadores según las reglas del
            juego.
 
-3.2.17 JUGAR RONDA
-    ·Caso de uso: Cerrar sesión.
-    ·Actor primario: Usuario.
-    ·Actor secundario: Sistema.
-    ·Precondiciones: · Se debe haber iniciado una ronda satisfactoriamente.
-    ·Escenario exitoso princial:
-        1. El sistema muetra al jugador mano los botones: "Truco", "Envido" y
-           "Jugar carta", mientras muestra al otro jugador un mensaje diciendo
-           "Turno de X" donde X es el nombre de usuario del jugador mano.
-        2. El jugador mano hace click en alguno de los botones.
-        3. El sistema verifica las opciones disponibles del juego.
-        4. El sistema le muestra al jugador mano las nuevas opciones.
-        5. El jugador repite el proceso de elegir las opciones que están
-           disponibles hata que se termina la ronda.
-        6. El sistema actualiza los puntos de los jugadores según las reglas del
-           juego.
-        7. El sistema verifica si se terminó la partida.
-    ·Extensiones:
-        2.a El jugador hace click en "Truco":
-            1. El jugador canta truco.
-        2.b El jugador hace click en "Envido":
-            1. El jugador canta envido.
-        2.c El jugador hace click en "Jugar carta":
-            1. El jugador tira una carta en la mesa.
-        7.a La partida no se terminó:
-            1. El sistema registra que el jugador a la derecha del jugador mano
-               actual, será mano en la siguiente ronda.
-            2. El sistema inicia una nueva ronda.
-        7.b La partida se terminó:
-            1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
-            2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
-            3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
-            4. El sistema muestra a los jugadores un botón que los redirige al lobby.
-    ·Escenarios excepcionales:
-        3. El jugador canta truco en la primer mano y este es rechazado:
-           · Se termina la ronda.
+
