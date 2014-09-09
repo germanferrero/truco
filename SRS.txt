@@ -398,7 +398,7 @@ pasar un usuario durante el juego.
 3.2.6 INICIAR UNA PARTIDA
     ·Caso de uso: Se inicia una partida.
     ·Actor primario: Sistema.
-    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).-------------------------------------------------
+    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).
     ·Precondición: Ambos jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
@@ -430,7 +430,7 @@ pasar un usuario durante el juego.
         2. El sistema registra el canto y por quién fue cantado.
         3. El sistema le muestra al oponente las opciones "Quiero" y "No quiero"
         a través de botones.
-        3. El sistema le cede el turno al oponente.
+        4. El sistema le cede el turno al oponente.
 
 
 3.2.9 ACEPTAR ENVIDO
@@ -452,7 +452,7 @@ pasar un usuario durante el juego.
     ·Extensiones:
         4.a El jugador mano ganó el envido:
           1. El sistema muestra al jugador mano el mensaje "son buenas"
-          b El jugador mano perdió el envido:
+        4.b El jugador mano perdió el envido:
           1. El sistema muestra al jugador mano los puntos del adversario.
 
 3.2.10 RECHAZAR ENVIDO
@@ -480,24 +480,29 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El jugador selecciona una carta de su haber.
         2. El jugador selecciona la carta que desea jugar y hace click en "jugar carta".
-        3. El sistema verifica si se terminó un enfrentamiento. 
-        4. El sistema verifica si se terminó la ronda. Si se terminó, calcula los
--          puntos y los registra.
--       5. El sistema verifica si se terminó la partida
--   ·Extensiones:
+        3. El sistema verifica si se terminó un enfrentamiento.
+        4. El sistema verifica si se terminó la ronda.
+        5. El sistema verifica si se terminó la partida
+    ·Extensiones:
         3.a El enfrentamiento se terminó:
           1. El sistema registra al ganador del enfrentamiento, o registra un empate,
            según las reglas del juego.
           2. El sistema cede el turno al otro jugador.
--       5.a La partida no se terminó:
--         1. El sistema registra que el jugador a la derecha del jugador mano
--            actual, será mano en la siguiente ronda.
--         2. El sistema inicia una nueva ronda.
--       5.b La partida se terminó:
--         1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
--         2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
--         3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
--         4. El sistema redirige al lobby a ambos jugadores.
+        3.b El enfrentamiento no se terminó:
+          1. El sistema cede el turno al oponente.
+        4.a La ronda se terminó:
+          1. El sistema calcula los puntos y los registra.
+        4.b La ronda no se terminó:
+          1. El sistema cede el turno al oponente.
+        5.a La partida se terminó:
+          1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
+          2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
+          3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
+          4. El sistema redirige al lobby a ambos jugadores.
+        5.b La partida no se terminó:
+          1. El sistema registra que el jugador a la derecha del jugador mano
+             actual, será mano en la siguiente ronda.
+          2. El sistema inicia una nueva ronda.
 
 
 3.2.12 CANTAR TRUCO
@@ -534,7 +539,7 @@ pasar un usuario durante el juego.
         3. El sistema le cede el turno al jugador que cantó el truco
 
 
-3.2.14 RECHAZAR ENVIDO
+3.2.14 RECHAZAR TRUCO
     ·Caso de uso: Se rechaza el truco.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -559,16 +564,25 @@ pasar un usuario durante el juego.
         2. El sistema registra al usuario como desconectado y lo redirige al lobby.
 
 3.2.16 IRSE AL MAZO
-
     ·Caso de uso: Un jugador quiere abandonar la ronda ("irse al mazo").
     ·Actor primario: Usuario.
     ·Actor secundario: Sistema.
     ·Precondición: ·Hay una ronda en curso.
-    ·Escenario exitoso princial:
-        1. El sistema muestra al jugador un botón de "Irse al mazo".
-        2. El jugador hace click en ese botón.
-        3. El sistema registra como ganador de la ronda al otro jugador.
+    ·Escenario exitoso principal:
+        1. El jugador hace click en "Irse ir al mazo".
+        2. El sistema registra como ganador de la ronda al otro jugador.
         3. El sistema actualiza el puntaje de los jugadores según las reglas del
            juego.
+        4. El sistema verifica si se terminó la partida
+    ·Extensiones:
+        4.a La partida se terminó:
+          1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
+          2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
+          3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
+          4. El sistema redirige al lobby a ambos jugadores.
+        4.b La partida no se terminó:
+          1. El sistema registra que el jugador a la derecha del jugador mano
+             actual, será mano en la siguiente ronda.
+          2. El sistema inicia una nueva ronda.
 
 
