@@ -26,6 +26,15 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+TEMPLATE_DIRS = [os.path.join(BASE_DIR, 'templates')]
+
+# Constantes para sistema de login.
+LOGIN_URL = 'mysite_login'
+LOGOUT_URL = 'mysite_logout'
+LOGIN_REDIRECT_URL = '/truco/'
+
+# Agregarmos fromularios de boostrap3
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 # Application definition
 
@@ -36,6 +45,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'truco',
+    'crispy_forms',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -67,7 +78,7 @@ DATABASES = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Argentina/Buenos_Aires'
 
 USE_I18N = True
 
