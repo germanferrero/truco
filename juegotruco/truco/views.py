@@ -4,11 +4,11 @@ from django.template import RequestContext, loader
 from django.template.response import TemplateResponse
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect
-from truco.forms import LoginForm
+from truco.forms import LoginForm, UserCreationForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import User
 
-#template_name = 'truco/index.html'
 
 def my_login(request):
     if request.method == 'POST':
@@ -27,9 +27,22 @@ def my_login(request):
 
 @login_required(login_url='/truco/login')
 def index(request):
-    return HttpResponse("hola")
+    return HttpResponse("LOGUEADO!!")
 
-#def logout_view(request):
-    #logout(request)
-    ## Redirect to a success page.
+def my_create_user(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user(request.POST['username'],
+                                            request.POST['password1'],
+                                            request.POST['password2'],
+                                            )
+        return HttpResponseRedirect('/truco/index')
+    else:
+        form = UserCreationForm()
+    return TemplateResponse(request, 'truco/create_user.html',
+                            {'form':form})
 
+def my_logout(request):
+    logout(request)
+    return HttpResponse("DESLOGUEADO!")
