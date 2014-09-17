@@ -1,11 +1,9 @@
 <h1 class="text-center login-title">Iniciar Sesión</h1>
-<img class="profile-img" src=""alt="">
 <form action="" method="POST">
 {%csrf_token%}
 {{form.as_p}}
-<button type='submit'>
-Iniciar sesión
-</button>
+<button type='submit'>Iniciar sesión</button>
 </form>
 <a href="/truco/create_user">Crear un nuevo usuario </a>
+
 

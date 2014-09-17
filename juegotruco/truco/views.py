@@ -5,8 +5,8 @@ from django.template import RequestContext, loader
 from django.template.response import TemplateResponse
 from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect
-from truco.forms import LoginForm
-from django.contrib.auth.forms import UserCreationForm
+from truco.forms import LoginForm, RegisterForm
+#from django.contrib.auth.forms import UserCreationForm
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
@@ -36,18 +36,18 @@ def lobby(request):
 
 def my_create_user(request):
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = RegisterForm(request.POST)
         if form.is_valid():
             user = User.objects.create_user(request.POST['username'],
+                                            request.POST['email'],
                                             request.POST['password1'],
-                                            request.POST['password2'],
                                             )
         else:
             return TemplateResponse(request, 'truco/create_user.html',
                                     {'form':form})
         return HttpResponseRedirect('lobby')
     else:
-        form = UserCreationForm()
+        form = RegisterForm()
     return TemplateResponse(request, 'truco/create_user.html',
                             {'form':form})
 
