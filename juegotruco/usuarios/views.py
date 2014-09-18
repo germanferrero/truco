@@ -39,7 +39,7 @@ def my_create_user(request):
         else:
             return TemplateResponse(request, 'usuarios/create_user.html',
                                     {'form':form})
-        return HttpResponseRedirect('truco/lobby')
+        return HttpResponseRedirect(reverse('truco:lobby'))
     else:
         form = RegisterForm()
     return TemplateResponse(request, 'usuarios/create_user.html',
