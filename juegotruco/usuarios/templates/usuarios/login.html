@@ -1,0 +1,9 @@
+<h1 class="text-center login-title">Iniciar Sesión</h1>
+<form action="" method="POST">
+{%csrf_token%}
+{{form.as_p}}
+<button type='submit'>Iniciar sesión</button>
+</form>
+<a href="/usuarios/create_user">Crear un nuevo usuario </a>
+
+
