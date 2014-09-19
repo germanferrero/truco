@@ -11,36 +11,51 @@ from django.contrib.auth.decorators import login_required
 
 def my_login(request):
     if request.method == 'POST':
-        form = LoginForm(request.POST)
+        # Si hay un POST, se instancia un RegisterForm con los datos completados
+        form = LoginForm(data=request.POST)
         if form.is_valid():
-            user = authenticate(username=request.POST['username'],
-                                password=request.POST['password'])
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'])
             if user is not None:
                 if user.is_active:
                     login(request, user)
-            else:
-                return TemplateResponse(request, 'usuarios/login.html',
-                            {'form':form})
+        # Si los datos son invalidos mustra mensaje de error y el formulario
+        else:
+            return TemplateResponse(request, 'usuarios/login.html',
+                    {'form':form})
 
         return HttpResponseRedirect(reverse('truco:lobby'))
     else:
+        # Si hay un GET, se muestran los campos a completar
         form = LoginForm()
     return TemplateResponse(request, 'usuarios/login.html',
                             {'form':form})
 
 def my_create_user(request):
     if request.method == 'POST':
-        form = RegisterForm(request.POST)
+        # Si hay un POST, se instancia un RegisterForm con los datos completados
+        form = RegisterForm(data=request.POST)
         if form.is_valid():
-            user = User.objects.create_user(request.POST['username'],
-                                            request.POST['email'],
-                                            request.POST['password1'],
-                                            )
+            # Se crea un nuevo usuario
+            User.objects.create_user(
+                username=form.cleaned_data['username'],
+                email=form.cleaned_data['email'],
+                password=form.cleaned_data['password1'],
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                )
+            # Se loguea al usuario recien creado
+            new_user = authenticate(
+                username=form.cleaned_data['username'],
+                password=form.cleaned_data['password1']
+                )
+            login(request, new_user)
         else:
             return TemplateResponse(request, 'usuarios/create_user.html',
                                     {'form':form})
         return HttpResponseRedirect(reverse('truco:lobby'))
     else:
+        # Si hay un GET, se muestran los campos a completar
         form = RegisterForm()
     return TemplateResponse(request, 'usuarios/create_user.html',
                             {'form':form})

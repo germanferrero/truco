@@ -1,5 +1,5 @@
 <h1> Lobby </h1>
-<h1> {{username}} </h1>
+Welcome '{{ request.user.username }}'
 <form action="" method="POST">
 {%csrf_token%}
 <a href="/usuarios/logout">Logout</a>
