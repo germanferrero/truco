@@ -19,17 +19,16 @@ def my_login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
+                    return HttpResponseRedirect(reverse('truco:lobby'))
         # Si los datos son invalidos mustra mensaje de error y el formulario
         else:
             return TemplateResponse(request, 'usuarios/login.html',
-                    {'form':form})
-
-        return HttpResponseRedirect(reverse('truco:lobby'))
+                                    {'form':form})
     else:
         # Si hay un GET, se muestran los campos a completar
         form = LoginForm()
-    return TemplateResponse(request, 'usuarios/login.html',
-                            {'form':form})
+        return TemplateResponse(request, 'usuarios/login.html', {'form':form})
+
 
 def my_create_user(request):
     if request.method == 'POST':
@@ -50,16 +49,17 @@ def my_create_user(request):
                 password=form.cleaned_data['password1']
                 )
             login(request, new_user)
+            return HttpResponseRedirect(reverse('truco:lobby'))
         else:
             return TemplateResponse(request, 'usuarios/create_user.html',
                                     {'form':form})
-        return HttpResponseRedirect(reverse('truco:lobby'))
     else:
         # Si hay un GET, se muestran los campos a completar
         form = RegisterForm()
-    return TemplateResponse(request, 'usuarios/create_user.html',
-                            {'form':form})
+        return TemplateResponse(request, 'usuarios/create_user.html',
+                                {'form':form})
 
 def my_logout(request):
     logout(request)
+    # Redirigir a truco solamente. No un reverse al lobby?
     return HttpResponseRedirect(reverse('truco:lobby'))

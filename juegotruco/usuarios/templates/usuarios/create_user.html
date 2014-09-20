@@ -1,6 +1,23 @@
-<form action="" method="POST">
-{%csrf_token%}
-{{form.as_p}}
-<button type='submit'>Crear nuevo usuario</button>
-</form>
-<a href="/usuarios/login">Login</a>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Registro de Usuario </title>
+    </head>
+
+    <body background="https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg">
+        <div style="background-color:#424242;
+                    border: 2px dashed black;
+                    border-radius: 10px;
+                    width:400px;
+                    margin-left:35%;
+                    margin-top:10%;">
+            <form action="" method="POST" style="color:white; font-size:20px;">
+                {%csrf_token%}
+                {{form.as_p}}
+                <button type='submit' style="border-radius:3px;display:inline-block;margin-left:24%;">Crear nuevo usuario</button>
+                <button type='button' style="border-radius:3px;display:inline-block;"><a href="/usuarios/login">Login</a></button>
+            </form>
+        </div>
+
+    <body>
+</html>
