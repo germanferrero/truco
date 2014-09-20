@@ -1,9 +1,25 @@
-<h1 class="text-center login-title">Iniciar Sesión</h1>
-<form action="" method="POST">
-{%csrf_token%}
-{{form.as_p}}
-<button type='submit'>Iniciar sesión</button>
-</form>
-<a href="/usuarios/create_user">Crear un nuevo usuario </a>
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Registro de Usuario </title>
+    </head>
 
+    <body background="https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg">
+        <div style="background-color:#424242;
+                    border: 2px dashed black;
+                    border-radius: 10px;
+                    width:400px;
+                    margin-left:35%;
+                    margin-top:15%;">
+            <form action="" method="POST" style="color:white; font-size:20px;text-align:center;">
+                <h3 style="font-family:cursive">Iniciar Sesión</h3>
+                {%csrf_token%}
+                {{form.as_p}}
+                <button type='submit' style="border-radius:3px;display:inline-block;margin-bottom:5%;">Iniciar Sesion</button>
+                <button type='button' style="border-radius:3px;display:inline-block;"><a href="/usuarios/create_user">Crear nuevo usuario </a></button>
+            </form>
+            </form>
+        </div>
+    <body>
 
+</html>
