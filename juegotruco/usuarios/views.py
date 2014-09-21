@@ -23,11 +23,11 @@ def my_login(request):
         # Si los datos son invalidos mustra mensaje de error y el formulario
         else:
             return TemplateResponse(request, 'usuarios/login.html',
-                                    {'form':form})
+                                    {'form': form})
     else:
         # Si hay un GET, se muestran los campos a completar
         form = LoginForm()
-        return TemplateResponse(request, 'usuarios/login.html', {'form':form})
+        return TemplateResponse(request, 'usuarios/login.html', {'form': form})
 
 
 def my_create_user(request):
@@ -52,12 +52,13 @@ def my_create_user(request):
             return HttpResponseRedirect(reverse('truco:lobby'))
         else:
             return TemplateResponse(request, 'usuarios/create_user.html',
-                                    {'form':form})
+                                    {'form': form})
     else:
         # Si hay un GET, se muestran los campos a completar
         form = RegisterForm()
         return TemplateResponse(request, 'usuarios/create_user.html',
-                                {'form':form})
+                                {'form': form})
+
 
 def my_logout(request):
     logout(request)
