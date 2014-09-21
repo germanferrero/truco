@@ -9,3 +9,15 @@ from django.contrib.auth.decorators import login_required
 def lobby(request):
     return TemplateResponse(request, 'truco/lobby.html')
 
+
+def index(request):
+    if request.method == 'POST':
+        # Si hay un POST, se redirecciona a login o create_user
+        url = data=request.POST
+        return HttpResponseRedirect(request, url) ##'truco/index.html')
+    else:
+        # Si hay un GET, se muestran la pagina
+        return TemplateResponse(request, 'truco/index.html', {})
+
+
+
