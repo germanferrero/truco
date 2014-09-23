@@ -11,24 +11,45 @@
                     height:50px;
                     text-align:center;
                     margin-top: -25px;">
-                <h4 style="color:white; padding-top:2px; display:inline-block; float:left; padding-left:10px;">Welcome</h4>
-{{ username }}
+                <h4 style="color:white; padding-top:2px; display:inline-block; float:left; padding-left:10px;">Welcome {{ username }}</h4>
                 <h5 style="font-family:cursive; color:white; padding-top:2px; display:inline-block">TRUCO</h5>
                 <button type='button' style="border-radius:3px;float:right; margin-top:22px; margin-right: 10px;"><a href="/usuarios/logout">Logout</a></button>
         </div>
 
-
-    <body background="https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg">
-        <div id="barra_arriba" style="background-color:#424242;
+        <div id="pantalla_" style="background-color:#424242;
                     border-radius: 10px;
                     height:600px;
                     clear:both;
                     text-align:center;
                     margin-top: -25px;">
-                <h4 style="color:white; display:inline-block;">ACA VA EL CUADRO DEL LOBBY</h4>
+            <h4 style="color:white; display:inline-block;">ACA VA EL CUADRO DEL LOBBY</h4>
+
+            <table style="border:3px dotted white;
+                          clear: both;
+                          width: 80%;
+                          height: 85%;
+                          margin-left: 10px;
+                          color: white;">
+                <thead>
+                    <th colspan="1"> Lista de Partidas </th>
+                </thead>
+                <tr>
+                    <td> {{ lista_de_partidas }} </td>
+                </tr>
+            </table>
+
+            <div style="border-radius:3px;
+                        float:right;
+                        margin-top:22px;
+                        margin-right: 10px
+                        border: ;
+                                         "><a href="/usuarios/logout"></a></button>
         </div>
 
-    <body>
+
+
+
+    </body>
 
 </html>
 
