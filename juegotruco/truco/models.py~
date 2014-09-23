@@ -39,7 +39,7 @@ class Partida(models.Model):
     def agregar_jugador(self,jugador):
             self.jugadores.add(jugador)
             self.save()
-            if list(self.jugadores).length == self.cantidad_jugadores:
+            if self.jugadores.length == self.cantidad_jugadores:
                 self.estado = EN_CURSO
 
 

@@ -19,7 +19,7 @@
                     <li>{{ partida }}</li>
                 {% endfor %}
             </ul>
-        <button type='button'><a href="/truco/unirse_partida"> Unirse a Partida</a></button>
+        <button type='button'><a href="/truco/crear_partida"> Unirse a Partida</a></button>
         <button type='button'><a href="/truco/crear_partida"> Crear Partida</a></button>
         </div>
     </body>

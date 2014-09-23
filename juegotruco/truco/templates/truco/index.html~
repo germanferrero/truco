@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-{% load staticfiles %}
+{% load statics %}
 <html>
     <head>
-        <link rel="stylesheet" href={% static "style_index.css"%}>
+        <link rel="stylesheet" href={static "style_index.css"}>
         <title> Truco </title>
     </head>
 
