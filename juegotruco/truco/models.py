@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from truco.constants import *
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse, HttpResponseRedirect
 
 class Jugador(models.Model):
     user = models.ForeignKey(User, verbose_name='usuario')
@@ -14,11 +15,12 @@ class Lobby:
         lista_partidas = Partida.objects.filter(estado=EN_ESPERA)
         return (lista_partidas)
 
-    def crear_partida(self, user, puntos_objetivo, password):
-        partida = Partida(puntos_objetivo=puntos_objetivo, password=password)
+    def crear_partida(self, user, nombre, puntos_objetivo, password):
+        partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo, password=password)
         partida.save()
-        partida.agregar_jugador(user)
+        jugador = partida.agregar_jugador(user)
         partida.set_mano(jugador)
+        return partida
 
     def unirse_partida(self, jugador,partida):
         result=0
@@ -30,6 +32,7 @@ class Lobby:
 
 class Partida(models.Model):
     #falta puntaje
+    nombre = models.CharField(max_length=16)
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     puntos_objetivo = models.IntegerField(default=15)
     password = models.CharField(max_length=16)
@@ -38,18 +41,21 @@ class Partida(models.Model):
     cantidad_jugadores = models.IntegerField(default=2)
 
     def agregar_jugador(self,user):
-            jugador = Jugador(nombre=username,equipo=list(self.jugadores).length%2)
+            jugador = Jugador(nombre=user.username,equipo=len(self.jugadores.all())%2)
             jugador.user = user
             jugador.save()
             self.jugadores.add(jugador)
             self.save()
-            if list(self.jugadores).length == self.cantidad_jugadores:
+            if len(self.jugadores.all()) == self.cantidad_jugadores:
                 self.estado = EN_CURSO
-
+            return jugador
 
     def set_mano(self,jugador):
         self.mano = jugador.id
         self.save()
 
     def get_absolute_url(self):
-        return reverse('people.views.details', args=[str(self.id)])
+        return HttpResponseRedirect(reverse('partida'))
+
+    def __unicode__(self):
+        return self.nombre

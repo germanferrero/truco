@@ -30,9 +30,10 @@ def crear_partida(request):
         if form.is_valid():
             my_lobby = Lobby()
             my_partida = my_lobby.crear_partida(request.user,
+                                                form.cleaned_data['nombre'],
                                                 form.cleaned_data['puntos_objetivo'],
                                                 form.cleaned_data['password'])
-            redirect(my_partida)
+            return HttpResponseRedirect('partida/%d' % int(my_partida.id))
     else:
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html',
@@ -42,5 +43,5 @@ def unirse_partida(request):
     return HttpResponse("Unirse Partida")
 
 
-def partida(request,num):
-    return HttpResponse("Estas en la partida %d",num)
+def partida(request,partida_id):
+    return HttpResponse("Estas en la partida %d" % int(partida_id))

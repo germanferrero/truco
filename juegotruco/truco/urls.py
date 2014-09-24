@@ -8,4 +8,5 @@ urlpatterns = patterns(
     url(r'^lobby$', views.lobby, name='lobby'),
     url(r'^crear_partida$', views.crear_partida, name='crear_partida'),
     url(r'^unirse_partida$', views.unirse_partida, name='unirse_partida'),
+    url(r'^partida/(?P<partida_id>\d+)$', views.partida, name='partida'),
 )

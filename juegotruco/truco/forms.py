@@ -17,5 +17,6 @@ class RegisterForm(UserCreationForm):
         fields = ("username", "email", "password1", "password2")
 
 class crear_partida_form(forms.Form):
+    nombre = forms.CharField(max_length=16,required=True)
     puntos_objetivo = forms.CharField(max_length=2,required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
