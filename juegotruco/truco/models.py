@@ -32,7 +32,7 @@ class Lobby:
 
 class Partida(models.Model):
     #falta puntaje
-    nombre = models.CharField(max_length=16)
+    nombre = models.CharField(max_length=32)
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     puntos_objetivo = models.IntegerField(default=15)
     password = models.CharField(max_length=16)

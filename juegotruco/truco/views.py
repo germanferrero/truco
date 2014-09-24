@@ -21,8 +21,8 @@ def index(request):
         url = data=request.POST
         return HttpResponseRedirect(request, url)  #'truco/index.html')
     else:
-        # Si hay un GET, se muestran la pagina
-        return TemplateResponse(request, 'truco/index.html', {})
+        # Si esta logueado entra al lobby directamente
+        return HttpResponseRedirect(reverse('truco:lobby'))
 
 def crear_partida(request):
     if request.method == "POST":
@@ -34,7 +34,12 @@ def crear_partida(request):
                                                 form.cleaned_data['puntos_objetivo'],
                                                 form.cleaned_data['password'])
             return HttpResponseRedirect('partida/%d' % int(my_partida.id))
+        else:
+            # Si el formulario es incorrecto se muestran los errores.
+            return TemplateResponse(request, 'truco/crear_partida.html',
+                                {'form': form})
     else:
+        # SI hay un GET se muestra el formulario para crear partida.
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html',
                                 {'form': form})

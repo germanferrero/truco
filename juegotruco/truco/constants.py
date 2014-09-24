@@ -1,3 +1,4 @@
 EN_ESPERA = 0
 EN_CURSO = 1
 FINALIZADA = 2
+PUNTOS_OBJETIVO = (('1',"15"),('2',"30"))
