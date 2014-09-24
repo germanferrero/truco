@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.template import RequestContext, loader
 from django.template.response import TemplateResponse
 from django.http import HttpResponse, HttpResponseRedirect
@@ -26,7 +26,13 @@ def index(request):
 
 def crear_partida(request):
     if request.method == "POST":
-        pass
+        form = crear_partida_form(data=request.POST)
+        if form.is_valid():
+            my_lobby = Lobby()
+            my_partida = my_lobby.crear_partida(request.user,
+                                                form.cleaned_data['puntos_objetivo'],
+                                                form.cleaned_data['password'])
+            redirect(my_partida)
     else:
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html',
@@ -34,3 +40,7 @@ def crear_partida(request):
 
 def unirse_partida(request):
     return HttpResponse("Unirse Partida")
+
+
+def partida(request,num):
+    return HttpResponse("Estas en la partida %d",num)

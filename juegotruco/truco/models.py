@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from truco.constants import *
+from django.core.urlresolvers import reverse
 
 class Jugador(models.Model):
     user = models.ForeignKey(User, verbose_name='usuario')
@@ -13,10 +14,10 @@ class Lobby:
         lista_partidas = Partida.objects.filter(estado=EN_ESPERA)
         return (lista_partidas)
 
-    def crear_partida(self, jugador, puntos_objetivo, password):
+    def crear_partida(self, user, puntos_objetivo, password):
         partida = Partida(puntos_objetivo=puntos_objetivo, password=password)
         partida.save()
-        partida.agregar_jugador(jugador)
+        partida.agregar_jugador(user)
         partida.set_mano(jugador)
 
     def unirse_partida(self, jugador,partida):
@@ -36,7 +37,10 @@ class Partida(models.Model):
     mano = models.IntegerField(default=0)
     cantidad_jugadores = models.IntegerField(default=2)
 
-    def agregar_jugador(self,jugador):
+    def agregar_jugador(self,user):
+            jugador = Jugador(nombre=username,equipo=list(self.jugadores).length%2)
+            jugador.user = user
+            jugador.save()
             self.jugadores.add(jugador)
             self.save()
             if list(self.jugadores).length == self.cantidad_jugadores:
@@ -47,3 +51,5 @@ class Partida(models.Model):
         self.mano = jugador.id
         self.save()
 
+    def get_absolute_url(self):
+        return reverse('people.views.details', args=[str(self.id)])
