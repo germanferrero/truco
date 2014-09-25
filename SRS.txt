@@ -418,8 +418,8 @@ pasar un usuario durante el juego.
 
 3.2.6 TURNO
     ·Caso de uso: Se inicia el turno.
-    ·Actor primario: Jugador en turno.
-    ·Actor secundario: Sistema.
+    ·Actor primario: Sistema.
+    ·Actor secundario: Jugador en turno.
     ·Precondición: Hay una ronda en curso.
     ·Escenario exitoso principal:
         1. El sistema verifica en registro las opciones que el jugador en turno 
