@@ -416,6 +416,16 @@ pasar un usuario durante el juego.
         (empezando por el jugador que es mano y siguiendo por el de la derecha).
         3. El sistema cede el turno al jugador que es mano.
 
+3.2.6 TURNO
+    ·Caso de uso: Se inicia el turno.
+    ·Actor primario: Sistema.
+    ·Actor secundario: Jugador en turno.
+    ·Precondición: Hay una ronda en curso.
+    ·Escenario exitoso principal:
+        1. El sistema verifica en registro las opciones que el jugador en turno 
+        tiene disponibles para jugar.
+        2. El sistema muestra las opciones al jugador, para que este seleccione.
+
 
 3.2.8 CANTAR ENVIDO
     ·Caso de uso: Un jugador canta envido.
