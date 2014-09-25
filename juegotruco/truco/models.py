@@ -22,10 +22,10 @@ class Lobby:
         partida.set_mano(jugador)
         return partida
 
-    def unirse_partida(self, jugador,partida):
+    def unirse_partida(self, user, partida):
         result=0
         if partida.estado == EN_ESPERA:
-            partida.agregar_jugador(jugador)
+            partida.agregar_jugador(user)
         else:
             result=-1
         return result

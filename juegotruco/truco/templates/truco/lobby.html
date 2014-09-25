@@ -14,12 +14,14 @@
         </div>
 
         <div id="pantalla_medio">
-            <ul>
-                {% for partida in lista_de_partidas %}
-                    <li>{{ partida }}</li>
-                {% endfor %}
-            </ul>
-        <button type='button'><a href="/truco/unirse_partida"> Unirse a Partida</a></button>
+            <form action="{% url 'truco:unirse_partida' %}" method="post">
+            {% csrf_token %}
+            {% for partida in lista_de_partidas %}
+                <input type="radio" name="partida" id="partida{{ forloop.counter }}" value="{{ partida.id }}" />
+                <label for="partida{{ forloop.counter }}">{{ partida }}</label><br />
+            {% endfor %}
+            <input type="submit" value="Unirse a Partida" />
+            </form>
         <button type='button'><a href="/truco/crear_partida"> Crear Partida</a></button>
         </div>
     </body>

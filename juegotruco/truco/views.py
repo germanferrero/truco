@@ -45,8 +45,12 @@ def crear_partida(request):
                                 {'form': form})
 
 def unirse_partida(request):
-    return HttpResponse("Unirse Partida")
-
+    my_partida = Partida.objects.get(pk=request.POST['partida'])
+    my_lobby = Lobby()
+    if my_lobby.unirse_partida(request.user,my_partida) == -1:
+        return HttpResponseRedirect(reverse('truco:lobby'))
+    else:
+        return HttpResponseRedirect('partida/%d' % int(my_partida.id))
 
 def partida(request,partida_id):
     return HttpResponse("Estas en la partida %d" % int(partida_id))
