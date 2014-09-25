@@ -46,8 +46,9 @@ class Partida(models.Model):
             jugador.save()
             self.jugadores.add(jugador)
             self.save()
-            if len(self.jugadores.all()) == self.cantidad_jugadores:
+            if len(self.jugadores.all()) >= self.cantidad_jugadores:
                 self.estado = EN_CURSO
+                self.save()
             return jugador
 
     def set_mano(self,jugador):

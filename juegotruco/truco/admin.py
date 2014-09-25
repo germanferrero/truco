@@ -1,3 +1,6 @@
 from django.contrib import admin
+from truco.models import Jugador, Partida
 
-# Register your models here.
+admin.site.register(Jugador)
+admin.site.register(Partida)
+

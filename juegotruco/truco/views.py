@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from truco.models import Lobby, Partida, Jugador
 from truco.forms import crear_partida_form
+from django.dispatch import receiver
 
 @login_required(login_url='/usuarios/login')
 def lobby(request):
@@ -53,4 +54,6 @@ def unirse_partida(request):
         return HttpResponseRedirect('partida/%d' % int(my_partida.id))
 
 def partida(request,partida_id):
-    return HttpResponse("Estas en la partida %d" % int(partida_id))
+    my_partida = Partida.objects.get(id=partida_id)
+    context = {'partida': my_partida}
+    return render(request, 'truco/partida.html',context)

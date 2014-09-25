@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    {% load staticfiles %}
+    <head>
+        <link rel="stylesheet" href= {% static "style_lobby.css" %}>
+        <title> Lobby Truco </title>
+    </head>
+
+    <body>
+        <div id="barra_arriba">
+                <h5>PARTIDA {{ partida }}</h5>
+                <button type='button'><a href="/truco/lobby">Retirarse</a></button>
+        </div><p>
+
+        <div id="pantalla_medio">
+        </div>
+    </body>
+</html>
