@@ -38,12 +38,11 @@ def crear_partida(request):
         else:
             # Si el formulario es incorrecto se muestran los errores.
             return TemplateResponse(request, 'truco/crear_partida.html',
-                                {'form': form})
+                                    {'form': form})
     else:
         # SI hay un GET se muestra el formulario para crear partida.
         form = crear_partida_form()
-        return render(request, 'truco/crear_partida.html',
-                                {'form': form})
+        return render(request, 'truco/crear_partida.html', {'form': form})
 
 def unirse_partida(request):
     my_partida = Partida.objects.get(pk=request.POST['partida'])
