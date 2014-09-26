@@ -24,7 +24,7 @@ class Mazo():
     cartas = Carta.objects.all() 
 
     def get_n_cartas(self, cant_cartas):
-        return random.sample(cartas, cant_cartas)
+        return random.sample(self.cartas, cant_cartas)
 
 
 
@@ -110,6 +110,7 @@ class Partida(models.Model):
         ronda.save()
         ronda.jugadores = self.jugadores.all()
         ronda.mano = self.mano
+        ronda.repartir()
         ronda.save()
         return ronda
 
@@ -128,8 +129,8 @@ class Ronda(models.Model):
     id_canto_actual = models.IntegerField(default=0)
 
     def repartir(self):
-        cartas_a_repartir = Mazo.get_n_cartas(len(self.jugadores)*CARTAS_JUGADOR)
-        for j in self.jugadores:
+        cartas_a_repartir = self.mazo.get_n_cartas(len(self.jugadores.all())*CARTAS_JUGADOR)
+        for j in self.jugadores.all():
             desde = 0
             hasta = desde + 3
             j.asignar_cartas(cartas_a_repartir[desde:hasta])
