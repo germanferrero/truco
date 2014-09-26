@@ -64,12 +64,14 @@ class Lobby:
         partida.set_mano(jugador)
         return partida
 
-    def unirse_partida(self, user, partida):
+    def unirse_partida(self, user, partida): 
         result=0
-        if partida.estado == EN_ESPERA:
+        for j in partida.jugadores:
+            # Verifica que el usuario no este ya en la partida
+            if j.user.id == user.id:
+                result =-1
+        if partida.estado == EN_ESPERA and result==0:
             partida.agregar_jugador(user)
-        else:
-            result=-1
         return result
 
 
@@ -130,8 +132,8 @@ class Ronda(models.Model):
 
     def repartir(self):
         cartas_a_repartir = self.mazo.get_n_cartas(len(self.jugadores.all())*CARTAS_JUGADOR)
+        desde = 0
         for j in self.jugadores.all():
-            desde = 0
             hasta = desde + 3
             j.asignar_cartas(cartas_a_repartir[desde:hasta])
             desde = desde + 3
