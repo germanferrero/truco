@@ -1,13 +1,58 @@
+import random
 from django.db import models
 from django.contrib.auth.models import User
 from truco.constants import *
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 
+
+class Carta(models.Model):
+    nombre = models.CharField(max_length=32)
+    valor_jerarquico = models.IntegerField(max_length=2)
+    valor_envido = models.IntegerField(max_length=1)
+    palo = models.IntegerField(max_length=1)
+
+    def __unicode__(self):
+        return self.nombre
+
+
+class Mazo():
+    cartas = Carta.objects.all() 
+
+    def get_n_cartas(self, cant_cartas):
+        return random.sample(cartas, cant_cartas)
+
+
+class Enfrentamiento(models.Model):
+    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
+    id_jugador_empezo = models.IntegerField(max_length=1)
+
+    def get_ganador(self):
+        pass
+
+    def agragar_carta(self):
+        pass
+
+
+class Carta(models.Model):
+    nombre = models.CharField(max_length=32)
+    valor_jerarquico = models.IntegerField(max_length=2)
+    valor_envido = models.IntegerField(max_length=1)
+    palo = models.IntegerField(max_length=1)
+
+    def __unicode__(self):
+        return self.nombre
+
+
 class Jugador(models.Model):
     user = models.ForeignKey(User, verbose_name='usuario')
     nombre = models.CharField(max_length=32)
     equipo = models.IntegerField(max_length=1)
+    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
+
+    def asignar_cartas(self, cartas):
+        self.cartas = cartas
+
 
 class Lobby:
 
@@ -29,6 +74,7 @@ class Lobby:
         else:
             result=-1
         return result
+
 
 class Partida(models.Model):
     #falta puntaje
@@ -60,60 +106,34 @@ class Partida(models.Model):
 
     def __unicode__(self):
         return self.nombre
+
+    def crear_ronda(self):
+        ronda = Ronda(jugadores=self.jugadores, mano=self.mano)
+        return ronda
+
+
 class Ronda(models.Model):
     # Estado inical de una ronda
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     cantos = []
     enfrentamientos = []
-    #mazo = Mazo.cartas
-    mano = Partida.mano
+    mazo = Mazo()
+    mano = models.IntegerField(default=0)
     turno = mano
-    terminada = false
-    id_enfrentamiento_actual = 0
-    id_canto_actual = 0
+    terminada = False
+    id_enfrentamiento_actual = models.IntegerField(default=0)
+    id_canto_actual = models.IntegerField(default=0)
 
     def repartir(self):
-        self.cartas = get_n_cartas(len(jugadores)*CARTAS_JUGADOR)
-        # Se reparten las cartas entre los jugadores
+        cartas_a_repartir = Mazo.get_n_cartas(len(jugadores)*CARTAS_JUGADOR)
         for j in jugadores:
-            i = 0
-            Jugador.cartas[j] = self.cartas[i..i+3]
-            i = i+3
+            desde = 0
+            hasta = desde + 3
+            Jugador.asignar_cartas(cartas_a_repartir[desde:hasta], j)
+            desde = desde + 3
 
     def crear_enfrentamiento(self):
-        enfrentamiento = Enfrentamiento(id_jugador_empezo=self.mano, cartas=self.cartas)
+        enfrentamiento = Enfrentamiento(id_jugador_empezo=self.mano, cartas=Mazo.cartas)
 
 
-class Mazo(models.Model):
-    cartas = []
 
-    def get_n_cartas(self, cant_cartas):
-        pass
-
-
-class Carta(models.Model):
-    nombre = models.CharField(max_length=32)
-    valor_jerarquico = models.IntegerField(max_length=2)
-    valor_envido = models.IntegerField(max_length=1)
-    palo = models.IntegerField(max_length=1)
-
-    def __unicode__(self):
-        return self.nombre
-
-class Enfrentamiento(models.Model):
-
-    def get_ganador(self):
-        pass
-
-    def agragar_carta(self):
-        pass
-
-
-class Carta(models.Model):
-    nombre = models.CharField(max_length=32)
-    valor_jerarquico = models.IntegerField(max_length=2)
-    valor_envido = models.IntegerField(max_length=1)
-    palo = models.IntegerField(max_length=1)
-
-    def __unicode__(self):
-        return self.nombre
