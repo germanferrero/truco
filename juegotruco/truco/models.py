@@ -60,6 +60,54 @@ class Partida(models.Model):
 
     def __unicode__(self):
         return self.nombre
+class Ronda(models.Model):
+    # Estado inical de una ronda
+    jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
+    cantos = []
+    enfrentamientos = []
+    #mazo = Mazo.cartas
+    mano = Partida.mano
+    turno = mano
+    terminada = false
+    id_enfrentamiento_actual = 0
+    id_canto_actual = 0
+
+    def repartir(self):
+        self.cartas = get_n_cartas(len(jugadores)*CARTAS_JUGADOR)
+        # Se reparten las cartas entre los jugadores
+        for j in jugadores:
+            i = 0
+            Jugador.cartas[j] = self.cartas[i..i+3]
+            i = i+3
+
+    def crear_enfrentamiento(self):
+        enfrentamiento = Enfrentamiento(id_jugador_empezo=self.mano, cartas=self.cartas)
+
+
+class Mazo(models.Model):
+    cartas = []
+
+    def get_n_cartas(self, cant_cartas):
+        pass
+
+
+class Carta(models.Model):
+    nombre = models.CharField(max_length=32)
+    valor_jerarquico = models.IntegerField(max_length=2)
+    valor_envido = models.IntegerField(max_length=1)
+    palo = models.IntegerField(max_length=1)
+
+    def __unicode__(self):
+        return self.nombre
+
+class Enfrentamiento(models.Model):
+
+    def get_ganador(self):
+        pass
+
+    def agragar_carta(self):
+        pass
+
 
 class Carta(models.Model):
     nombre = models.CharField(max_length=32)
