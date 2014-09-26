@@ -60,3 +60,12 @@ class Partida(models.Model):
 
     def __unicode__(self):
         return self.nombre
+
+class Carta(models.Model):
+    nombre = models.CharField(max_length=32)
+    valor_jerarquico = models.IntegerField(max_length=2)
+    valor_envido = models.IntegerField(max_length=1)
+    palo = models.IntegerField(max_length=1)
+
+    def __unicode__(self):
+        return self.nombre
