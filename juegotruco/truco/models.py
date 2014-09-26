@@ -1,4 +1,5 @@
 import random
+import heapq # Para encontrar los maximos dos elementos en calcular envido
 from django.db import models
 from django.contrib.auth.models import User
 from truco.constants import *
@@ -160,5 +161,61 @@ class Canto(models.Model):
 
     def get_pts_en_juego(self):
         return self.pts_en_juego
+
+
+class Envido(models.Model):
+    jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
+
+    def get_ganador(self):
+# MODULARIZAR! VER QUE PASA SI HAY DOS JUGADORES CON LOS MISMOS PUNTOS!
+        puntos_jugadores = []
+        for jugador in self.jugadores:
+        # Calcular los puntos de cada jugador
+            puntos = 0
+            palo = 0
+            cartas_mismo_palo = 0 # Cartas del mismo palo
+            cartas_vistas = 0
+            for carta in jugador.cartas:
+                if cartas_vistas == 0:
+                # Si es la primer carta
+                    cartas_mismo_palo = 1
+                    carta_en_vista = 1
+                    palo = carta.palo
+                    puntos = carta.valor_envido
+                    puntos1 = carta.valor_envido # Por si son las tres iguales
+                else:
+                    if cartas_vistas == 1:
+                    # Es la segunda carta
+                        cartas_vistas = 2
+                        puntos2 = carta.valor_envido # Por si son las tres iguales o si solo son iguales la segunda y tercera
+                        palo2 = carta.palo # Por si solo la segunda y tercera son iguales
+                        if carta.palo == palo:
+                        # Si es del mismo palo
+                            cartas_mismo_palo = 2
+                            puntos += 20
+                            puntos += puntos2
+                    else:
+                    # Es la tercer carta
+                        puntos3 = carta.valor_envido
+                        if cartas_mismo_palo == 2:
+                            if carta.palo == palo:
+                            # Las tres son del mismo palo
+                                mayores_valores = heapq.nlargest(2, (puntos1, puntos2, puntos3))
+                                puntos = 20 + mayores_valores[0] + mayores_valores[1]
+                        else:
+                            if carta.palo == palo:
+                            # Si solo la primera y tercera son iguales
+                                puntos += 20
+                                puntos += puntos3
+                            else:
+                            # La primera no es igual a ninguna
+                                if(carta.palo == palo2):
+                                # Si la segunda y tercera son iguales
+                                    puntos = 20 + puntos2 + puntos3
+                                else:
+                                # Las tres cartas son distintas
+                                    puntos = max(puntos1, puntos2, puntos3)
+            puntos_jugadores.append(puntos)
+        return self.jugadores[puntos_jugadores.index(max(puntos_jugadores))]
 
 
