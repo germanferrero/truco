@@ -4,7 +4,7 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
-from truco.models import Lobby, Partida, Jugador
+from truco.models import Lobby, Partida, Jugador, Carta
 from truco.forms import crear_partida_form
 from django.dispatch import receiver
 
@@ -53,6 +53,10 @@ def unirse_partida(request):
         return HttpResponseRedirect('partida/%d' % int(my_partida.id))
 
 def partida(request,partida_id):
-    my_partida = Partida.objects.get(id=partida_id)
-    context = {'partida': my_partida}
-    return render(request, 'truco/partida.html',context)
+    if request.method == 'POST':
+        pass
+    else:
+        my_partida = Partida.objects.get(id=partida_id)
+        my_cartas = my_partida.jugadores.filter(user=request.user)[0].cartas.all()
+        context = {'partida': my_partida, 'cartas': my_cartas}
+        return render(request, 'truco/partida.html',context)

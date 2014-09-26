@@ -96,7 +96,7 @@ class Partida(models.Model):
             return jugador
 
     def set_mano(self,jugador):
-        self.mano = jugador.id
+        self.mano = int(jugador.id)
         self.save()
 
     def get_absolute_url(self):
@@ -106,7 +106,11 @@ class Partida(models.Model):
         return self.nombre
 
     def crear_ronda(self):
-        ronda = Ronda(jugadores=self.jugadores, mano=self.mano)
+        ronda = Ronda()
+        ronda.save()
+        ronda.jugadores = self.jugadores.all()
+        ronda.mano = self.mano
+        ronda.save()
         return ronda
 
 
@@ -117,8 +121,8 @@ class Ronda(models.Model):
     cantos = []
     enfrentamientos = []
     mazo = Mazo() # No deberiamos crear un mazo siempre
-    mano = models.IntegerField(default=0)
-    turno = mano #mano?
+    mano = models.IntegerField(max_length=1, default=0)
+    turno = models.IntegerField(max_length=1, default=0)
     terminada = False
     id_enfrentamiento_actual = models.IntegerField(default=0)
     id_canto_actual = models.IntegerField(default=0)
