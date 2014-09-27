@@ -12,7 +12,8 @@ from django.dispatch import receiver
 def lobby(request):
     my_lobby = Lobby()
     lista_de_partidas = my_lobby.get_lista_partidas()
-    context = {'lista_de_partidas': lista_de_partidas}
+    context = {'lista_de_partidas': lista_de_partidas,
+               'username': request.user.username}
     return render(request, 'truco/lobby.html',context)
 
 
@@ -68,5 +69,8 @@ def partida(request,partida_id):
         #my_imagen[0] = my_cartas[0]
         #my_imagen[1] = my_cartas[1]
         #my_imagen[2] = my_cartas[2]
-        context = {'partida': my_partida, 'my_cartas_disponibles': my_cartas_disponibles, 'adv_cartas_disponibles': adv_cartas_disponibles}
+        context = {'partida': my_partida,
+                   'my_cartas_disponibles': my_cartas_disponibles,
+                   'adv_cartas_disponibles': adv_cartas_disponibles,
+                   'username': request.user.username}
         return render(request, 'truco/partida.html',context)
