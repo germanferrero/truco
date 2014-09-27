@@ -2,7 +2,7 @@
 <html>
     {% load staticfiles %}
     <head>
-        <link rel="stylesheet" href= {% static "style_lobby.css" %}>
+        <link rel="stylesheet" href= {% static "style_partida.css" %}>
         <title> Lobby Truco </title>
     </head>
 
@@ -13,7 +13,19 @@
         </div><p>
 
         <div id="pantalla_medio">
-            <p> {{ cartas }} </p>
+            <div id="cuadro_cartas_rival">
+                {% for carta in adv_cartas_dissponibles%}
+                    {% load staticfiles %}
+                    <img src={% static "truco/images/"%}{{carta}}/>
+                {% endfor %}
+            </div>
+
+            <div id="cuadro_cartas" style='clear:left'>
+                {% for carta in my_cartas_disponibles%}
+                    {% load staticfiles %}
+                    <button type="submit"><img src={% static "truco/images/"%}{{carta}}/></button>
+                {% endfor %}
+            </div>
         </div>
     </body>
 </html>

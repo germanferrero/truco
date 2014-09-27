@@ -13,11 +13,10 @@ class Carta(models.Model):
     valor_jerarquico = models.IntegerField(max_length=2)
     valor_envido = models.IntegerField(max_length=1)
     palo = models.IntegerField(max_length=1)
-# Agregar ImageField. Hay que volver a crear los objetos Carta
-#    imagen = models.ImageField(upload_to='Carta', height_field=None, width_field=None)
+    imagen = models.ImageField(upload_to='cartas', height_field=None, width_field=None)
 
     def __unicode__(self):
-        return self.nombre
+        return str(self.imagen)
 
 
 
@@ -86,6 +85,7 @@ class Partida(models.Model):
             self.save()
             if len(self.jugadores.all()) >= self.cantidad_jugadores:
                 self.estado = EN_CURSO
+                self.crear_ronda()
                 self.save()
             return jugador
 
@@ -107,13 +107,13 @@ class Partida(models.Model):
         return ronda
 
     def actualizar_puntajes():
-        ultima_ronda = self.set_ronda.all()[-1]
+        ultima_ronda = list(self.ronda_set.all())[-1]
         self.puntajes = map(add,self.puntajes,ultima_ronda.calcular_puntos())
         if len([i for i in self.puntajes if i > puntos_objetivo])>0:
             self.estado = TERMINADA
 
     def tirar(self,jugador,carta):
-        ronda_actual = self.set_ronda.all()[-1]
+        ronda_actual = list(self.ronda_set.all())[-1]
         ronda_actual.tirar(jugador,carta)
         if ronda_actual.termino:
             self.actualizar_puntajes()
@@ -145,23 +145,22 @@ class Ronda(models.Model):
         enfrentamient.jugador_pos = list(self.jugadores.all()).index(jugador)
         enfrentamiento.cartas.add(carta)
 
-    def crear_canto(self, tipo,jugador_id):
+    def crear_canto(self, tipo,equipo):
         canto = Canto(tipo=tipo, pts_en_juego = PTS_CANTO[tipo])
         canto.ronda = self
-        canto.id_jugador_canto = jugador_id
-        canto.mano = self.mano
+        canto.equipo_canto = equipo
+        canto.mano_pos = self.mano_pos
         canto.save()
         canto.jugadores = self.jugadores.all()
         canto.save()
-        self.cantos.add(canto)
 
     def calcular_puntos(self):
         puntajes=[]
         enfrentamientos_ganados=[]
-        for canto in self.set_canto.all():
+        for canto in self.canto_set.all():
             equipo_ganador = canto.get_ganador()
             puntajes[equipo_ganador] += canto.pts_en_juego
-        for enfrentamiento in self.set_enfrentamiento.all():
+        for enfrentamiento in self.enfrentamiento_set.all():
             pos_ganador = enfrentamiento.ganador_pos
             if pos_ganador > 0:
                 equipo_ganador = self.jugadores.all()[pos_ganador].equipo
@@ -174,7 +173,7 @@ class Ronda(models.Model):
         return puntajes
 
     def tirar(jugador,carta):
-        ultimo_enfrentamiento = self.set_enfrentamiento.all()[-1]
+        ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1]
         if not ultimo_enfrentamiento.terimo:
             ultimo_enfrentamiento.agregar_carta(carta)
             ultimo_enfrentamiento.get_ganador()
@@ -188,7 +187,7 @@ class Canto(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
     tipo = models.CharField(max_length=1)
     pts_en_juego = models.IntegerField(max_length=1, default=1)
-    id_jugador_canto = models.IntegerField()
+    equipo_canto = models.IntegerField()
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     mano_pos = models.IntegerField(max_length=1)
 
@@ -200,22 +199,24 @@ class Canto(models.Model):
         pass
 
     def dist_mano(self,x):
-        mano_pos = list(self.jugadores.all()).index(self.mano)
-        return (x+1) % (mano_pos+1)
+        return (x+1) % (self.mano_pos+1)
 
     def get_ganador(self):
         puntos_jugadores = []
         jugadores = self.jugadores.all()
         for jugador in jugadores:
-            puntos_jugadores.append(self.puntos_jugador(jugador.cartas.all()))
+            puntos_jugadores.append(self.puntos_jugador(jugador))
         maximo_puntaje = max(puntos_jugadores)
+        print maximo_puntaje
         ganadores = [i for i, j in enumerate(puntos_jugadores) if j == maximo_puntaje]
+        print ganadores
         distanciasamano = map(self.dist_mano,ganadores)
         minposfrom = distanciasamano.index(min(distanciasamano))
         ganador_pos = ganadores[minposfrom]
         return jugadores[ganador_pos].equipo
 
-    def puntos_jugador(self,cartas):
+    def puntos_jugador(self,jugador):
+        cartas = jugador.cartas.all()
         comb = list(combinations(cartas,2))
         return max(map(self.puntos_2_cartas,comb))
 
