@@ -45,10 +45,12 @@ class Jugador(models.Model):
     user = models.ForeignKey(User, verbose_name='usuario')
     nombre = models.CharField(max_length=32)
     equipo = models.IntegerField(max_length=1)
-    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
+    cartas = models.ManyToManyField(Carta, related_name='cartas')
+    cartas_disponibles = models.ManyToManyField(Carta, related_name='cartas_disponibles')
 
     def asignar_cartas(self, cartas):
         self.cartas = cartas
+        self.cartas_disponibles = cartas
         self.save()
 
     def __str__(self):

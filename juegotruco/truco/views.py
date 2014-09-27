@@ -60,12 +60,12 @@ def partida(request,partida_id):
     else:
         my_partida = Partida.objects.get(id=partida_id)
         my_jugador = my_partida.jugadores.get(user=request.user)
-        my_cartas_disponibles = my_jugador.cartas.all()
+        my_cartas_disponibles = my_jugador.cartas_disponibles.all()
 ## BORRAR, cambiar!
         for jugador in my_partida.jugadores.all():
             if jugador != my_jugador:
                 adv_jugador = jugador
-        adv_cartas_disponibles = adv_jugador.cartas.all()
+        adv_cartas_disponibles = adv_jugador.cartas_disponibles.all()
         #my_imagen[0] = my_cartas[0]
         #my_imagen[1] = my_cartas[1]
         #my_imagen[2] = my_cartas[2]

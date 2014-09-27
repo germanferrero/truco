@@ -2,52 +2,6 @@ body {
 background-image: url(https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg);
 }
 
-img {
-    height: 150px;
-    width: 100px;
-}
-
-#cuadro_cartas_rival img {
-    height: 100px;
-    width: 70px;
-}
-
-
-#barra_arriba{
-    background-color:#424242;
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
-    height:50px;
-    text-align:center;
-    margin-top: -25px;
-}
-
-#pantalla_medio{
-    background-color:#424242;
-    border-radius: 10px;
-    height:600px;
-    clear:both;
-    text-align:center;
-    margin-top: -5px;
-/*    padding-right: 35%;*/
-}
-
-#cuadro_cartas_rival {
-    margin-top: 10px;
-    float:right;
-    padding-right: 41%;
-    clear:right;
-}
-
-#cuadro_cartas {
-    float:right;
-    margin-top: 200px;
-    padding-right: 38%;
-    clear:right;
-    clear:left;
-}
-
-
 h4{
     color:white;
     padding-top:2px;
@@ -70,4 +24,81 @@ button{
     margin-right: 10px;
 }
 
+#cuadro_cartas_usuario img {
+    height: 150px;
+    width: 100px;
+}
+
+img {
+    height: 100px;
+    width: 70px;
+}
+
+
+#barra_arriba{
+    background-color:#424242;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    height:50px;
+    text-align:center;
+    margin-top: -25px;
+}
+
+#pantalla_medio{
+    background-color:#424242;
+    border-radius: 10px;
+    height:600px;
+    clear:left;
+    text-align:center;
+    margin-top: -5px;
+/*    padding-right: 35%;*/
+}
+
+#cuadro_cartas_rival {
+    margin-top: 10px;
+    float:right;
+    padding-right: 41%;
+}
+
+#cuadro_cartas_usuario {
+    float:right;
+    padding-top: 120px;
+    padding-right: 38%;
+    clear:right;
+    clear:left;
+}
+
+#tiradas_adversario {
+    clear:both;
+}
+
+#tiradas_usuario {
+    margin-top: 150px;
+    clear:both;
+}
+
+.cuadro_cartas_tiradas {
+    clear:both;
+}
+
+.cuadro_cartas_tiradas #primera_imagen {
+    float:left;
+    position:absolute;
+}
+
+.cuadro_cartas_tiradas #segunda_imagen {
+    float:left;
+    margin-left: 15px;
+    margin-top: 15px;
+    z-index:1;
+    position:absolute;
+}
+
+.cuadro_cartas_tiradas #tercera_imagen {
+    float:left;
+    margin-left: 30px;
+    margin-top: 30px;
+    z-index:2;
+    position:absolute;
+}
 
