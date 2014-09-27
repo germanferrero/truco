@@ -12,7 +12,8 @@ from django.dispatch import receiver
 def lobby(request):
     my_lobby = Lobby()
     lista_de_partidas = my_lobby.get_lista_partidas()
-    context = {'lista_de_partidas': lista_de_partidas}
+    context = {'lista_de_partidas': lista_de_partidas,
+               'username': request.user.username}
     return render(request, 'truco/lobby.html',context)
 
 
@@ -58,14 +59,17 @@ def partida(request,partida_id):
     else:
         my_partida = Partida.objects.get(id=partida_id)
         my_jugador = my_partida.jugadores.get(user=request.user)
-        my_cartas_disponibles = my_jugador.cartas.all()
+        my_cartas_disponibles = my_jugador.cartas_disponibles.all()
 ## BORRAR, cambiar!
         for jugador in my_partida.jugadores.all():
             if jugador != my_jugador:
                 adv_jugador = jugador
-        adv_cartas_disponibles = adv_jugador.cartas.all()
+        adv_cartas_disponibles = adv_jugador.cartas_disponibles.all()
         #my_imagen[0] = my_cartas[0]
         #my_imagen[1] = my_cartas[1]
         #my_imagen[2] = my_cartas[2]
-        context = {'partida': my_partida, 'my_cartas_disponibles': my_cartas_disponibles, 'adv_cartas_disponibles': adv_cartas_disponibles}
+        context = {'partida': my_partida,
+                   'my_cartas_disponibles': my_cartas_disponibles,
+                   'adv_cartas_disponibles': adv_cartas_disponibles,
+                   'username': request.user.username}
         return render(request, 'truco/partida.html',context)
