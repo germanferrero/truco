@@ -65,7 +65,6 @@ class Lobby:
         partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo, password=password)
         partida.save()
         jugador = partida.agregar_jugador(user)
-        partida.set_mano(jugador)
         return partida
 
     def unirse_partida(self, user, partida): 
@@ -87,7 +86,7 @@ class Partida(models.Model):
     puntos_objetivo = models.IntegerField(default=15)
     password = models.CharField(max_length=16)
     estado = models.IntegerField(default=EN_ESPERA)
-    mano = models.ForeignKey(Jugador, related_name='mano')
+    mano_pos = models.IntegerField(max_length=1,default=0)
     cantidad_jugadores = models.IntegerField(default=2)
 
     def agregar_jugador(self,user):
@@ -101,9 +100,6 @@ class Partida(models.Model):
                 self.save()
             return jugador
 
-    def set_mano(self,jugador):
-        self.mano = jugador
-        self.save()
 
     def get_absolute_url(self):
         return HttpResponseRedirect(reverse('partida'))
@@ -113,11 +109,12 @@ class Partida(models.Model):
 
     def crear_ronda(self):
         ronda = Ronda()
-        ronda.mano = self.mano
+        ronda.mano_pos = self.mano_pos
         ronda.save()
         ronda.jugadores = self.jugadores.all()
         ronda.repartir()
         ronda.save()
+        self.mano_pos = (self.mano_pos +1)%self.cantidad_jugadores
         return ronda
 
 
@@ -126,7 +123,7 @@ class Canto(models.Model):
     pts_en_juego = models.IntegerField(max_length=1, default=1)
     id_jugador_canto = models.IntegerField()
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
-    mano = models.ForeignKey(Jugador, related_name='mano canto')
+    mano_pos = models.IntegerField(max_length=1)
 
     def aceptar(self):
         self.pts_en_juego = 2;
@@ -178,7 +175,7 @@ class Ronda(models.Model):
     cantos = models.ManyToManyField(Canto, verbose_name='cantos')
     enfrentamientos = models.ManyToManyField(Enfrentamiento, verbose_name='enfrentamientos')
     mazo = Mazo() # No deberiamos crear un mazo siempre
-    mano = models.ForeignKey(Jugador, related_name='mano ronda')
+    mano_pos = models.IntegerField(max_length=1)
     turno = models.IntegerField(max_length=1, default=0)
     terminada = False
     id_enfrentamiento_actual = models.IntegerField(default=0)
@@ -213,7 +210,7 @@ class Ronda(models.Model):
 class Envido(Canto):
 
     def dist_mano(x):
-        mano_pos = list(self.jugadores.all()).index(self.mano)
+        mano_pos = list(self.jugadores.all()).index(self.jugadores.get(pk=self.mano_id))
         return (x+1) % (mano_pos+1)
 
     def get_ganador(self):
