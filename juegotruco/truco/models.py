@@ -5,7 +5,7 @@ from truco.constants import *
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect
 from itertools import combinations
-from operator import itemgetter
+from operator import itemgetter, add
 
 
 class Carta(models.Model):
@@ -26,18 +26,6 @@ class Mazo():
 
     def get_n_cartas(self, cant_cartas):
         return random.sample(self.cartas, cant_cartas)
-
-
-
-class Enfrentamiento(models.Model):
-    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
-    id_jugador_empezo = models.IntegerField(max_length=1)
-
-    def get_ganador(self):
-        pass
-
-    def agregar_carta(self):
-        pass
 
 
 
@@ -79,6 +67,7 @@ class Lobby:
 
 
 
+
 class Partida(models.Model):
     nombre = models.CharField(max_length=32)
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
@@ -108,7 +97,7 @@ class Partida(models.Model):
         return self.nombre
 
     def crear_ronda(self):
-        ronda = Ronda()
+        ronda = Ronda(partida=self)
         ronda.mano_pos = self.mano_pos
         ronda.save()
         ronda.jugadores = self.jugadores.all()
@@ -117,63 +106,24 @@ class Partida(models.Model):
         self.mano_pos = (self.mano_pos +1)%self.cantidad_jugadores
         return ronda
 
+    def actualizar_puntajes():
+        ultima_ronda = self.set_ronda.all()[-1]
+        self.puntajes = map(add,self.puntajes,ultima_ronda.calcular_puntos())
+        if len([i for i in self.puntajes if i > puntos_objetivo])>0:
+            self.estado = TERMINADA
 
-class Canto(models.Model):
-    tipo = models.CharField(max_length=1)
-    pts_en_juego = models.IntegerField(max_length=1, default=1)
-    id_jugador_canto = models.IntegerField()
-    jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
-    mano_pos = models.IntegerField(max_length=1)
-
-    def aceptar(self):
-        self.pts_en_juego = 2;
-#        COMO COMPARAR?
-#        if (str(self.nombre) = "Envido"):
-#            envido = Envido(self.jugadores)
-#            self.ganador = envido.get_ganador()
-
-    def rechazar(self):
-        # Como ya se pasa como parametro no hace nada
-        pass
-
-
-    def dist_mano(self,x):
-        mano_pos = list(self.jugadores.all()).index(self.mano)
-        return (x+1) % (mano_pos+1)
-
-    def get_ganador(self):
-        puntos_jugadores = []
-        jugadores = self.jugadores.all()
-        for jugador in jugadores:
-            puntos_jugadores.append(self.puntos_jugador(jugador.cartas.all()))
-        maximo_puntaje = max(puntos_jugadores)
-        print puntos_jugadores
-        ganadores = [i for i, j in enumerate(puntos_jugadores) if j == maximo_puntaje]
-        print "ganadores"
-        print ganadores
-        distanciasamano = map(self.dist_mano,ganadores)
-        minposfrom = distanciasamano.index(min(distanciasamano))
-        ganador_pos = ganadores[minposfrom]
-        return jugadores[ganador_pos]
-
-    def puntos_jugador(self,cartas):
-        comb = list(combinations(cartas,2))
-        return max(map(self.puntos_2_cartas,comb))
-
-    def puntos_2_cartas(self,(carta1,carta2)):
-        puntos=0
-        if carta1.palo == carta2.palo:
-            puntos = 20 + carta1.valor_envido + carta2.valor_envido
-        else:
-            puntos = max(carta1.valor_envido,carta2.valor_envido)
-        return puntos
+    def tirar(self,jugador,carta):
+        ronda_actual = self.set_ronda.all()[-1]
+        ronda_actual.tirar(jugador,carta)
+        if ronda_actual.termino:
+            self.actualizar_puntajes()
+        return self.termino()
 
 
 class Ronda(models.Model):
     # Estado inical de una ronda
+    partida = models.ForeignKey(Partida, verbose_name= "partida")
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
-    cantos = models.ManyToManyField(Canto, verbose_name='cantos')
-    enfrentamientos = models.ManyToManyField(Enfrentamiento, verbose_name='enfrentamientos')
     mazo = Mazo() # No deberiamos crear un mazo siempre
     mano_pos = models.IntegerField(max_length=1)
     turno = models.IntegerField(max_length=1, default=0)
@@ -189,15 +139,15 @@ class Ronda(models.Model):
             j.asignar_cartas(cartas_a_repartir[desde:hasta])
             desde = desde + 3
 
-    def crear_enfrentamiento(self):
-        # MAL! al enfrentamiento no se le pasan todas las cartas del mazo! Ademas que es Mazo?
-        self.enfrentamiento = Enfrentamiento(id_jugador_empezo=self.mano, cartas=Mazo.cartas)
+    def crear_enfrentamiento(self,jugador,carta):
+        enfrentamiento = Enfrentamiento()
+        enfrentamiento.ronda = self
+        enfrentamient.jugador_pos = list(self.jugadores.all()).index(jugador)
+        enfrentamiento.cartas.add(carta)
 
     def crear_canto(self, tipo,jugador_id):
-        if tipo == ENVIDO:
-            canto = Envido(tipo=ENVIDO)
-        else:
-            canto = Canto(tipo=tipo)
+        canto = Canto(tipo=tipo, pts_en_juego = PTS_CANTO[tipo])
+        canto.ronda = self
         canto.id_jugador_canto = jugador_id
         canto.mano = self.mano
         canto.save()
@@ -205,32 +155,97 @@ class Ronda(models.Model):
         canto.save()
         self.cantos.add(canto)
 
+    def calcular_puntos(self):
+        puntajes=[]
+        enfrentamientos_ganados=[]
+        for canto in self.set_canto.all():
+            equipo_ganador = canto.get_ganador()
+            puntajes[equipo_ganador] += canto.pts_en_juego
+        for enfrentamiento in self.set_enfrentamiento.all():
+            pos_ganador = enfrentamiento.ganador_pos
+            if pos_ganador > 0:
+                equipo_ganador = self.jugadores.all()[pos_ganador].equipo
+                enfrentamientos_ganados[equipo_ganador] += 1
+        if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
+            ganador = self.jugadores.all()[mano_pos].equipo
+        else:
+            ganador = enfrentamientos_ganados.index(max(enfrentamientos_ganados))
+        puntajes[ganador]+=1
+        return puntajes
+
+    def tirar(jugador,carta):
+        ultimo_enfrentamiento = self.set_enfrentamiento.all()[-1]
+        if not ultimo_enfrentamiento.terimo:
+            ultimo_enfrentamiento.agregar_carta(carta)
+            ultimo_enfrentamiento.get_ganador()
+            self.turno = ultimo_enfrentamiento.get_ganador()
+        else:
+            self.crear_enfrentamiento(jugador,carta)
 
 
-class Envido(Canto):
 
-    def dist_mano(x):
-        mano_pos = list(self.jugadores.all()).index(self.jugadores.get(pk=self.mano_id))
+class Canto(models.Model):
+    ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
+    tipo = models.CharField(max_length=1)
+    pts_en_juego = models.IntegerField(max_length=1, default=1)
+    id_jugador_canto = models.IntegerField()
+    jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
+    mano_pos = models.IntegerField(max_length=1)
+
+    def aceptar(self):
+        self.pts_en_juego += 1;
+
+    def rechazar(self):
+        # Como ya se pasa como parametro no hace nada
+        pass
+
+    def dist_mano(self,x):
+        mano_pos = list(self.jugadores.all()).index(self.mano)
         return (x+1) % (mano_pos+1)
 
     def get_ganador(self):
         puntos_jugadores = []
         jugadores = self.jugadores.all()
         for jugador in jugadores:
-            puntos_jugadores.append(puntos_jugador(jugador.cartas.all()))
+            puntos_jugadores.append(self.puntos_jugador(jugador.cartas.all()))
         maximo_puntaje = max(puntos_jugadores)
         ganadores = [i for i, j in enumerate(puntos_jugadores) if j == maximo_puntaje]
-        ganador_pos = min(map(dist_mano,ganadores))
-        return jugadores[ganador_pos]
+        distanciasamano = map(self.dist_mano,ganadores)
+        minposfrom = distanciasamano.index(min(distanciasamano))
+        ganador_pos = ganadores[minposfrom]
+        return jugadores[ganador_pos].equipo
 
-    def puntos_jugador(cartas):
+    def puntos_jugador(self,cartas):
         comb = list(combinations(cartas,2))
-        return max(map(puntos_2_cartas,comb))
+        return max(map(self.puntos_2_cartas,comb))
 
-    def puntos_2_cartas((carta1,carta2)):
+    def puntos_2_cartas(self,(carta1,carta2)):
         puntos=0
         if carta1.palo == carta2.palo:
             puntos = 20 + carta1.valor_envido + carta2.valor_envido
         else:
             puntos = max(carta1.valor_envido,carta2.valor_envido)
         return puntos
+
+
+class Enfrentamiento(models.Model):
+    ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
+    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
+    jugador_canto_pos = models.IntegerField(max_length=1)
+    ganador_pos = models.IntegerField(max_length=1)
+    empate = models.BooleanField(default=False)
+    termino = models.BooleanField(default=False)
+
+    def get_ganador(self):
+        carta_ganadora = max(self.cartas.all(),key= lambda c: c.valor_jerarquico)
+        ganadores = [i for i, j in enumerate(self.cartas.all()) if
+                     j.valor_jerarquico == maximo_puntaje]
+        if len(ganadores) > 1:
+            self.ganador_pos=-1
+            self.empate = True
+        ganador_pos_carta = list(self.cartas.all()).index(carta_ganadora)
+        self.ganador_pos = (jugador_canto_pos + ganador_pos_carta)%len(self.cartas.all())
+        return self.ganador_pos
+
+    def agregar_carta(self,carta):
+        cartas.add(carta)
