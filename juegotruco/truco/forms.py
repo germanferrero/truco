@@ -10,13 +10,14 @@ class LoginForm(forms.Form):
     password = forms.CharField(widget=forms.PasswordInput, required=True)
 
 
-# Personalizamos la clase UserCreationForm
 class RegisterForm(UserCreationForm):
+# Personalizamos la clase UserCreationForm
     email = forms.CharField(max_length=255, required=True)
 
     class Meta:
         model = User
         fields = ("username", "email", "password1", "password2")
+
 
 class crear_partida_form(forms.Form):
     nombre = forms.CharField(max_length=32,required=True)

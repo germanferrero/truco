@@ -69,16 +69,21 @@ class Lobby:
         partida.set_mano(jugador)
         return partida
 
-    def unirse_partida(self, user, partida):
+    def unirse_partida(self, user, partida): 
         result=0
+<<<<<<< HEAD
         for j in partida.jugadores.all():
             #Verifica que el usuario no este ya en la partida
             if j.user.id == user.id:
                 result=-1
+=======
+        for j in partida.jugadores:
+            # Verifica que el usuario no este ya en la partida
+            if j.user.id == user.id:
+                result =-1
+>>>>>>> eb69bb40610ced7a4ec93cc8aa099eef580e0be7
         if partida.estado == EN_ESPERA and result==0:
             partida.agregar_jugador(user)
-        else:
-            result=-1
         return result
 
 
@@ -105,7 +110,11 @@ class Partida(models.Model):
             return jugador
 
     def set_mano(self,jugador):
+<<<<<<< HEAD
         self.mano = jugador
+=======
+        self.mano = int(jugador.id)
+>>>>>>> eb69bb40610ced7a4ec93cc8aa099eef580e0be7
         self.save()
 
     def get_absolute_url(self):
@@ -116,9 +125,15 @@ class Partida(models.Model):
 
     def crear_ronda(self):
         ronda = Ronda()
+<<<<<<< HEAD
         ronda.mano = self.mano
         ronda.save()
         ronda.jugadores = self.jugadores.all()
+=======
+        ronda.save()
+        ronda.jugadores = self.jugadores.all()
+        ronda.mano = self.mano
+>>>>>>> eb69bb40610ced7a4ec93cc8aa099eef580e0be7
         ronda.repartir()
         ronda.save()
         return ronda
@@ -181,7 +196,11 @@ class Ronda(models.Model):
     cantos = models.ManyToManyField(Canto, verbose_name='cantos')
     enfrentamientos = models.ManyToManyField(Enfrentamiento, verbose_name='enfrentamientos')
     mazo = Mazo() # No deberiamos crear un mazo siempre
+<<<<<<< HEAD
     mano = models.ForeignKey(Jugador, related_name='mano ronda')
+=======
+    mano = models.IntegerField(max_length=1, default=0)
+>>>>>>> eb69bb40610ced7a4ec93cc8aa099eef580e0be7
     turno = models.IntegerField(max_length=1, default=0)
     terminada = False
     id_enfrentamiento_actual = models.IntegerField(default=0)
