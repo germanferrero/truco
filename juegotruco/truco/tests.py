@@ -15,7 +15,7 @@ class TrucoTests(TestCase):
                                         password='asdf',)
         lobby = Lobby()
         partida = lobby.crear_partida(user=user1, nombre='Partida a 15 sin password',
-                          puntos_objetivo=15,password='')
+                                      puntos_objetivo=15,password='')
         # La partida esta en espera hasta que se una un nuevo jugador
         self.assertEqual(partida.cantidad_jugadores,2)
         self.assertEqual(partida.estado, EN_ESPERA)

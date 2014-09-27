@@ -14,10 +14,10 @@ class Carta(models.Model):
     valor_envido = models.IntegerField(max_length=1)
     palo = models.IntegerField(max_length=1)
 # Agregar ImageField. Hay que volver a crear los objetos Carta
-#    imagen = models.ImageField(upload_to='Carta', height_field=None, width_field=None)
+    imagen = models.ImageField(upload_to='cartas', height_field=None, width_field=None)
 
     def __unicode__(self):
-        return self.nombre
+        return str(self.imagen)
 
 
 

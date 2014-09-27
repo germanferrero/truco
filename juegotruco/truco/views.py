@@ -59,5 +59,8 @@ def partida(request,partida_id):
     else:
         my_partida = Partida.objects.get(id=partida_id)
         my_cartas = my_partida.jugadores.filter(user=request.user)[0].cartas.all()
+        #my_imagen[0] = my_cartas[0]
+        #my_imagen[1] = my_cartas[1]
+        #my_imagen[2] = my_cartas[2]
         context = {'partida': my_partida, 'cartas': my_cartas}
         return render(request, 'truco/partida.html',context)

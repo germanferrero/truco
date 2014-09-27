@@ -13,7 +13,10 @@
         </div><p>
 
         <div id="pantalla_medio">
-            <p> {{ cartas }} </p>
+            {% for carta in cartas%}
+                {% load staticfiles %}
+                <button type="submit"><img src={% static "truco/images/"%}{{carta}} height="200" with="80"/></button>
+            {% endfor %}
         </div>
     </body>
 </html>
