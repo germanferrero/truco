@@ -38,10 +38,10 @@
             <div id="cuadro_botones">
                 {% for opcion in opciones %}
                     <div id="botones_opciones">
-                        <button type="submit" value="{{ opcion }}"><a href="/truco/partida">{{ opcion }}</a></button>
-<!--                        <form action="{% url 'truco:partida' %}" method="post">-->
-<!--                            <input type="submit" value="{{ opcion }}">-->
-<!--                        </form>-->
+                        <form action="{% url 'truco:partida' partida.id %}" method="post">
+                            {% csrf_token %}
+                            <input type="submit" value="{{ opcion }}">
+                       </form>
                     </div>
                 {% endfor %}
             </div>
