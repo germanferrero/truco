@@ -21,11 +21,8 @@ class Carta(models.Model):
 
 
 class Mazo():
-    cartas = Carta.objects.all() 
-
     def get_n_cartas(self, cant_cartas):
-        return random.sample(self.cartas, cant_cartas)
-
+            return list(Carta.objects.order_by('?')[:6])
 
 
 class Jugador(models.Model):
@@ -117,6 +114,8 @@ class Partida(models.Model):
         self.puntos_e2 = self.puntos_e2 + puntos[1]
         if self.puntos_e1 >= self.puntos_objetivo or self.puntos_e2 >= self.puntos_objetivo:
             self.estado = TERMINADA
+        else:
+            self.crear_ronda()
         self.save()
 
     def tirar(self,jugador,carta):
@@ -137,7 +136,7 @@ class Ronda(models.Model):
     termino = models.BooleanField(default=False)
     id_enfrentamiento_actual = models.IntegerField(default=0)
     id_canto_actual = models.IntegerField(default=0)
-    opciones = models.CharField(max_length=10,default= str())
+    opciones = models.CharField(max_length=10, default= str(CANTAR_ENVIDO))
 
     def repartir(self):
         cartas_a_repartir = self.mazo.get_n_cartas(len(self.jugadores.all())*CARTAS_JUGADOR)
@@ -154,12 +153,17 @@ class Ronda(models.Model):
         enfrentamiento.save()
         enfrentamiento.agregar_carta(carta)
 
-    def aceptar_canto(self):
-        ultimo_canto = ronda.canto_set.all()[-1][0]
-        ultimo_canto.aceptar()
-        self.turno = ultimo_canto.id_jugador_canto
+    def responder_canto(self,respuesta):
+        ultimo_canto = list(self.canto_set.all())[-1]
+        if respuesta == QUIERO:
+            ultimo_canto.aceptar()
+        else:
+            ultimo_canto.rechazar()
+        self.turno = ultimo_canto.pos_jugador_canto
+        self.opciones = ''
+        self.save()
 
-    def crear_canto(self, tipo,jugador_id):
+    def crear_canto(self, tipo,jugador):
         if tipo == ENVIDO:
             canto = Envido()
         else:
@@ -167,12 +171,14 @@ class Ronda(models.Model):
         canto.tipo = tipo
         canto.pts_en_juego = PTS_CANTO[tipo]
         canto.ronda = self
-        canto.id_jugador_canto = jugador_id
+        canto.pos_jugador_canto = (list(self.jugadores.all())).index(jugador)
         canto.mano_pos = self.mano_pos
         canto.save()
         canto.jugadores = self.jugadores.all()
         canto.save()
         self.turno= (self.turno+1)%len(self.jugadores.all())
+        self.opciones = str(QUIERO)+str(NO_QUIERO)
+        self.save()
 
     def calcular_puntos(self):
         puntajes=[0,0]
@@ -190,12 +196,14 @@ class Ronda(models.Model):
         canto=self.canto_set.filter(tipo=TRUCO)
         if canto:
             canto[0].equipo_ganador = ganador
+            canto[0].save()
         for canto in self.canto_set.all():
             equipo_ganador = canto.equipo_ganador
             puntajes[equipo_ganador] += canto.pts_en_juego
         return puntajes
 
     def hay_ganador(self):
+        result = False
         enfrentamientos_ganados = [0,0]
         for enfrentamiento in self.enfrentamiento_set.all():
             ganador = enfrentamiento.ganador_pos
@@ -203,21 +211,22 @@ class Ronda(models.Model):
                 equipo_ganador = self.jugadores.all()[ganador].equipo
                 enfrentamientos_ganados[equipo_ganador] += 1
         if len(self.enfrentamiento_set.all())==3:
-            self.termino = True
+            result = True
         elif (len(self.enfrentamiento_set.all())==2 and 
               enfrentamientos_ganados[0] != enfrentamientos_ganados[1]):
-            self.termino = True
-        self.save()
+            result = True
+        return result
 
     def tirar(self,jugador,carta):
         ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1:]
         if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
             ultimo_enfrentamiento[0].agregar_carta(carta)
             ganador = ultimo_enfrentamiento[0].get_ganador()
-            ultimo_enfrentamiento[0].termino = True
             self.turno = ganador
+            self.termino = self.hay_ganador()
+            if list(self.enfrentamiento_set.all()).index(ultimo_enfrentamiento[0]) == 0:
+                self.opciones += str(CANTAR_TRUCO)
             self.save()
-            self.hay_ganador()
         else:
             self.crear_enfrentamiento(jugador,carta)
 
@@ -230,13 +239,15 @@ class Canto(models.Model):
     tipo = models.CharField(max_length=1)
     pts_en_juego = models.IntegerField(max_length=1, default=1)
     equipo_ganador = models.IntegerField(max_length=1)
-    id_jugador_canto = models.IntegerField(max_length=1)
+    pos_jugador_canto = models.IntegerField(max_length=1)
 
     def aceptar(self):
         self.pts_en_juego += 1
+        self.save()
 
     def rechazar(self):
-        self.equipo_ganador = self.jugadores.get(pk=id_jugador_canto).equipo
+        self.equipo_ganador = self.jugadores.all()[self.pos_jugador_canto].equipo
+        self.save()
         # Como ya se pasa como parametro no hace nada
         pass
 
@@ -277,16 +288,17 @@ class Envido(Canto):
 
 class Enfrentamiento(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
-    cartas = models.ManyToManyField(Carta, verbose_name='cartas')
+    cartas = models.ManyToManyField(Carta, through='Tirada',verbose_name='cartas')
     jugador_empezo_pos = models.IntegerField(max_length=1)
     ganador_pos = models.IntegerField(max_length=1)
     empate = models.BooleanField(default=False)
     termino = models.BooleanField(default=False)
 
     def get_ganador(self):
+        self.termino = True
         carta_ganadora = min(self.cartas.all(),key= lambda c: c.valor_jerarquico)
         maximo_puntaje = carta_ganadora.valor_jerarquico
-        ganadores = [i for i, j in enumerate(self.cartas.all()) if
+        ganadores = [i for i, j in enumerate(self.cartas.order_by("tirada__orden")) if
                      j.valor_jerarquico == maximo_puntaje]
         if len(ganadores) > 1:
             self.ganador_pos=-1
@@ -294,10 +306,14 @@ class Enfrentamiento(models.Model):
         else:
             ganador_pos_carta = list(self.cartas.all()).index(carta_ganadora)
             self.ganador_pos = (self.jugador_empezo_pos + ganador_pos_carta)%len(self.cartas.all())
-            self.termino = True
-            self.save()
+        self.save()
         return self.ganador_pos
 
     def agregar_carta(self,carta):
-        self.cartas.add(carta)
-        self.save()
+        tirada= Tirada.objects.create(carta=carta,enfrentamiento=self,orden=len(self.cartas.all()))
+        tirada.save()
+
+class Tirada(models.Model):
+    carta = models.ForeignKey(Carta)
+    enfrentamiento = models.ForeignKey(Enfrentamiento)
+    orden = models.IntegerField(max_length=0)
