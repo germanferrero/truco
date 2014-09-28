@@ -61,7 +61,7 @@ def partida(request,partida_id):
         my_partida = Partida.objects.get(id=partida_id)
         my_jugador = my_partida.jugadores.get(user=request.user)
         my_ronda = list(my_partida.ronda_set.all())
-        my_opciones = [2, 3]
+        my_opciones = []
         my_opciones = map(lambda x: OPCIONES[x], my_opciones)
         print my_opciones
         if my_ronda:
