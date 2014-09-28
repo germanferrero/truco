@@ -75,9 +75,6 @@ donde se enfrentarán en partidas “uno contra uno”.
 1.3 DEFINICIONES, ACRÓNIMOS Y ABREVIATURAS
 
 * USUARIO: persona que utilizará la aplicación.
-* CUADRO DE DIÁLOGO: herramienta utilizada por dos usuarios jugando una misma
-                     partida, dentro de la cuál pueden comunicarse a través de
-                     mensajes de texto.
 * CANTAR: sinónimo de la acción de proponer Envido, Truco, o cualquier derivado.
 * PUNTOS OBJETIVO: meta a alcanzar por los jugadores para poder ganar el juego.
 * PARTIDA: juego entre dos personas hasta alcanzar los puntos objetivo.
@@ -143,9 +140,6 @@ para cada usuario:
       * Gestionar una cuenta. Ya sea para crear una cuenta de usuario o para
         modificar la misma cambiando la contraseña.
       * Llevar a cabo una partida de truco.
-      * Interactuar con los contrincantes a través de un chat privado en la mesa.
-      * Verificar el ranking general de la aplicación, y la posición donde se
-        encuentra en el mismo.
 
 
 
@@ -195,13 +189,9 @@ menor jerarquía en un enfrentamiento.
 
 __Envido
     Si alguien canta Envido, el oponente tiene que responder "quiero" o "no quiero" . En caso de que
-acepte, entonces el jugador mano debe cantar los puntos de envido que tiene en su
-mano y el oponente le responde con sus puntos en caso de tener mayor puntaje, o
-con el mensaje "son buenas" donde se le dará por ganado el Envido al jugador mano.
+acepte, se mostrarán los puntos del ganador.
     El jugador con mas puntos será el ganador. En caso de empate gana el jugador que
-es mano
-    Al terminar la ronda, si el envido se quiso, quien lo haya ganado deberá mostrar las cartas
-que conformaron su envido.
+es mano.
     Los puntos en caso de aceptar el enfrentamiento de Envido son 2 puntos, en caso
 de no quererse el ganador recibe 1 punto.
 
@@ -220,9 +210,7 @@ __Juego
     Se mezclan las cartas al azar y luego se reparten, una por vez, comenzando por el
 jugador que es mano, tres cartas a cada jugador.
     Empieza jugando el jugador mano, quien puede bajar una carta, o cantar Envido o Truco.
-   (Si canta truco, el otro jugador puede responderle que antes se debe jugar el envido,
-y entonces el mano debe responder si acepta el envido o no)
-    Si se cantó el envido entonces se entra en la fase del Envido mismo y luego el mano
+    Si se canta el envido, se entra en la fase del Envido mismo y luego el mano
 tiene la posibilidad de cantar truco o bajar una carta.(Si canta truco, el oponente
 debe contestar "quiero" o "no quiero" y despues bajar una carta).
     Una vez que el mano baja una carta, el oponente puede cantar Envido y/o Truco (en caso de
@@ -323,7 +311,7 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
          1. El sistema muestra el formulario de registro de cuenta.
          2· El usuario rellena el formulario con sus datos.
-         3· El usuario hace click en el boton de "Crear Cuenta".
+         3· El usuario hace click en el boton de "Crear nuevo usuario".
          4. El sistema verifica los datos ingresados.
          5· El sistema crea la nueva cuenta en la base de datos.
          6. El sistema loguea al nuevo usuario y lo redirecciona al lobby.
@@ -384,13 +372,12 @@ pasar un usuario durante el juego.
     ·Escenario exitoso pricipal:
         1. El usuario hace click en "Unirse a partida".
         2. El usuario ingresa la contraseña de la partida (si existe).
-        3. El sistema avisa al usuario dueño de la partida.
-        4. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
+        3. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
     ·Escenarios excepcionales:
         2.a La contraseña ingresada es incorrecta.
             El sistema muestra un mensaje de error pidiendo reingresar
             la contraseña correcta.
-        4.a En medio del proceso la partida es eliminada por su dueño.
+        3.a En medio del proceso la partida es eliminada por su dueño.
             El sistema notifica al usuario que intentaba unirse a la partida y 
             lo redirecciona al lobby.
 
@@ -413,10 +400,10 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en los registros quién es el jugador mano.
         2. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
-        (empezando por el jugador que es mano y siguiendo por el de la derecha).
         3. El sistema cede el turno al jugador que es mano.
 
-3.2.6 TURNO
+
+3.2.8 TURNO
     ·Caso de uso: Se inicia el turno.
     ·Actor primario: Sistema.
     ·Actor secundario: Jugador en turno.
@@ -427,7 +414,7 @@ pasar un usuario durante el juego.
         2. El sistema muestra las opciones al jugador, para que este seleccione.
 
 
-3.2.8 CANTAR ENVIDO
+3.2.9 CANTAR ENVIDO
     ·Caso de uso: Un jugador canta envido.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -443,7 +430,7 @@ pasar un usuario durante el juego.
         4. El sistema le cede el turno al oponente.
 
 
-3.2.9 ACEPTAR ENVIDO
+3.2.10 ACEPTAR ENVIDO
     ·Caso de uso: Se juega el envido.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
@@ -454,18 +441,13 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "Quiero".
         2. El sistema calcula los puntos de todos los jugadores.
-        3. El sistema muestra los puntos del jugador mano al otro jugador.
-        4. El sistema muestra un mensaje al jugador mano según si ganó o no.
-        5. El sistema registra al ganador del envido.
-        6. El sistema verifica quién canto el envido.
-        7. El sistema le cede el turno al jugador que cantó el envido.
-    ·Extensiones:
-        4.a El jugador mano ganó el envido:
-          1. El sistema muestra al jugador mano el mensaje "son buenas"
-        4.b El jugador mano perdió el envido:
-          1. El sistema muestra al jugador mano los puntos del adversario.
+        3. El sistema muestra los puntos del jugador que ganó.
+        4. El sistema registra al ganador del envido.
+        5. El sistema verifica quién canto el envido.
+        6. El sistema le cede el turno al jugador que cantó el envido.
 
-3.2.10 RECHAZAR ENVIDO
+
+3.2.11 RECHAZAR ENVIDO
     ·Caso de uso: Se rechaza el envido.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -480,7 +462,7 @@ pasar un usuario durante el juego.
         4. El sistema le cede el turno al jugador que cantó el envido.
 
 
-3.2.11 JUGAR CARTA
+3.2.12 JUGAR CARTA
     ·Caso de uso: Jugador tira una carta en la mesa.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -489,33 +471,32 @@ pasar un usuario durante el juego.
                      · No hubo un canto en el turno anterior.
     ·Escenario exitoso principal:
         1. El jugador selecciona una carta de su haber.
-        2. El jugador selecciona la carta que desea jugar y hace click en "jugar carta".
-        3. El sistema verifica si se terminó un enfrentamiento.
-        4. El sistema verifica si se terminó la ronda.
-        5. El sistema verifica si se terminó la partida
+        2. El sistema verifica si se terminó un enfrentamiento.
+        3. El sistema verifica si se terminó la ronda.
+        4. El sistema verifica si se terminó la partida
     ·Extensiones:
-        3.a El enfrentamiento se terminó:
+        2.a El enfrentamiento se terminó:
           1. El sistema registra al ganador del enfrentamiento, o registra un empate,
            según las reglas del juego.
           2. El sistema cede el turno al otro jugador.
-        3.b El enfrentamiento no se terminó:
+        2.b El enfrentamiento no se terminó:
           1. El sistema cede el turno al oponente.
-        4.a La ronda se terminó:
+        3.a La ronda se terminó:
           1. El sistema calcula los puntos y los registra.
-        4.b La ronda no se terminó:
+        3.b La ronda no se terminó:
           1. El sistema cede el turno al oponente.
-        5.a La partida se terminó:
+        4.a La partida se terminó:
           1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
           2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
           3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
           4. El sistema redirige al lobby a ambos jugadores.
-        5.b La partida no se terminó:
+        4.b La partida no se terminó:
           1. El sistema registra que el jugador a la derecha del jugador mano
              actual, será mano en la siguiente ronda.
           2. El sistema inicia una nueva ronda.
 
 
-3.2.12 CANTAR TRUCO
+3.2.13 CANTAR TRUCO
     ·Caso de uso: Un jugador canta truco.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -527,15 +508,9 @@ pasar un usuario durante el juego.
         3. El sistema le muestra al oponente las opciones "Quiero" y "No quiero"
         a través de botones.
         3. El sistema le cede el turno al oponente.
-    Excenarios Exepcionales:
-        3.a El sistma le muestra al oponente las opciones "Quiero" y "No quiero"
-            a través de botones:
-            1. Si el que cantó el truco es el jugador mano, y los jugadores se encuentran
-            en el primer enfrentamiento, entonces el sistema le muestra también al
-            oponente la opción "Envido".
 
 
-3.2.13 ACEPTAR TRUCO
+3.2.14 ACEPTAR TRUCO
     ·Caso de uso: Se juega el truco.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
@@ -549,7 +524,7 @@ pasar un usuario durante el juego.
         3. El sistema le cede el turno al jugador que cantó el truco
 
 
-3.2.14 RECHAZAR TRUCO
+3.2.15 RECHAZAR TRUCO
     ·Caso de uso: Se rechaza el truco.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -563,7 +538,7 @@ pasar un usuario durante el juego.
 
 
 
-3.2.15 CERRAR SESIÓN
+3.2.16 CERRAR SESIÓN
     ·Caso de uso: Cerrar sesión.
     ·Actor primario: Usuario.
     ·Actor secundario: Sistema.
@@ -573,7 +548,7 @@ pasar un usuario durante el juego.
         1. El usuario hace click en el botón de "Cerrar Sesión".
         2. El sistema registra al usuario como desconectado y lo redirige al lobby.
 
-3.2.16 IRSE AL MAZO
+3.2.17 IRSE AL MAZO
     ·Caso de uso: Un jugador quiere abandonar la ronda ("irse al mazo").
     ·Actor primario: Usuario.
     ·Actor secundario: Sistema.
