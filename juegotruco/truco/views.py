@@ -62,11 +62,13 @@ def partida(request,partida_id):
         my_jugador = my_partida.jugadores.get(user=request.user)
         my_ronda = list(my_partida.ronda_set.all())
         my_opciones = []
-        my_opciones = map(lambda x: OPCIONES[x], my_opciones)
-        print my_opciones
         if my_ronda:
             my_ronda = my_ronda[-1]
-#            my_opciones = my_ronda.opciones ## Agregar cuando este el atributo de opciones
+            if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
+                # Se calculan las opciones que tiene el jugador si es el jugador en turno
+#                my_opciones = my_ronda.opciones ## Agregar cuando este el atributo de opciones y borrar lo de abajo
+                my_opciones = [1]
+                my_opciones = map(lambda x: OPCIONES[x], my_opciones)
         adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
         adv_cartas_disponibles = []
         if adversario:

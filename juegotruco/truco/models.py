@@ -51,7 +51,7 @@ class Lobby:
         return (lista_partidas)
 
     def crear_partida(self, user, nombre, puntos_objetivo, password):
-        partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo, password=password)
+        partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo, password=password, mano_pos=0)
         partida.save()
         jugador = partida.agregar_jugador(user)
         return partida
@@ -100,8 +100,8 @@ class Partida(models.Model):
 
     def crear_ronda(self):
         ronda = Ronda(partida=self)
-        ronda.mano_pos = self.mano_pos
         ronda.save()
+        ronda.mano_pos = self.mano_pos
         ronda.jugadores = self.jugadores.all()
         ronda.repartir()
         ronda.save()
