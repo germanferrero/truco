@@ -7,6 +7,7 @@
     </head>
 
     <body>
+        {% load staticfiles %}
         <div id="barra_arriba">
                 <h4>Welcome {{ username }}</h4>
                 <h5>PARTIDA {{ partida }}</h5>
@@ -15,23 +16,13 @@
 
         <div id="pantalla_medio">
             <div id="cuadro_cartas_rival">
-                {% for carta in adv_cartas_disponibles %}
-                    {% load staticfiles %}
-                    {% if forloop.counter == 1 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 2 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="segunda_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 3 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="tercera_imagen"/>
-                    {% endif %}
+                {% for i in adv_cartas_disponibles %}
+                    <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
                 {% endfor %}
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
                 {% for carta in adv_cartas_disponibles %}
-                    {% load staticfiles %}
                     {% if forloop.counter == 1 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
                     {% endif %}
@@ -44,9 +35,16 @@
                 {% endfor %}
             </div>
 
+            <div id="cuadro_botones">
+                {% for opcion in opciones %}
+                    <div id="botones_opciones"">
+                        <button type="submit" value="{{ opcion }}"><a href="/truco/partida">{{ opcion }}</a></button>
+                    </div>
+                {% endfor %}
+            </div>
+
             <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
                 {% for carta in adv_cartas_disponibles %}
-                    {% load staticfiles %}
                     {% if forloop.counter == 1 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
                     {% endif %}
@@ -61,10 +59,10 @@
 
             <div id="cuadro_cartas_usuario">
                 {% for carta in my_cartas_disponibles %}
-                    {% load staticfiles %}
-                    <button type="submit"><img src={% static "truco/images/"%}{{carta}}/></button>
+                    <button type="submit" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
                 {% endfor %}
             </div>
+
         </div>
     </body>
 </html>

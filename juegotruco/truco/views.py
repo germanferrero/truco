@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from truco.models import Lobby, Partida, Jugador, Carta, Ronda
+from truco.constants import *
 from truco.forms import crear_partida_form
 from django.dispatch import receiver
 
@@ -59,17 +60,21 @@ def partida(request,partida_id):
     else:
         my_partida = Partida.objects.get(id=partida_id)
         my_jugador = my_partida.jugadores.get(user=request.user)
+        my_ronda = list(my_partida.ronda_set.all())
+        my_opciones = [2, 3]
+        my_opciones = map(lambda x: OPCIONES[x], my_opciones)
+        print my_opciones
+        if my_ronda:
+            my_ronda = my_ronda[-1]
+#            my_opciones = my_ronda.opciones ## Agregar cuando este el atributo de opciones
+        adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
+        adv_cartas_disponibles = []
+        if adversario:
+            adv_cartas_disponibles = list(adversario[0].cartas.all())
         my_cartas_disponibles = my_jugador.cartas_disponibles.all()
-## BORRAR, cambiar!
-        for jugador in my_partida.jugadores.all():
-            if jugador != my_jugador:
-                adv_jugador = jugador
-        adv_cartas_disponibles = adv_jugador.cartas_disponibles.all()
-        #my_imagen[0] = my_cartas[0]
-        #my_imagen[1] = my_cartas[1]
-        #my_imagen[2] = my_cartas[2]
         context = {'partida': my_partida,
                    'my_cartas_disponibles': my_cartas_disponibles,
-                   'adv_cartas_disponibles': adv_cartas_disponibles,
-                   'username': request.user.username}
+                   'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
+                   'username': request.user.username,
+                   'opciones': my_opciones,}
         return render(request, 'truco/partida.html',context)

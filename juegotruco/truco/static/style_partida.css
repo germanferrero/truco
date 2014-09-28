@@ -64,7 +64,6 @@ img {
     float:right;
     padding-top: 120px;
     padding-right: 38%;
-    clear:right;
     clear:left;
 }
 
@@ -102,3 +101,11 @@ img {
     position:absolute;
 }
 
+
+#cuadro_botones {
+    float:right;
+}
+
+#botones_opciones {
+    clear:both;
+}
