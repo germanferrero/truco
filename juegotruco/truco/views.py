@@ -4,6 +4,7 @@ from django.template.response import TemplateResponse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
 from truco.models import Lobby, Partida, Jugador, Carta, Ronda
 from truco.constants import *
 from truco.forms import crear_partida_form
@@ -27,6 +28,7 @@ def index(request):
         # Si esta logueado entra al lobby directamente
         return HttpResponseRedirect(reverse('truco:lobby'))
 
+@login_required(login_url='/usuarios/login')
 def crear_partida(request):
     if request.method == "POST":
         form = crear_partida_form(data=request.POST)
@@ -46,6 +48,7 @@ def crear_partida(request):
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html', {'form': form})
 
+@login_required(login_url='/usuarios/login')
 def unirse_partida(request):
     my_partida = Partida.objects.get(pk=request.POST['partida'])
     my_lobby = Lobby()
@@ -54,6 +57,7 @@ def unirse_partida(request):
     else:
         return HttpResponseRedirect('partida/%d' % int(my_partida.id))
 
+@login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
     if request.method == 'POST':
         pass
@@ -67,7 +71,7 @@ def partida(request,partida_id):
             if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
                 # Se calculan las opciones que tiene el jugador si es el jugador en turno
 #                my_opciones = my_ronda.opciones ## Agregar cuando este el atributo de opciones y borrar lo de abajo
-                my_opciones = [1]
+                my_opciones = [0,1,2,3]
                 my_opciones = map(lambda x: OPCIONES[x], my_opciones)
         adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
         adv_cartas_disponibles = []
@@ -79,4 +83,4 @@ def partida(request,partida_id):
                    'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
                    'username': request.user.username,
                    'opciones': my_opciones,}
-        return render(request, 'truco/partida.html',context)
+        return TemplateResponse(request, 'truco/partida.html',context)
