@@ -101,6 +101,10 @@ img {
     position:absolute;
 }
 
+#mensaje{
+    color:white;
+    float:right;
+}
 
 #cuadro_botones {
     float:right;

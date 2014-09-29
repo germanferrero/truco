@@ -35,6 +35,10 @@
                 {% endfor %}
             </div>
 
+            <div id="mensaje">
+                {{mensaje}}
+            </div>
+
             <div id="cuadro_botones">
                 <form action="{% url 'truco:partida' partida.id %}" method="post">
                 {% csrf_token %}
@@ -64,7 +68,7 @@
                 <form method="post">
                 {% for carta in my_cartas_disponibles %}
                 {% csrf_token %}
-                    <button type="submit" id="{{ carta.id }}" name="carta{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
+                    <button type="submit" name="carta" value="{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
                 {% endfor %}
                 </form>
             </div>
