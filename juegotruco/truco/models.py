@@ -113,7 +113,7 @@ class Partida(models.Model):
         self.puntos_e1 = self.puntos_e1 + puntos[0]
         self.puntos_e2 = self.puntos_e2 + puntos[1]
         if self.puntos_e1 >= self.puntos_objetivo or self.puntos_e2 >= self.puntos_objetivo:
-            self.estado = TERMINADA
+            self.estado = FINALIZADA
         else:
             self.crear_ronda()
         self.save()
@@ -123,6 +123,7 @@ class Partida(models.Model):
         ronda_actual.tirar(jugador,carta)
         if ronda_actual.termino:
             self.actualizar_puntajes()
+        jugador.cartas_disponibles.remove(carta)
         return self.estado
 
 
@@ -219,7 +220,9 @@ class Ronda(models.Model):
 
     def tirar(self,jugador,carta):
         ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1:]
+        print "ultimo_enfrentamiento", ultimo_enfrentamiento
         if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
+            print "no se termino el enfrentamiento"
             ultimo_enfrentamiento[0].agregar_carta(carta)
             ganador = ultimo_enfrentamiento[0].get_ganador()
             self.turno = ganador

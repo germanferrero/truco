@@ -59,28 +59,50 @@ def unirse_partida(request):
 
 @login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
+    my_partida = Partida.objects.get(id=partida_id)
+    my_jugador = my_partida.jugadores.get(user=request.user)
+    my_ronda = list(my_partida.ronda_set.all())
+    my_opciones = []
     if request.method == 'POST':
-        pass
-    else:
-        my_partida = Partida.objects.get(id=partida_id)
-        my_jugador = my_partida.jugadores.get(user=request.user)
-        my_ronda = list(my_partida.ronda_set.all())
-        my_opciones = []
-        if my_ronda:
-            my_ronda = my_ronda[-1]
-            if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
-                # Se calculan las opciones que tiene el jugador si es el jugador en turno
-#                my_opciones = my_ronda.opciones ## Agregar cuando este el atributo de opciones y borrar lo de abajo
-                my_opciones = [0,1,2,3]
-                my_opciones = map(lambda x: OPCIONES[x], my_opciones)
-        adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
-        adv_cartas_disponibles = []
-        if adversario:
-            adv_cartas_disponibles = list(adversario[0].cartas.all())
-        my_cartas_disponibles = my_jugador.cartas_disponibles.all()
-        context = {'partida': my_partida,
-                   'my_cartas_disponibles': my_cartas_disponibles,
-                   'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
-                   'username': request.user.username,
-                   'opciones': my_opciones,}
-        return TemplateResponse(request, 'truco/partida.html',context)
+        print 'POST'
+    if my_ronda:
+        my_ronda = my_ronda[-1]
+        if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
+            if request.method == 'POST':
+                print "POST en mi turno"
+                # Parseo de request.POST para ver opciones elegidas
+                temp_list = []
+                for key, value in request.POST.iteritems():
+                    temp = [key,value]
+                    temp_list.append(temp)
+                [item for post_list in temp_list for item in post_list]
+                print post_list
+                # Si el jugador elige una opcion del costado:
+                if any(u'opcion' in s for s in post_list):
+                    opcion = request.POST['option']
+                    #print request.POST['opcion']
+                    if opcion == "CANTAR ENVIDO":
+                        my_ronda.crear_canto(PTS_CANTO[1], my_jugador)
+                    elif opcion == "CANTAR TRUCO":
+                        my_ronda.crear_canto(PTS_CANTO[0], my_jugador)
+                    else:
+                        my_ronda.responder_canto(opcion)
+                # Si el jugador elige una carta para tirar
+                elif any(u'carta' in s for s in post_list):
+                    print "post_list", post_list[0][5:]
+                    my_partida.tirar(my_jugador, Carta.objects.get(id=post_list[0][5:]))
+            # Se establecen las opciones para mostrarle al jugador
+            print "my_opcion", my_opciones
+            my_opciones = my_ronda.opciones
+            my_opciones = map(lambda x: OPCIONES[int(x)], my_opciones)
+    adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
+    adv_cartas_disponibles = []
+    if adversario:
+        adv_cartas_disponibles = list(adversario[0].cartas.all())
+    my_cartas_disponibles = my_jugador.cartas_disponibles.all()
+    context = {'partida': my_partida,
+                'my_cartas_disponibles': my_cartas_disponibles,
+                'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
+                'username': request.user.username,
+                'opciones': my_opciones,}
+    return TemplateResponse(request, 'truco/partida.html',context)

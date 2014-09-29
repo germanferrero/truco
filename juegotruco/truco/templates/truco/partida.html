@@ -36,13 +36,13 @@
             </div>
 
             <div id="cuadro_botones">
+                <form action="{% url 'truco:partida' partida.id %}" method="post">
+                {% csrf_token %}
                 {% for opcion in opciones %}
                     <div id="botones_opciones">
-                        <form action="{% url 'truco:partida' partida.id %}" method="post">
-                            {% csrf_token %}
-                            <input type="submit" value="{{ opcion }}">
-                       </form>
+                        <input type="submit" name="opcion" value="{{ opcion }}">
                     </div>
+                </form>
                 {% endfor %}
             </div>
 
@@ -61,11 +61,13 @@
             </div>
 
             <div id="cuadro_cartas_usuario">
+                <form method="post">
                 {% for carta in my_cartas_disponibles %}
-                    <button type="submit" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
+                {% csrf_token %}
+                    <button type="submit" id="{{ carta.id }}" name="carta{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
                 {% endfor %}
+                </form>
             </div>
-
         </div>
     </body>
 </html>
