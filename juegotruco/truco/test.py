@@ -150,21 +150,29 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password')
         lobby.unirse_partida(user2, partida)
-        ronda = list(partida.ronda_set.all())
         #Obtengo la ultima ronda
-        ronda = ronda[-1]
-        #Chequeo que la opcion disponible sea 3 = "Cantar envido"
+        ronda = list(partida.ronda_set.all())[-1]
+        #Chequeo que la opcion sea 3 =  "envido"
         self.assertEqual(ronda.opciones, '3')
-        #Obtengo el primer jugador
-        jugador = partida.jugadores.get(user = user1)
+        #Obtengo los jugadores
+        jugador1 = partida.jugadores.get(user = user1)
+        jugador2 = partida.jugadores.get(user = user2)
         #Creo un canto
-        ronda.crear_canto(ENVIDO, jugador)
+        ronda.crear_canto(ENVIDO, jugador1)
+        canto = list(ronda.canto_set.all())
+        #Verifico que haya un canto creado
+        self.assertEqual(len(list(ronda.canto_set.all())), 1)
+        #Obtengo el ultimo canto
+        canto = canto[-1]
         #Chequeo que las opciones disponibles sean 0 = "Quiero" y 1 "No quiero"
         self.assertEqual(ronda.opciones, '01')
         #El jugador 2 acepta el envido
+        ronda.responder_canto(1)
+        #Chequeo que los puntos en juego sean 2
+        self.assertNotEqual(canto.pts_en_juego, 2)
+#        print"cantoo"
+#        print canto.tipo
+#        ganador = canto.equipo_ganador
+#        print ganador
         #Chequeo que la ronda no termino
-
-
-
-
-#####        print '[%s]' % ', '.join(map(str, list(partida.ronda_set.all())))
+#        print '[%s]' % ', '.join(map(str, list(partida.ronda_set.all())))
