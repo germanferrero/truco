@@ -84,9 +84,9 @@ def partida(request,partida_id):
                 # Si el jugador elige una opcion del costado
                     opcion = request.POST['opcion']
                     if opcion == "CANTAR ENVIDO":
-                        my_ronda.crear_canto(PTS_CANTO[ENVIDO], my_jugador)
+                        my_ronda.crear_canto(ENVIDO, my_jugador)
                     elif opcion == "CANTAR TRUCO":
-                        my_ronda.crear_canto(PTS_CANTO[TRUCO], my_jugador)
+                        my_ronda.crear_canto(TRUCO, my_jugador)
                     else:
                         my_ronda.responder_canto(opcion)
                 elif 'carta' in request.POST:
