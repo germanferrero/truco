@@ -126,11 +126,10 @@ class Partida(models.Model):
         ronda_actual = list(self.ronda_set.all())[-1]
         ronda_actual.tirar(jugador, carta)
         jugador.cartas_disponibles.remove(carta)
-        jugador.cartas_jugadas.add(carta) ## COMO HACER QUE SE AGREGUEN EN ORDEN! ____
-# Como va a saber la ronda actual si ya termino si todavia no se tiro la carta!
-#        if ronda_actual.termino:
-#            self.actualizar_puntajes()
-#        return self.estado
+        jugador.cartas_jugadas.add(carta) 
+        if ronda_actual.termino:
+            self.actualizar_puntajes()
+        return self.estado
 
 
 
@@ -197,7 +196,7 @@ class Ronda(models.Model):
                 enfrentamientos_ganados[equipo_ganador] += 1
         if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
         # Si se empataron los tres enfrentamientos
-            ganador = self.jugadores.all()[mano_pos].equipo
+            ganador = self.jugadores.all()[self.mano_pos].equipo
         else:
             ganador = enfrentamientos_ganados.index(max(enfrentamientos_ganados))
         puntajes[ganador] += 1
@@ -229,22 +228,22 @@ class Ronda(models.Model):
 
     def tirar(self, jugador, carta):
         ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1:]
-#        print "ultimo_enfrentamiento", ultimo_enfrentamiento
-        if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
-#            print "no se termino el enfrentamiento"
-            ultimo_enfrentamiento = ultimo_enfrentamiento[0]
-            ultimo_enfrentamiento.agregar_carta(carta)
-###ACAAA
-            ganador = ultimo_enfrentamiento.get_ganador() ## POR QUE SE CALCULA EL GANADOR SI NI SI QUIERA SE SABE SI HAY UN GANADOR, NI SI TIENE QUE CALCULARLO!!
-            self.turno = ganador
-            self.termino = self.hay_ganador()
-            if list(self.enfrentamiento_set.all()).index(ultimo_enfrentamiento) == 0:
-                self.opciones += str(CANTAR_TRUCO)
-            self.save()
+        self.termino = self.hay_ganador()
+        if self.termino:
+            self.partida.crear_ronda()
         else:
-            self.turno = (self.turno +1) % len(list(self.jugadores.all()))
-            self.save()
-            self.crear_enfrentamiento(jugador, carta)
+            if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
+                ultimo_enfrentamiento = ultimo_enfrentamiento[0]
+                ultimo_enfrentamiento.agregar_carta(carta)
+                ganador = ultimo_enfrentamiento.get_ganador() 
+                self.turno = ganador
+                if list(self.enfrentamiento_set.all()).index(ultimo_enfrentamiento) == 0:
+                    self.opciones += str(CANTAR_TRUCO)
+                self.save()
+            else:
+                self.turno = (self.turno +1) % len(list(self.jugadores.all()))
+                self.save()
+                self.crear_enfrentamiento(jugador, carta)
 
 
 
