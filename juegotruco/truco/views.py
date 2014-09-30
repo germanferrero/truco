@@ -101,10 +101,17 @@ def partida(request,partida_id):
     adv_cartas_disponibles = []
     adv_cartas_jugadas = []
     if adversario:
-        adv_cartas_disponibles = list(adversario[0].cartas.all())
+        adv_cartas_disponibles = list(adversario[0].cartas_disponibles.all())
         adv_cartas_jugadas = adversario[0].cartas_jugadas.all()
     my_cartas_disponibles = my_jugador.cartas_disponibles.all()
     my_cartas_jugadas = my_jugador.cartas_jugadas.all()
+    # Guardamos los puntos de cada equipo para mostrarlos
+    if my_jugador.equipo == 0:
+        my_puntos = my_partida.puntos_e1
+        adv_puntos = my_partida.puntos_e2
+    else:
+        my_puntos = my_partida.puntos_e2
+        adv_puntos = my_partida.puntos_e1
     context = {'partida': my_partida,
                 'my_cartas_disponibles': my_cartas_disponibles,
                 'my_cartas_jugadas': my_cartas_jugadas,
@@ -112,5 +119,7 @@ def partida(request,partida_id):
                 'adv_cartas_jugadas': adv_cartas_jugadas,
                 'username': request.user.username,
                 'opciones': my_opciones,
-                'mensaje': mensaje,}
+                'mensaje': mensaje,
+                'my_puntos': my_puntos,
+                'adv_puntos': adv_puntos,}
     return TemplateResponse(request, 'truco/partida.html',context)

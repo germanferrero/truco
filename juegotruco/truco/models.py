@@ -36,6 +36,7 @@ class Jugador(models.Model):
     cartas_jugadas = models.ManyToManyField(Carta, related_name='cartas_jugadas')
 
     def asignar_cartas(self, cartas):
+        self.cartas_jugadas = []
         self.cartas_disponibles = cartas
         self.cartas = cartas
         self.save()
@@ -126,7 +127,7 @@ class Partida(models.Model):
         ronda_actual = list(self.ronda_set.all())[-1]
         ronda_actual.tirar(jugador, carta)
         jugador.cartas_disponibles.remove(carta)
-        jugador.cartas_jugadas.add(carta) 
+        jugador.cartas_jugadas.add(carta) ## COMO HACER QUE SE AGREGUEN EN ORDEN! ____
         if ronda_actual.termino:
             self.actualizar_puntajes()
         return self.estado
@@ -231,6 +232,7 @@ class Ronda(models.Model):
         self.termino = self.hay_ganador()
         if self.termino:
             self.partida.crear_ronda()
+
         else:
             if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
                 ultimo_enfrentamiento = ultimo_enfrentamiento[0]
@@ -244,7 +246,6 @@ class Ronda(models.Model):
                 self.turno = (self.turno +1) % len(list(self.jugadores.all()))
                 self.save()
                 self.crear_enfrentamiento(jugador, carta)
-
 
 
 
@@ -329,7 +330,7 @@ class Enfrentamiento(models.Model):
         return self.ganador_pos
 
     def agregar_carta(self, carta):
-        tirada= Tirada.objects.create(carta=carta, enfrentamiento=self, orden=len(self.cartas.all()))
+        tirada = Tirada.objects.create(carta=carta, enfrentamiento=self, orden=len(self.cartas.all()))
         tirada.save()
 
 

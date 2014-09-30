@@ -10,7 +10,7 @@ TRUCO=0
 ENVIDO=1
 
 PTS_CANTO={
-    TRUCO : 0,
+    TRUCO : 1,
     ENVIDO : 1,
 }
 
