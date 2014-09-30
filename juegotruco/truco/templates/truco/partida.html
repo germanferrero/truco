@@ -22,15 +22,15 @@
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
-                {% for carta in adv_cartas_disponibles %}
+                {% for carta in adv_cartas_jugadas %}
                     {% if forloop.counter == 1 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                     {% endif %}
                     {% if forloop.counter == 2 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="segunda_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
                     {% endif %}
                     {% if forloop.counter == 3 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="tercera_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
                     {% endif %}
                 {% endfor %}
             </div>
@@ -51,15 +51,15 @@
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
-                {% for carta in adv_cartas_disponibles %}
+                {% for carta in my_cartas_jugadas %}
                     {% if forloop.counter == 1 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                     {% endif %}
                     {% if forloop.counter == 2 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="segunda_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
                     {% endif %}
                     {% if forloop.counter == 3 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%} id="tercera_imagen"/>
+                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
                     {% endif %}
                 {% endfor %}
             </div>

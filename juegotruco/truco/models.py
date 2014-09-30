@@ -36,8 +36,8 @@ class Jugador(models.Model):
     cartas_jugadas = models.ManyToManyField(Carta, related_name='cartas_jugadas')
 
     def asignar_cartas(self, cartas):
-        self.cartas = cartas
         self.cartas_disponibles = cartas
+        self.cartas = cartas
         self.save()
 
     def __str__(self):
@@ -126,7 +126,7 @@ class Partida(models.Model):
         ronda_actual = list(self.ronda_set.all())[-1]
         ronda_actual.tirar(jugador, carta)
         jugador.cartas_disponibles.remove(carta)
-        jugador.cartas_jugadas.add(carta)
+        jugador.cartas_jugadas.add(carta) ## COMO HACER QUE SE AGREGUEN EN ORDEN! ____
 # Como va a saber la ronda actual si ya termino si todavia no se tiro la carta!
 #        if ronda_actual.termino:
 #            self.actualizar_puntajes()
@@ -144,7 +144,7 @@ class Ronda(models.Model):
     termino = models.BooleanField(default=False)
     id_enfrentamiento_actual = models.IntegerField(default=0)
     id_canto_actual = models.IntegerField(default=0)
-    opciones = models.CharField(max_length=10, default= str(CANTAR_ENVIDO)) ## Por que default cantar envido?
+    opciones = models.CharField(max_length=10, default= str(CANTAR_ENVIDO)) ## TENDRIA QUE TENER LAS OPCIONES DE ENVIDO Y TRUCO COMO DEFAULT!
 
     def repartir(self):
         cartas_a_repartir = self.mazo.get_n_cartas(len(self.jugadores.all())*CARTAS_JUGADOR)
@@ -168,7 +168,7 @@ class Ronda(models.Model):
         else:
             ultimo_canto.rechazar()
         self.turno = ultimo_canto.pos_jugador_canto
-        self.opciones = ''
+#        self.opciones = ''
         self.save()
 
     def crear_canto(self, tipo, jugador):
@@ -229,17 +229,21 @@ class Ronda(models.Model):
 
     def tirar(self, jugador, carta):
         ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1:]
-        print "ultimo_enfrentamiento", ultimo_enfrentamiento
+#        print "ultimo_enfrentamiento", ultimo_enfrentamiento
         if ultimo_enfrentamiento and not ultimo_enfrentamiento[0].termino:
-            print "no se termino el enfrentamiento"
-            ultimo_enfrentamiento[0].agregar_carta(carta)
-            ganador = ultimo_enfrentamiento[0].get_ganador() ## POR QUE SE CALCULA EL GANADOR SI NI SI QUIERA SE SABE SI HAY UN GANADOR, NI SI TIENE QUE CALCULARLO!!
+#            print "no se termino el enfrentamiento"
+            ultimo_enfrentamiento = ultimo_enfrentamiento[0]
+            ultimo_enfrentamiento.agregar_carta(carta)
+###ACAAA
+            ganador = ultimo_enfrentamiento.get_ganador() ## POR QUE SE CALCULA EL GANADOR SI NI SI QUIERA SE SABE SI HAY UN GANADOR, NI SI TIENE QUE CALCULARLO!!
             self.turno = ganador
             self.termino = self.hay_ganador()
-            if list(self.enfrentamiento_set.all()).index(ultimo_enfrentamiento[0]) == 0:
+            if list(self.enfrentamiento_set.all()).index(ultimo_enfrentamiento) == 0:
                 self.opciones += str(CANTAR_TRUCO)
             self.save()
         else:
+            self.turno = (self.turno +1) % len(list(self.jugadores.all()))
+            self.save()
             self.crear_enfrentamiento(jugador, carta)
 
 
@@ -259,6 +263,7 @@ class Canto(models.Model):
         self.save()
         if int(self.tipo) == ENVIDO:
             ganador = self.get_ganador()
+            self.ronda.opciones = str(CANTAR_TRUCO)
 
     def rechazar(self):
         self.equipo_ganador = list(self.jugadores.all())[self.pos_jugador_canto].equipo
@@ -302,7 +307,7 @@ class Canto(models.Model):
 
 class Enfrentamiento(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
-    cartas = models.ManyToManyField(Carta, through='Tirada',verbose_name='cartas')
+    cartas = models.ManyToManyField(Carta, through='Tirada', verbose_name='cartas')
     jugador_empezo_pos = models.IntegerField(max_length=1)
     ganador_pos = models.IntegerField(max_length=1, default=-1)
     empate = models.BooleanField(default=False)
@@ -327,6 +332,8 @@ class Enfrentamiento(models.Model):
     def agregar_carta(self, carta):
         tirada= Tirada.objects.create(carta=carta, enfrentamiento=self, orden=len(self.cartas.all()))
         tirada.save()
+
+
 
 class Tirada(models.Model):
     carta = models.ForeignKey(Carta)

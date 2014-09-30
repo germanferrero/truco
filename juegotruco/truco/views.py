@@ -75,7 +75,7 @@ def partida(request,partida_id):
         if ultimo_canto and ultimo_canto[0].tipo == str(ENVIDO) and ultimo_canto[0].pts_en_juego > 1:
         # En caso de que se haya aceptado el envido
             ultimo_canto = ultimo_canto[0]
-            mensaje = "El equipo ganador es "+str(my_partida.jugadores.get(equipo=ultimo_canto.equipo_ganador))+" con "+str(ultimo_canto.puntos_ganador)+"puntos"
+            mensaje = "El equipo ganador del envido es el de "+str(my_partida.jugadores.get(equipo=ultimo_canto.equipo_ganador))+" con "+str(ultimo_canto.puntos_ganador)+" puntos"
         ##################################################
         if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador): # CAMBIAR! EN ESTE MOMENTO, LAS CARTAS SON BOTONES ACTIVOS! ENTONCES PODES PULSARLAS CUANDO ES EL TURNO DEL OTRO! SI SE VUELVEN INACTIVOS, HAY QUE SACAR ESTA LINEA
         # Es mi turno
@@ -99,12 +99,17 @@ def partida(request,partida_id):
     # Muestra las cartas del adversario
     adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
     adv_cartas_disponibles = []
+    adv_cartas_jugadas = []
     if adversario:
         adv_cartas_disponibles = list(adversario[0].cartas.all())
+        adv_cartas_jugadas = adversario[0].cartas_jugadas.all()
     my_cartas_disponibles = my_jugador.cartas_disponibles.all()
+    my_cartas_jugadas = my_jugador.cartas_jugadas.all()
     context = {'partida': my_partida,
                 'my_cartas_disponibles': my_cartas_disponibles,
+                'my_cartas_jugadas': my_cartas_jugadas,
                 'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
+                'adv_cartas_jugadas': adv_cartas_jugadas,
                 'username': request.user.username,
                 'opciones': my_opciones,
                 'mensaje': mensaje,}
