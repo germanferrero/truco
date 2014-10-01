@@ -8,7 +8,7 @@ urlpatterns = patterns(
     url(r'^lobby$', views.lobby, name='lobby'),
     url(r'^crear_partida$', views.crear_partida, name='crear_partida'),
     url(r'^unirse_partida$', views.unirse_partida, name='unirse_partida'),
-    url(r'^partida/(?P<partida_id>\d+)$', views.partida, name='partida'),
+    url(r'^partida/(?P<partida_id>\w+)$', views.partida, name='partida'),
     url(r'^en_espera/(?P<partida_id>\d+)$', views.partida, name='en_espera'),
     url(r'^ronda/(?P<ronda_id>\d+)$', views.partida, name='ronda'),
 )

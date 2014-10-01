@@ -92,7 +92,47 @@ class Partida(models.Model):
         # Devuelve true si una partida esta lista para empezar nueva ronda
         rondas_terminadas = all(ronda.termino for ronda in list(self.ronda_set.all())[-1:])
         jugadores_listos = len(self.jugadores.all()) == self.cantidad_jugadores
-        return rondas_terminadas and jugadores_listos
+        ganador = self.get_ganador()
+        return rondas_terminadas and jugadores_listos and ganador >=0
+
+    def get_ronda_actual(self):
+        #Devuelve la ronda acutal
+        try:
+            ronda = list(self.ronda_set.all())[-1]
+        except:
+            ronda = None
+        return None
+
+    def get_mensaje_ganador(self,user):
+        #Devuelve "Has Ganado" si user gano, "Has perdido" si perdio, '' sino
+        result = ''
+        jugador = partida.find_jugador(user)
+        equipo = jugador.equipo
+        ganador = partida.get_ganador()
+        if ganador >= 0:
+            if ganador == equipo:
+                result = 'Has ganado'
+            else:
+                result = 'Has perdido'
+        return result
+
+
+
+    def find_jugador(self,user):
+        try:
+            jugador = self.jugadores.get(user=user)
+        except:
+            jugador = None
+        return jugador
+
+
+    def get_ganador(self):
+        result = -1
+        if(self.puntos_e1 >= self.puntos_objetivo):
+            result = 0
+        elif(self.puntos_e2 >= self.puntos_objetivo):
+            result = 1
+        return result
 
     def get_puntajes(self, user):
         # Devuelve el puntaje en la partida para mostrarle a un usuario
@@ -122,14 +162,10 @@ class Partida(models.Model):
         # Actualiza el estado de la ronda
         if len(self.jugadores.all()) == self.cantidad_jugadores:
             self.estado = EN_CURSO
-            if (self.puntos_e1 >= self.puntos_objetivo
-                or self.puntos_e2 >= self.puntos_objetivo):
-                # Algun equipo logro los puntos objetivo, se termina la partida
-                self.estado = FINALIZADA
             self.save()
 
-#    def get_absolute_url(self):
-#        return HttpResponseRedirect(reverse('partida'))
+    def get_absolute_url(self):
+        return reverse('partida',(),{'partida_id':self.id})
 
     def __unicode__(self):
         return self.nombre
@@ -162,8 +198,6 @@ class Partida(models.Model):
 #        jugador.cartas_disponibles.remove(carta)
 #        jugador.cartas_jugadas.add(carta)
 
-    def get_absolute_url(self):
-        return ('ronda',(),{'id':self.id})
 
 
 
@@ -174,6 +208,12 @@ class Ronda(models.Model):
     mazo = Mazo()
     mano_pos = models.IntegerField(max_length=1,default=0)
     termino = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        return ('ronda',(),{'id':self.id})
+
+    def get_turno(self):
+        return 0
 
     def repartir(self):
         # Toma cartas al azar del mazo y las asigna a los jugadores
@@ -309,7 +349,7 @@ class Canto(models.Model):
     pts_en_juego = models.IntegerField(max_length=1, default=1)
     equipo_ganador = models.IntegerField(max_length=1, default =-1)
     pos_jugador_canto = models.IntegerField(max_length=1)
-    estado = models.IntegerField(max_length=1, default=-1)
+    estado = models.IntegerField(max_length=1, default=NO_CONTESTADO)
 
     def aceptar(self):
         self.estado = ACEPTADO
@@ -372,13 +412,14 @@ class Enfrentamiento(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name= "ronda")
     cartas = models.ManyToManyField(Carta, through='Tirada',verbose_name='cartas')
     jugador_empezo_pos = models.IntegerField(max_length=1)
-    ganador_pos = models.IntegerField(max_length=1, default=-1)
-    termino = models.BooleanField(default=False)
+    cantidad_jugadores = models.IntegerField(max_length=1,default=2)
+
+    def get_termino(self):
+        return (len(self.cartas.all()) == self.cantidad_jugadores)
 
     def get_ganador(self):
         # Esta funcion es invocada al finalizar un enfrentamiento
         # y devuelve el ganador del mismo, o -1 es caso de empate
-        self.termino = True
         # De las cartas del enfrentamiento obtiene la de mayor (min->mayor) valor jerarquico
         carta_puntaje_ganador = min(self.cartas.all(), key= lambda c: c.valor_jerarquico)
         maximo_puntaje = carta_puntaje_ganador.valor_jerarquico
@@ -388,15 +429,14 @@ class Enfrentamiento(models.Model):
         if len(cartas_ganadoras) > 1:
             # Hay un empate, pues hay 2 cartas con el mismo valor jerarquico
             # En proximas iteraciones hay que diferenciar a que equipo pertenecen las cartas
-            self.ganador_pos=-1
+            ganador_pos=-1
         else:
             # Ver documentacion: "Problema de orden en que se jugaron las cartas"
             # Orden en que fue jugada la carta ganadora. Ej: "la segunda carta"
             carta_ganadora_pos = list(self.cartas.order_by("tirada__orden")).index(carta_puntaje_ganador)
             # Calculamos a quien corresponde, segun quien empezo y la carta que gano
-            self.ganador_pos = (self.jugador_empezo_pos + carta_ganadora_pos)%len(self.cartas.all())
-        self.save()
-        return self.ganador_pos
+            ganador_pos = (self.jugador_empezo_pos + carta_ganadora_pos)%len(self.cartas.all())
+        return ganador_pos
 
     def agregar_carta(self, carta):
         # Agregamos una carta al enfrentamiento guardando el orden en que se lanzo
