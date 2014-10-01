@@ -57,7 +57,7 @@ def unirse_partida(request):
         return redirect(reverse('truco:lobby'))
     else:
         partida.actualizar_estado()
-        return redirect('en_espera/%d' % int(partida.id))
+        return redirect('en_espera/%d' % partida.id)
 
 
 @login_required(login_url='/usuarios/login')
@@ -66,11 +66,11 @@ def partida(request,partida_id):
     if partida:
         if partida.is_ready():
             ronda = partida.crear_ronda()
-            return redirect('ronda/%d' % int(partida.id))
+            return redirect('ronda/%d' % partida.id)
         else:
             context = {'partida' : partida,
                         'puntajes' : partida.get_puntajes(request.user),
-                        'username' : None,
+                        'username' : request.user.username,
                         'mensaje_ganador' : partida.get_mensaje_ganador(request.user)}
             return render(request,'truco/partida.html',context)
     else:
@@ -82,7 +82,7 @@ def en_espera(request,partida_id):
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     if ronda and jugador == ronda.get_turno():
-        return redirect('truco/ronda%d' % int(partida_id))
+        return redirect('partida/ronda/%d' % int(partida_id))
     else:
         context = { 'puntajes' : partida.get_puntajes(request.user),
                     'ronda' : ronda,

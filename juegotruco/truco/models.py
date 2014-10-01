@@ -64,6 +64,8 @@ class Lobby:
             # Verifica que el usuario no este ya en la partida
             if j.user.id == user.id:
                 result = -1
+        if result == 0:
+            partida.agregar_jugador(user)
         return result
 
 
@@ -93,7 +95,7 @@ class Partida(models.Model):
         rondas_terminadas = all(ronda.termino for ronda in list(self.ronda_set.all())[-1:])
         jugadores_listos = len(self.jugadores.all()) == self.cantidad_jugadores
         ganador = self.get_ganador()
-        return rondas_terminadas and jugadores_listos and ganador >=0
+        return rondas_terminadas and jugadores_listos and ganador < 0
 
     def get_ronda_actual(self):
         #Devuelve la ronda acutal
@@ -106,9 +108,9 @@ class Partida(models.Model):
     def get_mensaje_ganador(self,user):
         #Devuelve "Has Ganado" si user gano, "Has perdido" si perdio, '' sino
         result = ''
-        jugador = partida.find_jugador(user)
+        jugador = self.find_jugador(user)
         equipo = jugador.equipo
-        ganador = partida.get_ganador()
+        ganador = self.get_ganador()
         if ganador >= 0:
             if ganador == equipo:
                 result = 'Has ganado'
@@ -213,7 +215,28 @@ class Ronda(models.Model):
         return ('ronda',(),{'id':self.id})
 
     def get_turno(self):
-        return 0
+        canto = self.canto_set.filter(estado=NO_CONTESTADO)
+        enfrentamiento = list(self.enfrentamiento_set.all())[-1:]
+        if canto:
+            # Hay un canto que no se contesto aun, el turno es de quien debe responder
+            turno_pos = (canto[0].pos_jugador_canto + 1) % len(self.jugadores.all())
+        elif enfrentamiento and enfrentamiento[0].get_termino():
+            # No hay un canto abierto, y el ultimo enfrentamiento termino
+            # El turno es del ganador
+            turno_pos = enfrentamiento[0].get_ganador()
+            if turno_pos == -1:
+                # Si hubo un empate, el turno es del mano
+                turno_pos = self.mano_pos
+        elif enfrentamiento:
+            # Hay un enfrentamiento sin terminar
+            # El turno se calcula segun la cantidad de cartas del enfrentamiento
+            jugador_que_empezo = enfrentamiento[0].jugador_empezo_pos
+            cant_cartas_jugadas = len(enfrentamiento[0].cartas.all())
+            turno_pos = (jugador_que_empezo + cant_cartas_jugadas) % len(self.jugadores.all())
+        else:
+            # No hay un canto abierto ni enfrentamientos existentes
+            turno_pos = self.mano_pos
+        return turno_pos
 
     def repartir(self):
         # Toma cartas al azar del mazo y las asigna a los jugadores
@@ -228,6 +251,7 @@ class Ronda(models.Model):
         # Crea un enfrentamiento indicando el jugador que comienza el mismo
         enfrentamiento = Enfrentamiento()
         enfrentamiento.ronda = self
+        enfrentamiento.cantidad_jugadores = len(self.jugadores.all())
         enfrentamiento.jugador_empezo_pos = list(self.jugadores.all()).index(jugador)
         enfrentamiento.save()
 

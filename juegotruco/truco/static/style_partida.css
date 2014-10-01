@@ -47,9 +47,9 @@ img {
 #pantalla_de_juego{
     background-color:#424242;
     border-radius: 10px;
-    height:800px;
+    height:600px;
     width: 600px;
-    margin-left: 500px;
+    margin-left: 20%;
     clear:left;
     text-align:center;
     margin-top: -5px;
@@ -111,6 +111,7 @@ img {
     float: right;
     text-align:center;
     margin-top: 60px;
+    color: white;
 }
 
 #cuadro_botones {
