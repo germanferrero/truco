@@ -14,8 +14,8 @@ browser->+view: request
 view->+auth: create_user()
 auth->+User: get
 User-->-auth: new_user
-auth-->view:new_user
-view-->-browser: HttpResponseRedirect(lobby)
+auth-->-view:new_user
+view-->-browser: Redirect(lobby)
 
 
 INICIAR SESION
@@ -24,7 +24,7 @@ browser->+view: request
 view->+auth: autenticate
 auth->+User: get
 User-->-auth: user
-auth-->view:user
+auth-->-view:user
 view-->-browser: HttpResponseRedirect(lobby)
 
 
@@ -70,16 +70,17 @@ view-->-browser: Redirect(EnEspera)
 
 ACEPTAR ENVIDO
 
-browser->+view: request(QUIERO) 
+browser->+view: request(QUIERO)
 view->Envido: aceptar()
+Envido->Envido: set_puntos_en_juego()
 view->+Envido: get_ganador()
 Envido-->-view: ganador, puntaje
-view-->-browser: response
+view-->-browser: Redirect(EnEspera)
 
 
 RECHAZAR ENVIDO
 
-browser->+view: request(QUIERO) 
+browser->+view: request(NO QUIERO)
 view->Envido: aceptar()
 Envido->Envido: set_puntos_en_juego()
 view->+Envido: get_ganador()
@@ -98,13 +99,32 @@ ACEPTAR TRUCO
 
 browser->+view: request(QUIERO) 
 view->Canto: aceptar()
-view-->-browser: redirect(EnEspera)
+view-->-browser: Redirect(EnEspera)
+
+
+RECHAZAR TRUCO
+
+browser->+view: request(QUIERO) 
+view->Canto: rechazar()
+view-->-browser: Redirect(EnEspera)
+
+
+ENFRENTAMIENTO
+
+browser->+view: request(carta)
+alt No hay un enfrentamiento creado
+    view->+Ronda: crear_enfrentamiento()
+    Ronda->+Enfrentamiento: agregar_carta()
+    Ronda-->-view: enfrentamiento
+else Ya hay unfrentamiento iniciado
+    view->+Enfrentamiento: agregar_carta()
+view-->-browser: Redirect(enfrentamiento)
 
 
 CERRAR SESIÓN
 
 browser->+view: request
 view->auth: logout()
-view-->-browse: HttpResponseRedirect(lobby)
+view-->-browse: Redirect(lobby)
 
 
