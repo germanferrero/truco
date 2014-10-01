@@ -7,15 +7,6 @@ else No está logueado
     view-->-browser: TemplateResponse(index)
 end
 
-INICIAR SESION
-
-browser->+view: request
-view->+auth: autenticate
-auth->+User: get
-User-->-auth: user
-auth-->view:user
-view-->-browser: HttpResponseRedirect(lobby)
-
 
 REGISTRO DE CUENTA
 
@@ -25,6 +16,17 @@ auth->+User: get
 User-->-auth: new_user
 auth-->view:new_user
 view-->-browser: HttpResponseRedirect(lobby)
+
+
+INICIAR SESION
+
+browser->+view: request
+view->+auth: autenticate
+auth->+User: get
+User-->-auth: user
+auth-->view:user
+view-->-browser: HttpResponseRedirect(lobby)
+
 
 
 CREAR PARTIDA
@@ -58,6 +60,7 @@ Ronda->Jugador1: asignar_cartas(cartas[0..2])
 Ronda->Jugador2: asignar_cartas(cartas[3..5])
 view-->-browser: Redirect(Ronda)
 
+
 CANTAR ENVIDO
 
 browser->+view: request
@@ -84,6 +87,24 @@ Envido-->-view: ganador, puntaje
 view-->-browser: Redirect(EnEspera)
 
 
-ENFRENTAMIENTO
+CANTAR TRUCO
+
+browser->+view: request
+view->Ronda: crear_canto(truco)
+view-->-browser: Redirect(EnEspera)
+
+
+ACEPTAR TRUCO
+
+browser->+view: request(QUIERO) 
+view->Canto: aceptar()
+view-->-browser: redirect(EnEspera)
+
+
+CERRAR SESIÓN
+
+browser->+view: request
+view->auth: logout()
+view-->-browse: HttpResponseRedirect(lobby)
 
 
