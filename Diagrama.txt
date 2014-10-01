@@ -11,41 +11,78 @@ end
 REGISTRO DE CUENTA
 
 browser->+view: request
-view->+auth: create_user()
-auth->+User: get
-User-->-auth: new_user
-auth-->-view:new_user
+view->+Form: is_valid()
+Form-->-view: true
+view->+Auth: create_user()
+Auth->+User: get
+User-->-Auth: new_user
+Auth-->-view:new_user
 view-->-browser: Redirect(lobby)
+
+
+ERROR REGISTRO DE CUENTA
+
+browser->+view: request
+view->+Form: is_valid()
+Form-->-view: false
+view-->-browser: Redirect(Registro)
 
 
 INICIAR SESION
 
 browser->+view: request
-view->+auth: autenticate
-auth->+User: get
-User-->-auth: user
-auth-->-view:user
+view->+Form: is_valid()
+Form-->-view: true
+view->+Auth: autenticate
+Auth->+User: get
+User-->-Auth: user
+Auth-->-view:user
 view-->-browser: HttpResponseRedirect(lobby)
 
+
+ERROR INICIAR SESION
+
+browser->+view: request
+view->+Form: is_valid()
+Form-->-view: false
+view-->-browser: Redirect(IniciarSesion)
 
 
 CREAR PARTIDA
 
 browser->+view: request
+view->+Form: is_valid()
+Form-->-view: true
 view->+Partida: crear_partida()
 Partida-->-view: partida
 view->+Partida: agregar_jugador()
-Partida-->- view: jugador
+Partida-->-view: jugador
 view-->-browser: Redirect(Partida)
+
+
+ERROR AL CREAR PARTIDA
+
+browser->+view: request
+view->+Form: is_valid()
+Form-->-view: false
+view-->-browser: Redirect(CrearPartida)
 
 
 UNIRSE A UNA PARTIDA
 
-browser->+view: request
-view->+Partida: get
-Partida-->-view: partida
-view->Partida: agregar_jugador(user)
+browser->+view: request(partida)
+view->Lobby: unirse_partida()
+Lobby->Partida: agregar_jugador()
+Partida->view: éxito
 view-->-browser: Redirect(EnEspera)
+
+
+ERROR UNIRSE A UNA PARTIDA
+
+browser->+view: request
+view->+Lobby: unirse_partida()
+Lobby-->-view: error
+view-->-browser: Redirect(UnirsePartida)
 
 
 INICIAR RONDA
@@ -81,7 +118,7 @@ view-->-browser: Redirect(EnEspera)
 RECHAZAR ENVIDO
 
 browser->+view: request(NO QUIERO)
-view->Envido: aceptar()
+view->Envido: rechazar()
 Envido->Envido: set_puntos_en_juego()
 view->+Envido: get_ganador()
 Envido-->-view: ganador, puntaje
@@ -109,22 +146,48 @@ view->Canto: rechazar()
 view-->-browser: Redirect(EnEspera)
 
 
-ENFRENTAMIENTO
+TIRAR UNA CARTA
 
 browser->+view: request(carta)
 alt No hay un enfrentamiento creado
     view->+Ronda: crear_enfrentamiento()
-    Ronda->+Enfrentamiento: agregar_carta()
+    Ronda->Enfrentamiento: agregar_carta()
     Ronda-->-view: enfrentamiento
 else Ya hay unfrentamiento iniciado
-    view->+Enfrentamiento: agregar_carta()
-view-->-browser: Redirect(enfrentamiento)
+    view->Enfrentamiento: agregar_carta()
+    view->+Enfrentamiento:termino()
+    Enfrentamiento-->-view: estado
+end
+    view-->-browser: Redirect(EnEspera)
+
+
+PARTIDA
+
+browser->+view: request()
+view->+Partida: partida_is_ready()
+alt Se terminó la ronda pero no la partida
+    Partida-->-view: true
+    view-->-browser: Redirect(ronda)
+else Se terminó la partida
+    Partida-->-view: false
+    view-->-browser: Redirect(index)
+end
+
+
+EN ESPERA
+
+browser->+view: request()
+view->+Ronda: mi_turno()
+alt No es mi turno aún
+    Ronda-->-view: false
+    view-->-browser: Redirect(EnEspera)
+else Es mi turno
+    Ronda-->-view: true
+    view-->-browser: Redirect(Ronda)
 
 
 CERRAR SESIÓN
 
 browser->+view: request
-view->auth: logout()
-view-->-browse: Redirect(lobby)
-
-
+view->Auth: logout()
+view-->-browser: Redirect(lobby)
