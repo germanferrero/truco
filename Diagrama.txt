@@ -1,3 +1,12 @@
+HOME
+
+browser->+view: request
+alt Si está logueado
+    view-->-browser: Redirect(Lobby)
+else No está logueado
+    view-->-browser: TemplateResponse(index)
+end
+
 INICIAR SESION
 
 browser->+view: request
@@ -20,42 +29,61 @@ view-->-browser: HttpResponseRedirect(lobby)
 
 CREAR PARTIDA
 
-browser->view: request
+browser->+view: request
 view->+Partida: crear_partida()
-Partida-->view: partida
-view-> +Partida: agregar_jugador()
-Partida-> view: jugador
-view-> Partida: set_mano(jugador)
-view-->-browser: response
+Partida-->-view: partida
+view->+Partida: agregar_jugador()
+Partida-->- view: jugador
+view-->-browser: Redirect(Partida)
 
 
 UNIRSE A UNA PARTIDA
 
-browser->view: request
+browser->+view: request
 view->+Partida: get
 Partida-->-view: partida
-view->Partida: agregar_jugador()
-view->browser: response
+view->Partida: agregar_jugador(user)
+view-->-browser: Redirect(EnEspera)
 
 
-CREAR RONDA
+INICIAR RONDA
 
-browser->view: request
+browser->+view: request
 view->Partida: crear_ronda()
 Partida-->view: ronda
 view->Ronda: repartir()
-Ronda->Mazo: get_n_cartas()
-Mazo-->Ronda: cartas
+Ronda->+Mazo: get_n_cartas()
+Mazo-->-Ronda: cartas
 Ronda->Jugador1: asignar_cartas(cartas[0..2])
 Ronda->Jugador2: asignar_cartas(cartas[3..5])
-view-->-browser: response
-
+view-->-browser: Redirect(Ronda)
 
 CANTAR ENVIDO
 
-browser->view: request
-view->+Partida: get
-Partida-->-view: partida
+browser->+view: request
 view->Ronda: crear_canto(envido)
-view->browser: response
+view-->-browser: Redirect(EnEspera)
+
+
+ACEPTAR ENVIDO
+
+browser->+view: request(QUIERO) 
+view->Envido: aceptar()
+view->+Envido: get_ganador()
+Envido-->-view: ganador, puntaje
+view-->-browser: response
+
+
+RECHAZAR ENVIDO
+
+browser->+view: request(QUIERO) 
+view->Envido: aceptar()
+Envido->Envido: set_puntos_en_juego()
+view->+Envido: get_ganador()
+Envido-->-view: ganador, puntaje
+view-->-browser: Redirect(EnEspera)
+
+
+ENFRENTAMIENTO
+
 
