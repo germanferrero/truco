@@ -56,12 +56,6 @@ def unirse_partida(request):
     if my_lobby.unirse_partida(request.user,my_partida) == -1:
         return redirect(reverse('truco:lobby'))
     else:
-        context = {'ronda' : ronda,
-                    'cartas_disponibles' : jugador.get_cartas_diponibles(),
-                    'cartas_jugadas' : ronda.enfrentamiento_set.all(),
-                    'cant_cartas_adversario' : ronda.cant_cartas_adversario(jugador),
-                    'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
-                  }
         return redirect('en_espera/%d' % int(my_partida.id))
 
 
@@ -88,6 +82,12 @@ def en_espera(request,partida_id):
     if ronda and jugador == ronda.get_turno():
         return redirect(ronda.get_instancia())
     else:
+        context = {'ronda' : ronda,
+                    'cartas_disponibles' : jugador.get_cartas_diponibles(),
+                    'cartas_jugadas' : jugador.get_cartas_jugadas(),
+                    'cant_cartas_adversario' : ronda.cant_cartas_adversario(jugador),
+                    'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
+                  }
         return render(request,'truco/en_espera.html',{})
 
 def ronda(request,ronda_id):
@@ -113,7 +113,7 @@ def ronda(request,ronda_id):
     else:
         context = {'ronda' : ronda,
                     'cartas_disponibles' : jugador.get_cartas_diponibles(),
-                    'cartas_jugadas' : ronda.enfrentamiento_set.all(),
+                    'cartas_jugadas' : jugador.get_cartas_jugadas(),
                     'cant_cartas_adversario' : ronda.cant_cartas_adversario(jugador),
                     'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
                     'opciones' : ronda.get_opciones()
