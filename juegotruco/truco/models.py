@@ -40,6 +40,12 @@ class Jugador(models.Model):
         self.cartas_jugadas = []
         self.save()
 
+    def get_cartas_diponibles(self):
+        return list(self.cartas_disponibles)
+
+    def get_cartas_jugadas(self):
+        return list(self.cartas_jugadas)
+
     def __str__(self):
         return self.nombre
 
@@ -117,8 +123,6 @@ class Partida(models.Model):
             else:
                 result = 'Has perdido'
         return result
-
-
 
     def find_jugador(self,user):
         try:
@@ -211,6 +215,28 @@ class Ronda(models.Model):
     mano_pos = models.IntegerField(max_length=1,default=0)
     termino = models.BooleanField(default=False)
 
+    def get_opciones(self):
+        canto = self.canto_set.filter(estado=NO_CONTESTADO)  # Hay un canto no contestado
+        primer_enfrentamiento = list(self.enfrentamiento_set.all())[0:]
+        if canto:
+            opciones = str(QUIERO) + str(NO_QUIERO)
+        elif (primer_enfrentamiento and primer_enfrentamiento[0].get_termino()
+            and not any[canto.tipo == TRUCO in self.canto_set.all()]):
+            opciones = str(TRUCO)
+        elif not any[canto.tipo == ENVIDO in self.canto_set.all()]:
+            opciones = str(ENVIDO)
+        else:
+            opciones = ''
+        return opciones
+
+    def cant_cartas_adversario(self, jugador):
+        cant_cartas = [len(i.cartas_disponibles.all()) for i in self.jugadores if i != jugador]
+        return cant_cartas
+
+    def cartas_jugadas_adversario(self, jugador):
+        cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores if i != jugador]
+        return cartas
+
     def get_absolute_url(self):
         return ('ronda',(),{'id':self.id})
 
@@ -280,6 +306,13 @@ class Ronda(models.Model):
         canto.save()
         canto.jugadores = self.jugadores.all()
         canto.save()
+
+    def get_ultimo_enfrentamiento(self):
+        try:
+            ultimo_enfrentamiento = list(self.enfrentamiento_set.all())[-1]
+        except:
+            ultimo_enfrentamiento = None
+        return ultimo_enfrentamiento
 
     def calcular_puntos(self):
         # Una vez terminada la ronda se calculan los puntos de los equipos
@@ -379,7 +412,7 @@ class Canto(models.Model):
         self.estado = ACEPTADO
         self.pts_en_juego += 1
         if self.tipo == ENVIDO:
-            ultimo_canto.envido.get_ganador()
+            self.envido.get_ganador()
         self.save()
 
     def rechazar(self):
