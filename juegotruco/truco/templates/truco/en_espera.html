@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% extends "partida.html" %}
+{% load staticfiles %}
+<html>
+    <head>
+        <title> Ronda </title>
+    </head>
+
+    <body>
+            <div id="cuadro_cartas_rival">
+                {% for i in cant_cartas_adversario %}
+                    <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
+                {% endfor %}
+            </div>
+
+            <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
+                {% for carta in cartas_jugadas_adversario %}
+                    {% if forloop.counter == 1 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                    {% endif %}
+                    {% if forloop.counter == 2 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                    {% endif %}
+                    {% if forloop.counter == 3 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
+                {% for carta in cartas_jugadas %}
+                    {% if forloop.counter == 1 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                    {% endif %}
+                    {% if forloop.counter == 2 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                    {% endif %}
+                    {% if forloop.counter == 3 %}
+                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <div id="cuadro_cartas_usuario">
+                {% for carta in cartas_disponibles %}
+                    <img src={% static "truco/images/"%}{{carta}}/>
+                {% endfor %}
+            </div>
+        </div>
+    </body>
+</html>
