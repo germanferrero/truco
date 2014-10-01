@@ -44,10 +44,12 @@ img {
     margin-top: -25px;
 }
 
-#pantalla_medio{
+#pantalla_de_juego{
     background-color:#424242;
     border-radius: 10px;
-    height:600px;
+    height:800px;
+    width: 600px;
+    margin-left: 500px;
     clear:left;
     text-align:center;
     margin-top: -5px;
@@ -101,9 +103,14 @@ img {
     position:absolute;
 }
 
-#mensaje{
-    color:white;
-    float:right;
+#puntajes{
+    background-color:#424242;
+    border-radius: 10px;
+    height:80px;
+    width: 120px;
+    float: right;
+    text-align:center;
+    margin-top: 60px;
 }
 
 #cuadro_botones {

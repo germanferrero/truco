@@ -79,6 +79,27 @@ class Partida(models.Model):
     mano_pos = models.IntegerField(max_length=1,default=0)
     cantidad_jugadores = models.IntegerField(default=2)
 
+    @classmethod
+    def get(self,id):
+        try:
+            partida = Partida.objects.get(id=id)
+        except:
+            partida = None
+        return partida
+
+    def is_ready(self):
+        rondas_terminadas = all(ronda.termino for ronda in list(self.ronda_set.all()))
+        jugadores_listos = len(self.jugadores.all()) == self.cantidad_jugadores
+        return rondas_terminadas and jugadores_listos
+
+    def get_puntajes(self,user):
+        jugador = self.jugadores.get(user=user)
+        if jugador.equipo == 0:
+            result = [self.puntos_e1,self.puntos_e2]
+        else:
+            result = [self.puntos_e2,self.puntos_e1]
+        return result
+
     def agregar_jugador(self,user):
         #Agrega jugadores a la partida, uno a cada equipo por orden de ingreso.
             jugador = Jugador(nombre=user.username,equipo=len(self.jugadores.all())%2)
@@ -135,6 +156,8 @@ class Partida(models.Model):
             self.actualizar_puntajes()
         return self.estado
 
+    def get_absolute_url(self):
+        return ('ronda',(),{'id':self.id})
 
 
 class Ronda(models.Model):
@@ -210,7 +233,7 @@ class Ronda(models.Model):
         enfrentamientos_ganados=[0,0]
         # Verificamos si el truco estaba cantado
         canto = self.canto_set.filter(tipo=TRUCO)
-        if canto & canto[0].equipo_ganador >=0:
+        if canto and canto[0].equipo_ganador >=0:
             # Truco cantado y rechazado, por lo tanto ya hay un ganador
             puntajes[canto[0].equipo_ganador] += 1
         else:
@@ -374,7 +397,7 @@ class Enfrentamiento(models.Model):
         else:
             # Ver documentacion: "Problema de orden en que se jugaron las cartas"
             # Orden en que fue jugada la carta ganadora. Ej: "la segunda carta"
-            carta_ganadora_pos = list(self.cartas.order_by("tirada__orden")).index(carta_ganadora)
+            carta_ganadora_pos = list(self.cartas.order_by("tirada__orden")).index(carta_puntaje_ganador)
             # Calculamos a quien corresponde, segun quien empezo y la carta que gano
             self.ganador_pos = (self.jugador_empezo_pos + carta_ganadora_pos)%len(self.cartas.all())
         self.save()

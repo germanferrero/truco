@@ -23,10 +23,10 @@ def index(request):
     if request.method == 'POST':
         # Si hay un POST, se redirecciona a login o create_user
         url = data=request.POST
-        return HttpResponseRedirect(request, url)  #'truco/index.html')
+        return redirect(request, url)  #'truco/index.html')
     else:
         # Si esta logueado entra al lobby directamente
-        return HttpResponseRedirect(reverse('truco:lobby'))
+        return redirect(reverse('truco:lobby'))
 
 
 @login_required(login_url='/usuarios/login')
@@ -39,11 +39,10 @@ def crear_partida(request):
                                                 form.cleaned_data['nombre'],
                                                 form.cleaned_data['puntos_objetivo'],
                                                 form.cleaned_data['password'])
-            return HttpResponseRedirect('partida/%d' % int(my_partida.id))
+            return redirect('partida/%d' % int(my_partida.id))
         else:
             # Si el formulario es incorrecto se muestran los errores.
-            return TemplateResponse(request, 'truco/crear_partida.html',
-                                    {'form': form})
+            return render(request, 'truco/crear_partida.html',{'form': form})
     else:
         # SI hay un GET se muestra el formulario para crear partida.
         form = crear_partida_form()
@@ -52,74 +51,99 @@ def crear_partida(request):
 
 @login_required(login_url='/usuarios/login')
 def unirse_partida(request):
-    my_partida = Partida.objects.get(pk=request.POST['partida'])
+    my_partida = Partida.get(request.POST['partida'])
     my_lobby = Lobby()
     if my_lobby.unirse_partida(request.user,my_partida) == -1:
-        return HttpResponseRedirect(reverse('truco:lobby'))
+        return redirect(reverse('truco:lobby'))
     else:
-        return HttpResponseRedirect('partida/%d' % int(my_partida.id))
+        return redirect('en_espera/%d' % int(my_partida.id))
 
 
 @login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
-    my_partida = Partida.objects.get(id=partida_id)
-    my_jugador = my_partida.jugadores.get(user=request.user)
-    my_ronda = list(my_partida.ronda_set.all())
-    my_opciones = []
-    mensaje = ""
-    if my_ronda:
-        my_ronda = my_ronda[-1]
-        ###################################################
-        # Lo que esta entre estos simbolos sirve para mostrar el mensaje del ganador del envido.
-        ultimo_canto = list(my_ronda.canto_set.all())[-1:]
-        if ultimo_canto and ultimo_canto[0].tipo == str(ENVIDO) and ultimo_canto[0].pts_en_juego > 1:
-        # En caso de que se haya aceptado el envido
-            ultimo_canto = ultimo_canto[0]
-            mensaje = "El equipo ganador del envido es el de "+str(my_partida.jugadores.get(equipo=ultimo_canto.equipo_ganador))+" con "+str(ultimo_canto.puntos_ganador)+" puntos"
-        ##################################################
-        if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador): # CAMBIAR! EN ESTE MOMENTO, LAS CARTAS SON BOTONES ACTIVOS! ENTONCES PODES PULSARLAS CUANDO ES EL TURNO DEL OTRO! SI SE VUELVEN INACTIVOS, HAY QUE SACAR ESTA LINEA
-        # Es mi turno
-            if request.method == 'POST':
-                if 'opcion' in request.POST:
-                # Si el jugador elige una opcion del costado
-                    opcion = request.POST['opcion']
-                    if opcion == "CANTAR ENVIDO":
-                        my_ronda.crear_canto(ENVIDO, my_jugador)
-                    elif opcion == "CANTAR TRUCO":
-                        my_ronda.crear_canto(TRUCO, my_jugador)
-                    else:
-                        my_ronda.responder_canto(opcion)
-                elif 'carta' in request.POST:
-                # Si el jugador elige una carta para tirar
-                    my_partida.tirar(my_jugador, Carta.objects.get(id=request.POST['carta']))
-            # Se establecen las opciones para mostrarle al jugador
-            if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
-                my_opciones = my_ronda.opciones
-                my_opciones = map(lambda x: OPCIONES[int(x)], my_opciones)
-    # Muestra las cartas del adversario
-    adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
-    adv_cartas_disponibles = []
-    adv_cartas_jugadas = []
-    if adversario:
-        adv_cartas_disponibles = list(adversario[0].cartas_disponibles.all())
-        adv_cartas_jugadas = adversario[0].cartas_jugadas.all()
-    my_cartas_disponibles = my_jugador.cartas_disponibles.all()
-    my_cartas_jugadas = my_jugador.cartas_jugadas.all()
-    # Guardamos los puntos de cada equipo para mostrarlos
-    if my_jugador.equipo == 0:
-        my_puntos = my_partida.puntos_e1
-        adv_puntos = my_partida.puntos_e2
+    partida = Partida.get(partida_id)
+    if partida:
+        if partida.is_ready():
+            ronda = partida.crear_ronda()
+            return redirect(ronda)
+        else:
+            context = {'puntajes' : partida.get_puntajes(request.user),
+                        'username' : request.user.username,
+                        'partida' : partida}
+            return render(request,'truco/partida.html',context)
     else:
-        my_puntos = my_partida.puntos_e2
-        adv_puntos = my_partida.puntos_e1
-    context = {'partida': my_partida,
-                'my_cartas_disponibles': my_cartas_disponibles,
-                'my_cartas_jugadas': my_cartas_jugadas,
-                'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
-                'adv_cartas_jugadas': adv_cartas_jugadas,
-                'username': request.user.username,
-                'opciones': my_opciones,
-                'mensaje': mensaje,
-                'my_puntos': my_puntos,
-                'adv_puntos': adv_puntos,}
-    return TemplateResponse(request, 'truco/partida.html',context)
+        return redirect(reverse('index'))
+
+
+def en_espera(request,partida_id):
+    partida = Partida.get(partida_id)
+    ronda = partida.get_ronda_actual()
+    jugador = Partida.find_jugador(request.user)
+    if ronda and jugador == ronda.get_turno():
+       return redirect(ronda)
+    else:
+       return render(request,'truco/en_espera.html',{})
+
+    # my_partida = Partida.objects.get(id=partida_id)
+    # my_jugador = my_partida.jugadores.get(user=request.user)
+    # my_ronda = list(my_partida.ronda_set.all())
+    # my_opciones = []
+    # mensaje = ""
+    # if my_ronda:
+    #     my_ronda = my_ronda[-1]
+    #     ###################################################
+    #     # Lo que esta entre estos simbolos sirve para mostrar el mensaje del ganador del envido.
+    #     ultimo_canto = list(my_ronda.canto_set.all())[-1:]
+    #     if ultimo_canto and ultimo_canto[0].tipo == str(ENVIDO) and ultimo_canto[0].pts_en_juego > 1:
+    #     # En caso de que se haya aceptado el envido
+    #         ultimo_canto = ultimo_canto[0]
+    #         ganador = ultimo_canto.envido.get_ganador()
+    #         mensaje = "El equipo ganador del envido es le de  "+str(my_partida.jugadores.get(equipo=ganador[0]))+" con "+str(ganador[1])+" puntos"
+    #     ##################################################
+    #     if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador): # CAMBIAR! EN ESTE MOMENTO, LAS CARTAS SON BOTONES ACTIVOS! ENTONCES PODES PULSARLAS CUANDO ES EL TURNO DEL OTRO! SI SE VUELVEN INACTIVOS, HAY QUE SACAR ESTA LINEA
+    #     # Es mi turno
+    #         if request.method == 'POST':
+    #             if 'opcion' in request.POST:
+    #             # Si el jugador elige una opcion del costado
+    #                 opcion = request.POST['opcion']
+    #                 if opcion == "CANTAR ENVIDO":
+    #                     my_ronda.crear_canto(ENVIDO, my_jugador)
+    #                 elif opcion == "CANTAR TRUCO":
+    #                     my_ronda.crear_canto(TRUCO, my_jugador)
+    #                 else:
+    #                     print opcion
+    #                     my_ronda.responder_canto(opcion)
+    #             elif 'carta' in request.POST:
+    #             # Si el jugador elige una carta para tirar
+    #                 my_partida.tirar(my_jugador, Carta.objects.get(id=request.POST['carta']))
+    #         # Se establecen las opciones para mostrarle al jugador
+    #         if my_ronda.turno == list(my_partida.jugadores.all()).index(my_jugador):
+    #             my_opciones = my_ronda.opciones
+    #             my_opciones = map(lambda x: OPCIONES[int(x)], my_opciones)
+    # # Muestra las cartas del adversario
+    # adversario = [i for i in my_partida.jugadores.all() if i != my_jugador]
+    # adv_cartas_disponibles = []
+    # adv_cartas_jugadas = []
+    # if adversario:
+    #     adv_cartas_disponibles = list(adversario[0].cartas_disponibles.all())
+    #     adv_cartas_jugadas = adversario[0].cartas_jugadas.all()
+    # my_cartas_disponibles = my_jugador.cartas_disponibles.all()
+    # my_cartas_jugadas = my_jugador.cartas_jugadas.all()
+    # # Guardamos los puntos de cada equipo para mostrarlos
+    # if my_jugador.equipo == 0:
+    #     my_puntos = my_partida.puntos_e1
+    #     adv_puntos = my_partida.puntos_e2
+    # else:
+    #     my_puntos = my_partida.puntos_e2
+    #     adv_puntos = my_partida.puntos_e1
+    # context = {'partida': my_partida,
+    #             'my_cartas_disponibles': my_cartas_disponibles,
+    #             'my_cartas_jugadas': my_cartas_jugadas,
+    #             'adv_cartas_disponibles': [i+1 for i in range(len(adv_cartas_disponibles))],
+    #             'adv_cartas_jugadas': adv_cartas_jugadas,
+    #             'username': request.user.username,
+    #             'opciones': my_opciones,
+    #             'mensaje': mensaje,
+    #             'my_puntos': my_puntos,
+    #             'adv_puntos': adv_puntos,}
+    # return TemplateResponse(request, 'truco/partida.html',context)
