@@ -95,25 +95,21 @@ def en_espera(request,partida_id):
 
 def ronda(request,partida_id):
     partida = Partida.get(partida_id)
-    ronda = partida.ronda_actual()
-    jugador = ronda.find_jugador(request.user)
+    ronda = partida.get_ronda_actual()
+    jugador = partida.find_jugador(request.user)
     if request.method == POST:
         if 'opcion' in request.POST:
             opcion = request.POST['opcion']
             if opcion == "CANTAR ENVIDO":
                 canto = ronda.crear_canto(ENVIDO, jugador)
-                return redirect('cantar/%d')
+                return redirect('en_espera/%d' % partida.id)
             elif opcion == "CANTAR TRUCO":
                 canto = ronda.crear_canto(TRUCO, jugador)
-                return redirect(canto)
+                return redirect('en_espera/%d' % partida.id)
+            elif opcion == "QUIERO" or opcion == "NO QUIERO"
+                return redirect('responder_canto/%d' % partida.id, opcion)
         elif 'carta' in request.POST:
-            ultimo_enfrentamiento = ronda.get_ultimo_enfrentamiento()
-            if ultimo_enfrentamiento and not ultimo_enfrentamiento.termino():
-                return redirect(ultimo_enfrentamiento)
-            else:
-                enfrentamiento = ronda.crear_enfrentamiento(jugador,
-                                                            request.POST['carta'])
-                return redirect(enfrentamiento)
+            return redirect('tirar_carta/%d' % partida.id, request.POST['carta'])
     else:
         context = {'ronda' : ronda,
                     'cartas_disponibles' : jugador.get_cartas_diponibles(),
@@ -122,4 +118,27 @@ def ronda(request,partida_id):
                     'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
                     'opciones' : ronda.get_opciones()
                   }
-        return render(request,'truco/ronda.html',context)
+        return render(request,'truco/ronda.html', context)
+
+
+def tirar_carta(request, partida_id, carta):
+    partida = Partida.get(partida_id)
+    ronda = partida.get_ronda_actual()
+    jugador = partida.find_jugador(request.user)
+    ultimo_enfrentamiento = ronda.get_ultimo_enfrentamiento()
+    if not ultimo_enfrentamiento or ultimo_enfrentamiento.get_termino():
+        # Si no hay un enfrentamiento o el ultimo enfrentamiento ya esta terminado
+        # Se crea un enfrentamiento nuevo
+        ultimo_enfrentamientoronda.crear_enfrentamiento(jugador)
+    ultimo_enfrentamiento.agregar_carta(carta)
+    return redirect('en_espera/%d' % partida.id)
+
+
+def responder_canto(request, partida_id, opcion):
+    partida = Partida.get(partida_id)
+    ronda = partida.get_ronda_actual()
+    jugador = partida.find_jugador(request.user)
+    ronda.responder_canto(opcion)
+    return redirect('en_espera/%d' % partida.id)
+
+

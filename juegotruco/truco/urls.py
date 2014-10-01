@@ -11,4 +11,5 @@ urlpatterns = patterns(
     url(r'^partida/(?P<partida_id>\d+)$', views.partida, name='partida'),
     url(r'^en_espera/(?P<partida_id>\d+)$', views.en_espera, name='en_espera'),
     url(r'^partida/ronda/(?P<partida_id>\d+)$', views.ronda, name='ronda'),
+    url(r'^partida/ronda/tirar_carta/(?P<partida_id>\d+)$', views.tirar_carta, name='tirar_carta'),
 )
