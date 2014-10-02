@@ -1,14 +1,11 @@
 from django.test import TestCase
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from truco.constants import *
-from truco.models import *
 from django.test import Client
 from django.core.urlresolvers import reverse
 
 class TrucoViewTests(TestCase):
     def setUp(self):
-        cliente = Client()
         response = self.client.post(reverse('usuarios:create_user'), 
                                 {'username':'test',
                                 'email': 'test@gmail.com',
@@ -45,7 +42,7 @@ class TrucoViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         # Debe redirigir al template crate_user
         self.assertTemplateUsed(response,'usuarios/create_user.html')
-        self.assertContains(response, "form")
+
 
 
     def test_login (self):
@@ -65,7 +62,6 @@ class TrucoViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         # Como los datos son incorrectos, debe redirigir al login nuevamente
         self.assertTemplateUsed(response,'usuarios/login.html')
-        self.assertContains(response, "form")
 
 
     def test_logout (self):
