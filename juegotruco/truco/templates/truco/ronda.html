@@ -32,9 +32,9 @@
         </div>
 
         <div id="cuadro_botones">
+            {% for opcion in opciones %}
             <form action="{% url 'truco:ronda' ronda.id %}" method="post">
             {% csrf_token %}
-            {% for opcion in opciones %}
                 <div id="botones_opciones">
                     <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
                 </div>
@@ -56,12 +56,12 @@
             {% endfor %}
         </div>
         <div id="cuadro_cartas_usuario">
-            <form method="post">
             {% for carta in cartas_disponibles %}
+            <form method="post">
             {% csrf_token %}
                 <button type="submit" name="carta" value="{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
-            {% endfor %}
             </form>
+            {% endfor %}
         </div>
     {% endblock pantalla_de_juego %}
     {% block mensajes%}

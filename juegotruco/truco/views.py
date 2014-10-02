@@ -84,7 +84,10 @@ def en_espera(request,partida_id):
     if ronda and jugador == ronda.get_turno():
         return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
-        context = Context({'puntajes' : partida.get_puntajes(request.user)})
+        context = Context({'puntajes' : partida.get_puntajes(request.user),
+                           'partida' : partida,
+                           'username' : request.user.username
+                           })
         if ronda:
             context['ronda'] = ronda
             context['cartas_disponibles'] = jugador.get_cartas_diponibles()
@@ -112,7 +115,10 @@ def ronda(request,partida_id):
         elif 'carta' in request.POST:
             return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
     else:
-        context = {'ronda' : ronda,
+        context = {'puntajes' : partida.get_puntajes(request.user),
+                    'partida' : partida,
+                    'username' : request.user.username,
+                    'ronda' : ronda,
                     'cartas_disponibles' : jugador.get_cartas_diponibles(),
                     'cartas_jugadas' : jugador.get_cartas_jugadas(),
                     'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
@@ -130,11 +136,14 @@ def tirar_carta(request, partida_id, carta_id):
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     ultimo_enfrentamiento = ronda.get_ultimo_enfrentamiento()
+    carta = Carta.objects.get(pk=carta_id)
     if not ultimo_enfrentamiento or ultimo_enfrentamiento.get_termino():
         # Si no hay un enfrentamiento o el ultimo enfrentamiento ya esta terminado
         # Se crea un enfrentamiento nuevo
-        ultimo_enfrentamientoronda.crear_enfrentamiento(jugador)
+        ultimo_enfrentamiento = ronda.crear_enfrentamiento(jugador)
     ultimo_enfrentamiento.agregar_carta(Carta.objects.get(id=carta_id))
+    jugador.cartas_disponibles.remove(carta)
+    jugador.cartas_jugadas.add(carta)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 
@@ -143,12 +152,14 @@ def responder_canto(request, partida_id, opcion):
     ronda = partida.get_ronda_actual()
     canto_actual = ronda.get_ultimo_canto()
     if int(opcion) == QUIERO:
-        canto_actual.envido.aceptar()
-        if canto_actual.envido.tipo == ENVIDO:
+        canto_actual.aceptar()
+        if canto_actual.tipo == ENVIDO:
             canto_actual.envido.get_ganador()
             canto_actual.save()
     else:
-        canto_actual.envido.rechazar()
+        print "MIRA"
+        canto_actual.rechazar()
+        canto_actual.save()
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 

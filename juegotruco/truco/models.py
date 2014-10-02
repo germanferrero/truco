@@ -299,10 +299,10 @@ class Ronda(models.Model):
             # Si hay un canto que no fue contestado
             opciones = [QUIERO, NO_QUIERO]
         elif (primer_enfrentamiento and primer_enfrentamiento[0].get_termino()
-                and not any([mi_canto.tipo == TRUCO for mi_canto in self.canto_set.all()])):
+                and all([int(mi_canto.tipo) != TRUCO for mi_canto in self.canto_set.all()])):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
             opciones = [CANTAR_TRUCO]
-        elif all([mi_canto.tipo != ENVIDO for mi_canto in self.canto_set.all()]):
+        elif all([int(mi_canto.tipo) != ENVIDO for mi_canto in self.canto_set.all()]):
             # No se ha cantado envido aun y no se ha terminado el primer enfrentamiento
             opciones = [CANTAR_ENVIDO]
         else:
@@ -319,7 +319,7 @@ class Ronda(models.Model):
         return cant_cartas[0]
 
     """
-    Devuelve una lista con las cartas que jugó el adversario.
+    Devuelve una lista con las cartas que jugo el adversario.
     """
     def cartas_jugadas_adversario(self, jugador):
         cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores.all() if i != jugador]
@@ -373,6 +373,7 @@ class Ronda(models.Model):
         enfrentamiento.jugador_empezo_pos = list(self.jugadores.all()).index(jugador)
         # Se necesita la posicion del jugador para saber de quien son las cartas
         enfrentamiento.save()
+        return enfrentamiento
 
 
     """
