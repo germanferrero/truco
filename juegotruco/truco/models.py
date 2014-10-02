@@ -226,10 +226,11 @@ class Ronda(models.Model):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
             opciones = str(TRUCO)
         elif not any([mi_canto.tipo == ENVIDO for mi_canto in self.canto_set.all()]):
-            # No se ha cantado envido aun
+            # No se ha cantado envido aun y no se ha terminado el primer enfrentamiento
             opciones = str(ENVIDO)
         else:
-            # Ya se ha cantado envido y estamos en el primer enfrentamiento
+            # Ya se ha cantado envido y estamos en el primer enfrentamiento o
+            # ya se canto el truco y se respondio
             opciones = ''
         return opciones
 
