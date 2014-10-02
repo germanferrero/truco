@@ -101,13 +101,13 @@ def ronda(request,partida_id):
     if request.method == "POST":
         if 'opcion' in request.POST:
             opcion = request.POST['opcion']
-            if opcion == "CANTAR ENVIDO":
+            if opcion == CANTAR_ENVIDO:
                 canto = ronda.crear_canto(ENVIDO, jugador)
                 return redirect('en_espera/%d' % partida.id)
-            elif opcion == "CANTAR TRUCO":
+            elif opcion == CANTAR_TRUCO:
                 canto = ronda.crear_canto(TRUCO, jugador)
                 return redirect('en_espera/%d' % partida.id)
-            elif opcion == "QUIERO" or opcion == "NO QUIERO":
+            elif opcion == QUIERO or opcion == NO_QUIERO:
                 return redirect('responder_canto/%d' % partida.id, opcion)
         elif 'carta' in request.POST:
             return redirect('tirar_carta/%d' % partida.id, request.POST['carta'])
@@ -115,9 +115,10 @@ def ronda(request,partida_id):
         context = {'ronda' : ronda,
                     'cartas_disponibles' : jugador.get_cartas_diponibles(),
                     'cartas_jugadas' : jugador.get_cartas_jugadas(),
-                    'cant_cartas_adversario' : ronda.cant_cartas_adversario(jugador),
+                    'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
                     'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
-                    'opciones' : ronda.get_opciones()
+                    'opciones' : ronda.get_opciones(),
+                    'op_dict' : OPCIONES,
                   }
         return render(request,'truco/ronda.html', context)
 

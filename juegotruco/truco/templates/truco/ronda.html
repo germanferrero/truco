@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 {% extends "truco/partida.html" %}
 {% load staticfiles %}
+{% load custom_filters %}
 <html>
     <head>
         <title> Ronda </title>
+        {% block refresh %}
+        {% endblock refresh %}
     </head>
 
     <body>
+    {% block pantalla_de_juego %}
             <div id="cuadro_cartas_rival">
                 {% for i in cant_cartas_adversario %}
-                    <img src={% static "truco/images/cartas/naipe.jpg"%} id="primera_imagen"/>
+                    <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                 {% endfor %}
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
                 {% for carta in cartas_jugadas_adversario %}
+                {{ cartas_jugadas_adversario}}
                     {% if forloop.counter == 1 %}
                         <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                     {% endif %}
@@ -32,7 +37,7 @@
                 {% csrf_token %}
                 {% for opcion in opciones %}
                     <div id="botones_opciones">
-                        <input type="submit" name="opcion" value="{{ opcion }}">
+                        <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|lookup:opcion}}</button>
                     </div>
                 </form>
                 {% endfor %}
@@ -60,5 +65,6 @@
                 {% endfor %}
                 </form>
             </div>
+    {% endblock pantalla_de_juego %}
     </body>
 </html>

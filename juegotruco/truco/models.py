@@ -220,27 +220,27 @@ class Ronda(models.Model):
         primer_enfrentamiento = list(self.enfrentamiento_set.all())[0:]
         if canto:
             # Si hay un canto que no fue contestado
-            opciones = str(QUIERO) + str(NO_QUIERO)
+            opciones = [QUIERO,NO_QUIERO]
         elif (primer_enfrentamiento and primer_enfrentamiento[0].get_termino()
             and not any([mi_canto.tipo == TRUCO for mi_canto in self.canto_set.all()])):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
-            opciones = str(TRUCO)
+            opciones = [CANTAR_TRUCO]
         elif not any([mi_canto.tipo == ENVIDO for mi_canto in self.canto_set.all()]):
             # No se ha cantado envido aun y no se ha terminado el primer enfrentamiento
-            opciones = str(ENVIDO)
+            opciones = [CANTAR_ENVIDO]
         else:
             # Ya se ha cantado envido y estamos en el primer enfrentamiento o
             # ya se canto el truco y se respondio
-            opciones = ''
+            opciones = None
         return opciones
 
     def cant_cartas_adversario(self, jugador):
         cant_cartas = [len(i.get_cartas_diponibles()) for i in self.jugadores.all() if i != jugador]
-        return cant_cartas
+        return cant_cartas[0]
 
     def cartas_jugadas_adversario(self, jugador):
         cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores.all() if i != jugador]
-        return cartas
+        return cartas[0]
 
     def get_absolute_url(self):
         return ('ronda',(),{'id':self.id})
