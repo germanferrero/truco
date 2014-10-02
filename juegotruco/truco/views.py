@@ -9,6 +9,7 @@ from truco.models import Lobby, Partida, Jugador, Carta, Ronda
 from truco.constants import *
 from truco.forms import crear_partida_form
 from django.dispatch import receiver
+import pdb
 
 @login_required(login_url='/usuarios/login')
 def lobby(request):
@@ -51,7 +52,7 @@ def crear_partida(request):
 
 @login_required(login_url='/usuarios/login')
 def unirse_partida(request):
-    partida = Partida.get(request.POST['partida'])
+    partida = Partida.objects.get(pk=request.POST['partida'])
     lobby = Lobby()
     if lobby.unirse_partida(request.user,partida) == -1:
         return redirect(reverse('truco:lobby'))
@@ -62,12 +63,12 @@ def unirse_partida(request):
 
 @login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
-    partida = Partida.get(partida_id)
+    partida = Partida.objects.get(pk=partida_id)
     if partida:
         if partida.is_ready():
+            partida.actualizar_puntajes()
             ronda = partida.crear_ronda()
             partida.actualizar_mano()
-            partida.actualizar_puntajes()
             return redirect(reverse('truco:en_espera', args=(partida.id,)))
         else:
             context = {'partida' : partida,
@@ -80,7 +81,7 @@ def partida(request,partida_id):
 
 @login_required(login_url='/usuarios/login')
 def en_espera(request,partida_id):
-    partida = Partida.get(partida_id)
+    partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     if ronda and jugador == ronda.get_turno():
@@ -101,7 +102,7 @@ def en_espera(request,partida_id):
 
 @login_required(login_url='/usuarios/login')
 def ronda(request,partida_id):
-    partida = Partida.get(partida_id)
+    partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     if request.method == "POST":
@@ -138,7 +139,7 @@ def ronda(request,partida_id):
 
 @login_required(login_url='/usuarios/login')
 def tirar_carta(request, partida_id, carta_id):
-    partida = Partida.get(partida_id)
+    partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     ultimo_enfrentamiento = ronda.get_ultimo_enfrentamiento()
@@ -154,7 +155,7 @@ def tirar_carta(request, partida_id, carta_id):
 
 @login_required(login_url='/usuarios/login')
 def responder_canto(request, partida_id, opcion):
-    partida = Partida.get(partida_id)
+    partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     canto_actual = ronda.get_ultimo_canto()
     if int(opcion) == QUIERO:

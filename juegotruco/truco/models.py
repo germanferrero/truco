@@ -106,9 +106,9 @@ class Partida(models.Model):
     Si no existe devuelve None.
     """
     @classmethod
-    def get(self, id):
+    def get_partida(self, id_partida):
         try:
-            partida = Partida.objects.get(id=id)
+            partida = Partida.objects.get(pk=id_partida)
         except:
             partida = None
         return partida
@@ -244,11 +244,13 @@ class Partida(models.Model):
     Este metodo se llama cada vez que termina una ronda.
     """
     def actualizar_puntajes(self):
-        ultima_ronda = list(self.ronda_set.all())[-1]
-        puntos = ultima_ronda.calcular_puntos()
-        self.puntos_e1 += puntos[0]
-        self.puntos_e2 += puntos[1]
-        self.save()
+        ultima_ronda = list(self.ronda_set.all())[-1:]
+        if ultima_ronda:
+            ultima_ronda = ultima_ronda[0]
+            puntos = ultima_ronda.calcular_puntos()
+            self.puntos_e1 += puntos[0]
+            self.puntos_e2 += puntos[1]
+            self.save()
 
 
 class Ronda(models.Model):
@@ -457,10 +459,12 @@ class Ronda(models.Model):
     def hay_ganador(self):
         # Devuelve verdadero si hay un ganador de la ronda
         result = False
-        if len(self.enfrentamiento_set.all()) == 3:
+        if (len(self.enfrentamiento_set.all()) == 3 and
+                list(self.enfrentamiento_set.all())[-1].get_termino()):
             # Se jugaron los 3 enfrentamientos
             result = True
-        elif len(self.enfrentamiento_set.all()) == 2:
+        elif (len(self.enfrentamiento_set.all()) == 2 and
+                list(self.enfrentamiento_set.all())[-1].get_termino()):
             # Se jugaron 2 enfrentamientos
             enfrentamientos_ganados = [0, 0]
             for enfrentamiento in self.enfrentamiento_set.all():
