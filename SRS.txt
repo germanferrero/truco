@@ -156,7 +156,7 @@ realizar las funciones descriptas en el inciso 2.2.
 2.4 RESTRICCIONES GENERALES
 
     * La aplicación tiene que estar desarrollada en Django.
-    * Fecha límite de entrega del software es 02 de Septiembre de 2014
+    * Fecha límite de entrega del software es 02 de Octubre de 2014
     * El juego será regido por las siguientes reglas:
 
     El juego consiste en emplear las tres cartas que se poseen, de la mejor manera
@@ -174,7 +174,7 @@ menor jerarquía en un enfrentamiento.
 1 de espadas
 1 de bastos
 7 de espadas
-7 de oros
+7 de orosS
 3 de cualquier palo
 2 de cualquier palo
 1 de copas y 1 de oros
@@ -201,7 +201,7 @@ __Tantos para el envido
 que es empleado en el envido. El puntaje de una carta coincide con su valor nominal
 excepto para los diez, los onces, y los doces. El valor de estas tres cartas es cero.
     Los tantos o puntos para el envido se calculan de la siguiente forma:
-Si se poseen dos o más cartas de igual palo, los tantos equivalen a la suma del puntaje de
+Si se poseen dos o más cartas de igual palo, los tantos equivalen a la mayor suma del puntaje de
 dos cartas del mismo palo elegidas por el jugador más veinte puntos. Si se poseen tres
 cartas de diferente palo, los tantos equivalen al puntaje de mayor jerarquía.
 
@@ -247,12 +247,6 @@ ganador será el que llegó con los puntos del Envido.
 
 
 
-2.5 SUPOSICIONES Y DEPENDENCIAS
-version django
-   ________COMPLETAR________
-
-
-
 
 --------------------------------------------------------------------------------
 
@@ -266,14 +260,15 @@ version django
 3.1 REQUERIMIENTOS DE INTERFAZ EXTERNA
 
 3.1.1 INTERFACES DE USUARIO
-________COMPLETAR________
+    El usuario debe ser capaz de interactuar con el sistema a través de botones
+en las pantallas de un navegador.
 
 
 
 3.1.3 INTERFACES DE SOFTWARE
 
     La aplicación debe contar con las pantallas de 'Home', 'Lobby', 'Crear Partida',
-'Unirse a Partida' y 'Mesa'.
+'Unirse a Partida' y 'Partida'.
 
 
 
@@ -330,7 +325,7 @@ pasar un usuario durante el juego.
     ·Caso de uso: Inicio de sesión.
     ·Actor primario: Usuario
     ·Actor secundario: Sistema.
-    ·Precondición: El usuario debe tener una cuenta activa.
+    ·Precondición: El usuario debe tener una cuenta activa y debe estar en la pantalla de iniciar sesión.
     ·Escenario exitoso principal:
         1. El usuario ingresa su nombre de usuario y contraseña y hace click
             en el botón de "Iniciar Sesión".
@@ -364,8 +359,7 @@ pasar un usuario durante el juego.
 3.2.5 UNIRSE A PARTIDA
     ·Caso de uso: Un usuario se une a una partida ya creada
     ·Actor primario: Usuario que se une a la partida.
-    ·Actor secundario: Sistema.
-    ·Actor terciario: Usuario dueño de la partida.
+    ·Actores secundarios: Sistema, usuario dueño de la partida.
     ·Precondición: El usuario que se une a la partida debe haber seleccionado
                    del lobby, una partida ya creada en la cual todavía hay espacio
                    para un jugador más.
@@ -385,7 +379,7 @@ pasar un usuario durante el juego.
 3.2.6 INICIAR UNA PARTIDA
     ·Caso de uso: Se inicia una partida.
     ·Actor primario: Sistema.
-    ·Actores secundarios: Jugadores (Usuarios, de aquí en adelante, llamados así).
+    ·Actores secundarios: Jugadores
     ·Precondición: Ambos jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
