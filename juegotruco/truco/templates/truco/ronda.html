@@ -33,7 +33,7 @@
 
         <div id="cuadro_botones">
             {% for opcion in opciones %}
-            <form action="{% url 'truco:ronda' ronda.id %}" method="post">
+            <form action="{% url 'truco:ronda' partida.id %}" method="post">
             {% csrf_token %}
                 <div id="botones_opciones">
                     <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
