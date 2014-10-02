@@ -66,7 +66,9 @@ def partida(request,partida_id):
     if partida:
         if partida.is_ready():
             ronda = partida.crear_ronda()
-            return redirect(reverse('truco:ronda', args=(partida.id,)))
+            partida.actualizar_mano()
+            partida.actualizar_puntajes()
+            return redirect(reverse('truco:en_espera', args=(partida.id,)))
         else:
             context = {'partida' : partida,
                        'puntajes' : partida.get_puntajes(request.user),
@@ -76,7 +78,7 @@ def partida(request,partida_id):
     else:
         return redirect(reverse('truco:index'))
 
-
+@login_required(login_url='/usuarios/login')
 def en_espera(request,partida_id):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
@@ -97,6 +99,7 @@ def en_espera(request,partida_id):
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
         return render(request,'truco/en_espera.html', context)
 
+@login_required(login_url='/usuarios/login')
 def ronda(request,partida_id):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
@@ -115,22 +118,25 @@ def ronda(request,partida_id):
         elif 'carta' in request.POST:
             return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
     else:
-        context = {'puntajes' : partida.get_puntajes(request.user),
-                    'partida' : partida,
-                    'username' : request.user.username,
-                    'ronda' : ronda,
-                    'cartas_disponibles' : jugador.get_cartas_diponibles(),
-                    'cartas_jugadas' : jugador.get_cartas_jugadas(),
-                    'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
-                    'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
-                    'opciones' : ronda.get_opciones(),
-                    'op_dict' : OPCIONES,
-                    'puntajes' : partida.get_puntajes(request.user),
-                    'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador)
-                  }
-        return render(request,'truco/ronda.html', context)
+        if not ronda.hay_ganador():
+            context = {'puntajes' : partida.get_puntajes(request.user),
+                        'partida' : partida,
+                        'username' : request.user.username,
+                        'ronda' : ronda,
+                        'cartas_disponibles' : jugador.get_cartas_diponibles(),
+                        'cartas_jugadas' : jugador.get_cartas_jugadas(),
+                        'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+                        'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
+                        'opciones' : ronda.get_opciones(),
+                        'op_dict' : OPCIONES,
+                        'puntajes' : partida.get_puntajes(request.user),
+                        'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador)
+                      }
+            return render(request,'truco/ronda.html', context)
+        else:
+            return redirect(reverse('truco:partida', args=(partida.id,)))
 
-
+@login_required(login_url='/usuarios/login')
 def tirar_carta(request, partida_id, carta_id):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
@@ -146,7 +152,7 @@ def tirar_carta(request, partida_id, carta_id):
     jugador.cartas_jugadas.add(carta)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
-
+@login_required(login_url='/usuarios/login')
 def responder_canto(request, partida_id, opcion):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
@@ -157,7 +163,6 @@ def responder_canto(request, partida_id, opcion):
             canto_actual.envido.get_ganador()
             canto_actual.save()
     else:
-        print "MIRA"
         canto_actual.rechazar()
         canto_actual.save()
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
