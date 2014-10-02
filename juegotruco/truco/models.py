@@ -41,10 +41,10 @@ class Jugador(models.Model):
         self.save()
 
     def get_cartas_diponibles(self):
-        return list(self.cartas_disponibles)
+        return list(self.cartas_disponibles.all())
 
     def get_cartas_jugadas(self):
-        return list(self.cartas_jugadas)
+        return list(self.cartas_jugadas.all())
 
     def __str__(self):
         return self.nombre
@@ -109,7 +109,7 @@ class Partida(models.Model):
             ronda = list(self.ronda_set.all())[-1]
         except:
             ronda = None
-        return None
+        return ronda
 
     def get_mensaje_ganador(self,user):
         #Devuelve "Has Ganado" si user gano, "Has perdido" si perdio, '' sino
@@ -219,22 +219,26 @@ class Ronda(models.Model):
         canto = self.canto_set.filter(estado=NO_CONTESTADO)  # Hay un canto no contestado
         primer_enfrentamiento = list(self.enfrentamiento_set.all())[0:]
         if canto:
+            # Si hay un canto que no fue contestado
             opciones = str(QUIERO) + str(NO_QUIERO)
         elif (primer_enfrentamiento and primer_enfrentamiento[0].get_termino()
-            and not any[canto.tipo == TRUCO in self.canto_set.all()]):
+            and not any([mi_canto.tipo == TRUCO for mi_canto in self.canto_set.all()])):
+            # Termino el primer enfrentamiento y no se ha cantado truco aun
             opciones = str(TRUCO)
-        elif not any[canto.tipo == ENVIDO in self.canto_set.all()]:
+        elif not any([mi_canto.tipo == ENVIDO for mi_canto in self.canto_set.all()]):
+            # No se ha cantado envido aun
             opciones = str(ENVIDO)
         else:
+            # Ya se ha cantado envido y estamos en el primer enfrentamiento
             opciones = ''
         return opciones
 
     def cant_cartas_adversario(self, jugador):
-        cant_cartas = [len(i.cartas_disponibles.all()) for i in self.jugadores if i != jugador]
+        cant_cartas = [len(i.get_cartas_diponibles()) for i in self.jugadores.all() if i != jugador]
         return cant_cartas
 
     def cartas_jugadas_adversario(self, jugador):
-        cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores if i != jugador]
+        cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores.all() if i != jugador]
         return cartas
 
     def get_absolute_url(self):
