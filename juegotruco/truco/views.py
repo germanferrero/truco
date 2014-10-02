@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.template import RequestContext, loader
+from django.template import RequestContext, loader, Context
 from django.template.response import TemplateResponse
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -39,7 +39,7 @@ def crear_partida(request):
                                                 form.cleaned_data['nombre'],
                                                 form.cleaned_data['puntos_objetivo'],
                                                 form.cleaned_data['password'])
-            return redirect('partida/%d' % partida.id)
+            return redirect(reverse('truco:partida', args=(partida.id,)))
         else:
             # Si el formulario es incorrecto se muestran los errores.
             return render(request, 'truco/crear_partida.html',{'form': form})
@@ -57,7 +57,7 @@ def unirse_partida(request):
         return redirect(reverse('truco:lobby'))
     else:
         partida.actualizar_estado()
-        return redirect('en_espera/%d' % partida.id)
+        return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 
 @login_required(login_url='/usuarios/login')
@@ -66,15 +66,15 @@ def partida(request,partida_id):
     if partida:
         if partida.is_ready():
             ronda = partida.crear_ronda()
-            return redirect('ronda/%d' % partida.id)
+            return redirect(reverse('truco:ronda', args=(partida.id,)))
         else:
             context = {'partida' : partida,
-                        'puntajes' : partida.get_puntajes(request.user),
-                        'username' : request.user.username,
-                        'mensaje_ganador' : partida.get_mensaje_ganador(request.user)}
+                       'puntajes' : partida.get_puntajes(request.user),
+                       'username' : request.user.username,
+                       'mensaje_ganador' : partida.get_mensaje_ganador(request.user)}
             return render(request,'truco/partida.html',context)
     else:
-        return redirect(reverse('index'))
+        return redirect(reverse('truco:index'))
 
 
 def en_espera(request,partida_id):
@@ -82,17 +82,17 @@ def en_espera(request,partida_id):
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     if ronda and jugador == ronda.get_turno():
-        return redirect('partida/ronda/%d' % int(partida_id))
+        return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
-        context = {'puntajes' : partida.get_puntajes(request.user)}
+        context = Context({'puntajes' : partida.get_puntajes(request.user)})
         if ronda:
             context['ronda'] = ronda
             context['cartas_disponibles'] = jugador.get_cartas_diponibles()
             context['cartas_jugadas'] = jugador.get_cartas_jugadas()
-            context['cant_cartas_adversario'] = ronda.cant_cartas_adversario(jugador)
+            context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
             context['cartas_jugadas_adversario'] = ronda.cartas_jugadas_adversario(jugador)
-
-        return render(request,'truco/en_espera.html',{})
+            context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
+        return render(request,'truco/en_espera.html', context)
 
 def ronda(request,partida_id):
     partida = Partida.get(partida_id)
@@ -100,17 +100,17 @@ def ronda(request,partida_id):
     jugador = partida.find_jugador(request.user)
     if request.method == "POST":
         if 'opcion' in request.POST:
-            opcion = request.POST['opcion']
+            opcion = int(request.POST['opcion'])
             if opcion == CANTAR_ENVIDO:
                 canto = ronda.crear_canto(ENVIDO, jugador)
-                return redirect('en_espera/%d' % partida.id)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == CANTAR_TRUCO:
                 canto = ronda.crear_canto(TRUCO, jugador)
-                return redirect('en_espera/%d' % partida.id)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == QUIERO or opcion == NO_QUIERO:
-                return redirect('responder_canto/%d' % partida.id, opcion)
+                return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
         elif 'carta' in request.POST:
-            return redirect('tirar_carta/%d' % partida.id, request.POST['carta'])
+            return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
     else:
         context = {'ronda' : ronda,
                     'cartas_disponibles' : jugador.get_cartas_diponibles(),
@@ -119,11 +119,13 @@ def ronda(request,partida_id):
                     'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
                     'opciones' : ronda.get_opciones(),
                     'op_dict' : OPCIONES,
+                    'puntajes' : partida.get_puntajes(request.user),
+                    'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador)
                   }
         return render(request,'truco/ronda.html', context)
 
 
-def tirar_carta(request, partida_id, carta):
+def tirar_carta(request, partida_id, carta_id):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
@@ -132,15 +134,21 @@ def tirar_carta(request, partida_id, carta):
         # Si no hay un enfrentamiento o el ultimo enfrentamiento ya esta terminado
         # Se crea un enfrentamiento nuevo
         ultimo_enfrentamientoronda.crear_enfrentamiento(jugador)
-    ultimo_enfrentamiento.agregar_carta(carta)
-    return redirect('en_espera/%d' % partida.id)
+    ultimo_enfrentamiento.agregar_carta(Carta.objects.get(id=carta_id))
+    return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 
 def responder_canto(request, partida_id, opcion):
     partida = Partida.get(partida_id)
     ronda = partida.get_ronda_actual()
-    jugador = partida.find_jugador(request.user)
-    ronda.responder_canto(opcion)
-    return redirect('en_espera/%d' % partida.id)
+    canto_actual = ronda.get_ultimo_canto()
+    if int(opcion) == QUIERO:
+        canto_actual.envido.aceptar()
+        if canto_actual.envido.tipo == ENVIDO:
+            canto_actual.envido.get_ganador()
+            canto_actual.save()
+    else:
+        canto_actual.envido.rechazar()
+    return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 

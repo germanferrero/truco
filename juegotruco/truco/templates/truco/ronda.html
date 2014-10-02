@@ -11,60 +11,62 @@
 
     <body>
     {% block pantalla_de_juego %}
-            <div id="cuadro_cartas_rival">
-                {% for i in cant_cartas_adversario %}
-                    <img src={% static "truco/images/cartas/naipe.jpg"%}/>
-                {% endfor %}
-            </div>
+        <div id="cuadro_cartas_rival">
+            {% for i in cant_cartas_adversario %}
+                <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+            {% endfor %}
+        </div>
 
-            <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
-                {% for carta in cartas_jugadas_adversario %}
-                {{ cartas_jugadas_adversario}}
-                    {% if forloop.counter == 1 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 2 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 3 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
-                    {% endif %}
-                {% endfor %}
-            </div>
+        <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
+            {% for carta in cartas_jugadas_adversario %}
+                {% if forloop.counter == 1 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                {% endif %}
+                {% if forloop.counter == 2 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                {% endif %}
+                {% if forloop.counter == 3 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                {% endif %}
+            {% endfor %}
+        </div>
 
-            <div id="cuadro_botones">
-                <form action="{% url 'truco:ronda' ronda.id %}" method="post">
-                {% csrf_token %}
-                {% for opcion in opciones %}
-                    <div id="botones_opciones">
-                        <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|lookup:opcion}}</button>
-                    </div>
-                </form>
-                {% endfor %}
-            </div>
+        <div id="cuadro_botones">
+            <form action="{% url 'truco:ronda' ronda.id %}" method="post">
+            {% csrf_token %}
+            {% for opcion in opciones %}
+                <div id="botones_opciones">
+                    <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
+                </div>
+            </form>
+            {% endfor %}
+        </div>
 
-            <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
-                {% for carta in cartas_jugadas %}
-                    {% if forloop.counter == 1 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 2 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
-                    {% endif %}
-                    {% if forloop.counter == 3 %}
-                        <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
-                    {% endif %}
-                {% endfor %}
-            </div>
-
-            <div id="cuadro_cartas_usuario">
-                <form method="post">
-                {% for carta in cartas_disponibles %}
-                {% csrf_token %}
-                    <button type="submit" name="carta" value="{{carta}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
-                {% endfor %}
-                </form>
-            </div>
+        <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
+            {% for carta in cartas_jugadas %}
+                {% if forloop.counter == 1 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                {% endif %}
+                {% if forloop.counter == 2 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                {% endif %}
+                {% if forloop.counter == 3 %}
+                    <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <div id="cuadro_cartas_usuario">
+            <form method="post">
+            {% for carta in cartas_disponibles %}
+            {% csrf_token %}
+                <button type="submit" name="carta" value="{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
+            {% endfor %}
+            </form>
+        </div>
     {% endblock pantalla_de_juego %}
+    {% block mensajes%}
+        {{ mensaje_envido }}
+    {% endblock mensajes %}
     </body>
 </html>
+

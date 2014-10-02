@@ -11,6 +11,11 @@
 
     <body>
         {% load staticfiles %}
+        <div id="barra_arriba">
+                <h4>Bienvenido {{ username }}</h4>
+                <h5>PARTIDA {{ partida }}</h5>
+                <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
+        </div>
         <div id ="puntajes">
             <table>
                 <tr>
@@ -23,16 +28,13 @@
                 </tr>
             </table>
         </div>
-        <div id="barra_arriba">
-                <h4>Bienvenido {{ username }}</h4>
-                <h5>PARTIDA {{ partida }}</h5>
-                <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
+        <div id="mensajes">
+            {% block mensajes %}
+            <h1> {{mensaje_ganador}} </h1>
+            {% endblock mensajes%}
         </div>
         <div id="pantalla_de_juego">
             {% block pantalla_de_juego %}
             {% endblock pantalla_de_juego %}
-        </div>
-        <div>
-            <h1> {{mensaje_ganador}} </h1>
         </div>
 </html>
