@@ -4,7 +4,9 @@
     <head>
         <link rel="stylesheet" href= {% static "style_partida.css" %}>
         <title> Partida </title>
+        {% block refresh %}
         <meta http-equiv="refresh" content="4">
+        {% endblock refresh %}
     </head>
 
     <body>
@@ -27,8 +29,8 @@
                 <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
         </div>
         <div id="pantalla_de_juego">
-            {% block pantalla_medio %}
-            {% endblock pantalla_medio %}
+            {% block pantalla_de_juego %}
+            {% endblock pantalla_de_juego %}
         </div>
         <div>
             <h1> {{mensaje_ganador}} </h1>

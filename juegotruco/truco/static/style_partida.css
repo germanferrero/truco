@@ -29,9 +29,14 @@ button{
     width: 100px;
 }
 
+#cuadro_cartas_rival img {
+    display: inline-block;
+}
+
 img {
     height: 100px;
     width: 70px;
+    display: inline-block;
 }
 
 
@@ -58,14 +63,14 @@ img {
 
 #cuadro_cartas_rival {
     margin-top: 10px;
-    float:right;
-    padding-right: 41%;
+    float:left;
+    padding-left: 35%;
 }
 
 #cuadro_cartas_usuario {
-    float:right;
-    padding-top: 120px;
-    padding-right: 38%;
+    float:left;
+    margin-left: 20%;
+    margin-top: 24%;
     clear:left;
 }
 
