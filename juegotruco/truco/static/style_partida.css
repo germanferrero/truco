@@ -1,5 +1,5 @@
 body {
-background-image: url(https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg);
+    background-image: url(https://mauricioyanes.files.wordpress.com/2011/03/naipes-copy.jpg);
 }
 
 h4{
@@ -27,6 +27,17 @@ button{
 #cuadro_cartas_usuario img {
     height: 150px;
     width: 100px;
+    display:inline-block;
+}
+
+form {
+    display:inline-block;
+}
+
+#cuadro_cartas_usuario button {
+    height: 150px;
+    width: 100px;
+    display: inline-block;
 }
 
 #cuadro_cartas_rival img {
@@ -57,29 +68,38 @@ img {
     margin-left: 20%;
     clear:left;
     text-align:center;
-/*    padding-right: 35%;*/
 }
 
 #cuadro_cartas_rival {
-    margin-top: -100px;
+    display:inline-block;
+    clear:left;
+    margin-top: -120px;
     float:left;
     padding-left: 35%;
 }
 
-#cuadro_cartas_usuario {
-    float:left;
-    margin-left: inherit;
-    margin-top: inherit;
-    clear:left;
-}
-
 #tiradas_adversario {
-    clear:both;
+    float:left;
+    clear:left;
+    margin-left: 45%;
+    margin-top: -10px;
+    display:inline-block;
 }
 
 #tiradas_usuario {
-    margin-top: 150px;
+    position:relative;
+    float:left;
     clear:both;
+    margin-left: 45%;
+    margin-top: 5%;
+    display:inline-block;
+}
+
+#cuadro_cartas_usuario {
+    clear:left;
+    float:left;
+    margin-left: 25%;
+    margin-top: 25%;
 }
 
 .cuadro_cartas_tiradas {
@@ -123,10 +143,11 @@ img {
 }
 
 #botones_opciones {
-    clear:both;
+    float:right;
 }
 
 #mensajes {
+    margin-top: 15px;
     background-color:#424242;
     border-radius: 10px;
     height:80px;
@@ -134,5 +155,5 @@ img {
     float: right;
     text-align:center;
     color: white;
-    clear:both;
+    clear:right;
 }

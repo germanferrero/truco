@@ -539,8 +539,8 @@ pasar un usuario durante el juego.
     ·Precondiciones: · El usuario debe tener una cuenta activa.
                      · El usuario debe estar en la pantalla de lobby
     ·Escenario exitoso principal:
-        1. El usuario hace click en el botón de "Cerrar Sesión".
-        2. El sistema registra al usuario como desconectado y lo redirige al lobby.
+        1. El usuario hace click en el botón de "Logout".
+        2. El sistema registra al usuario como desconectado y lo redirige al index.
 
 3.2.17 IRSE AL MAZO
     ·Caso de uso: Un jugador quiere abandonar la ronda ("irse al mazo").
