@@ -52,7 +52,7 @@ img {
 #pantalla_de_juego{
     background-color:#424242;
     border-radius: 10px;
-    height:600px;
+    height:800px;
     width: 600px;
     margin-left: 20%;
     clear:left;
@@ -67,10 +67,9 @@ img {
 }
 
 #cuadro_cartas_usuario {
+    margin-top: 100px;
     float:left;
-    margin-left: inherit;
-    margin-top: inherit;
-    clear:left;
+    padding-left: 35%;
 }
 
 #tiradas_adversario {

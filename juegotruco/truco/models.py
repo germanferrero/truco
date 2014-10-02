@@ -120,7 +120,7 @@ class Partida(models.Model):
     """
     def is_ready(self):
         # Devuelve true si una partida esta lista para empezar nueva ronda
-        rondas_terminadas = all(ronda.termino for ronda in list(self.ronda_set.all())[-1:])
+        rondas_terminadas = all([ronda.hay_ganador() for ronda in list(self.ronda_set.all())[-1:]])
         jugadores_listos = len(self.jugadores.all()) == self.cantidad_jugadores
         ganador = self.get_ganador()
         return rondas_terminadas and jugadores_listos and ganador < 0
@@ -420,10 +420,10 @@ class Ronda(models.Model):
         else:
             # Hay que calcular el ganador de los enfrentamientos
             ganador_enfrentamientos = self.get_ganador_enfrentamientos()
-            puntajes[ganador] += 1
+            puntajes[ganador_enfrentamientos] += 1
             if canto:
                 # El Truco se canto y acepto, luego hay que definir el ganador
-                canto[0].equipo_ganador = ganador
+                canto[0].equipo_ganador = ganador_enfrentamientos
                 canto[0].save()
         for canto in self.canto_set.all():
             # Asignamos los puntos correspondientes a los cantos
@@ -445,7 +445,7 @@ class Ronda(models.Model):
                 enfrentamientos_ganados[equipo_ganador] += 1
         if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
             # Si se empataron los tres enfrentamientos
-            ganador = self.jugadores.all()[mano_pos].equipo
+            ganador = self.jugadores.all()[self.mano_pos].equipo
         else:
             # Ganador es el equipo con mas enfrentamientos ganados
             ganador = enfrentamientos_ganados.index(max(enfrentamientos_ganados))
