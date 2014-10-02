@@ -16,6 +16,7 @@ Form-->-view: true
 view->+Auth: create_user()
 Auth->+User: get
 User-->-Auth: new_user
+Auth->Auth: login()
 Auth-->-view:new_user
 view-->-browser: Redirect(lobby)
 
@@ -25,7 +26,7 @@ ERROR REGISTRO DE CUENTA
 browser->+view: request
 view->+Form: is_valid()
 Form-->-view: false
-view-->-browser: Redirect(Registro)
+view-->-browser: Redirect(Registro, error)
 
 
 INICIAR SESION
@@ -36,11 +37,12 @@ Form-->-view: true
 view->+Auth: autenticate
 Auth->+User: get
 User-->-Auth: user
-Auth-->-view:user
+view->Auth: login(user)
+Auth-->-view: user
 view-->-browser: HttpResponseRedirect(lobby)
 
 
-ERROR INICIAR SESION
+ERROR INICIAR SESION EN EL FORMULARIO
 
 browser->+view: request
 view->+Form: is_valid()
@@ -48,15 +50,26 @@ Form-->-view: false
 view-->-browser: Redirect(IniciarSesion)
 
 
+ERROR INICIAR SESION USUARIO INEXISTENTE
+
+browser->+view: request
+view->+Form: is_valid()
+Form-->-view: true
+view->+Auth: autenticate
+Auth->+User: get
+User-->-Auth: None
+Auth-->-view: None
+view-->-browser: HttpResponseRedirect(IniciarSesion)
+
+
 CREAR PARTIDA
 
 browser->+view: request
 view->+Form: is_valid()
 Form-->-view: true
-view->+Partida: crear_partida()
-Partida-->-view: partida
-view->+Partida: agregar_jugador()
-Partida-->-view: jugador
+view->+Lobby: crear_partida()
+Lobby->Partida: agregar_jugador()
+Lobby-->-view: partida
 view-->-browser: Redirect(Partida)
 
 
@@ -120,8 +133,6 @@ RECHAZAR ENVIDO
 browser->+view: request(NO QUIERO)
 view->Envido: rechazar()
 Envido->Envido: set_puntos_en_juego()
-view->+Envido: get_ganador()
-Envido-->-view: ganador, puntaje
 view-->-browser: Redirect(EnEspera)
 
 
@@ -141,7 +152,7 @@ view-->-browser: Redirect(EnEspera)
 
 RECHAZAR TRUCO
 
-browser->+view: request(QUIERO) 
+browser->+view: request(NO QUIERO) 
 view->Canto: rechazar()
 view-->-browser: Redirect(EnEspera)
 
@@ -155,7 +166,7 @@ alt No hay un enfrentamiento creado
     Ronda-->-view: enfrentamiento
 else Ya hay unfrentamiento iniciado
     view->Enfrentamiento: agregar_carta()
-    view->+Enfrentamiento:termino()
+    view->+Enfrentamiento: termino()
     Enfrentamiento-->-view: estado
 end
     view-->-browser: Redirect(EnEspera)
