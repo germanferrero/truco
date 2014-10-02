@@ -25,9 +25,14 @@ class TrucoTests(TestCase):
         partida2 = lobby.crear_partida(user=user1, nombre = 'Partida2 a 30 sin password',
                                     puntos_objetivo=15,password='')
         partida2.save()
-        partida3 = lobby.crear_partida(user=user1, nombre = 'Partida3 a 30 sin password',
+        partida3 = lobby.crear_partida(user=user1, nombre = 'Partida3 a 30 sin password con dos jugadores',
                                     puntos_objetivo=15,password='')
         partida3.save()
+        # Agrego a un jugador a la partida
+        lobby.unirse_partida(user2, partida3)
+        # Actualizo el estado de la partida
+        partida3.actualizar_estado()
+
 
         #Creo las cartas
         valor_otro = 7
@@ -110,14 +115,12 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         partida1 = Partida.objects.get(nombre = 'Partida1 a 15 sin password')
         partida2 = Partida.objects.get(nombre = 'Partida2 a 30 sin password')
-        partida3 = Partida.objects.get(nombre = 'Partida3 a 30 sin password')
         user2 = User.objects.get(username ='test_user2')
         user3 = User.objects.get(username = 'test_user3')
         # Agrego las partidas a la partida para compraralas luego
         lista_partidas.append(partida1)
         lista_partidas.append(partida2)
-        lista_partidas.append(partida3)
-        # Me fijo que esten las tres partidas
+        # Me fijo que esten las dos partidas
         self.assertEqual(lista_partidas, list(lobby.get_lista_partidas()))
         # Agrego a un jugador a la partida uno, por lo tanto debe salir de la lista disponibles
         lobby.unirse_partida(user2, partida1)
@@ -127,12 +130,12 @@ class TrucoTests(TestCase):
         lista_partidas.remove(partida1)
         # Compruebo que no esta en la lista de partidas en espera
         self.assertEqual(lista_partidas, list(lobby.get_lista_partidas()))
-        # Agrego un jugador a la partida 3
-        lobby.unirse_partida(user2, partida3)
+        # Agrego un jugador a la partida 2
+        lobby.unirse_partida(user2, partida2)
         # Actualizo el estado de la partida
-        partida3.actualizar_estado()
+        partida2.actualizar_estado()
         # Lo remuevo de la lista auxiliar
-        lista_partidas.remove(partida3)
+        lista_partidas.remove(partida2)
         # Compruebo que no esta en la lista de partidas en espera
         self.assertEqual(lista_partidas, list(lobby.get_lista_partidas()))
 
@@ -154,6 +157,7 @@ class TrucoTests(TestCase):
         # Obtengo los jugadores
         jugadores = list(partida.jugadores.all())
         # Chequeo que se les hayan asignado 3 cartas a cada uno 
+        self.assertEqual(len((jugadores[0].cartas.all())), 3)
         self.assertEqual(len((jugadores[1].cartas.all())), 3)
         # Chequeo que la mano sea el que esta en la posicion 0 (El que creo la partida)
         self.assertEqual(ronda.mano_pos, 0)
@@ -165,37 +169,44 @@ class TrucoTests(TestCase):
         self.assertEqual(opciones[0], CANTAR_ENVIDO)
 
 
-
-
-'''    def test_envido (self):
+    def test_envido (self):
         user1 = User.objects.get(username ='test_user1')
         user2 = User.objects.get(username ='test_user2')
         lobby = Lobby()
-        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password')
-        lobby.unirse_partida(user2, partida)
-        #Obtengo la ultima ronda
-        ronda = list(partida.ronda_set.all())[-1]
-        #Chequeo que la opcion sea 3 =  "envido"
-        self.assertEqual(ronda.opciones, '3')
-        #Obtengo los jugadores
-        jugador1 = partida.jugadores.get(user = user1)
-        jugador2 = partida.jugadores.get(user = user2)
-        #Creo un canto
-        ronda.crear_canto(ENVIDO, jugador1)
-        canto = list(ronda.canto_set.all())
-        #Verifico que haya un canto creado
-        self.assertEqual(len(list(ronda.canto_set.all())), 1)
-        #Obtengo el ultimo canto
-        canto = canto[-1]
-        #Chequeo que las opciones disponibles sean 0 = "Quiero" y 1 "No quiero"
-        self.assertEqual(ronda.opciones, '01')
-        #El jugador 2 acepta el envido
-        ronda.responder_canto(1)
-        #Chequeo que los puntos en juego sean 2
-        self.assertNotEqual(canto.pts_en_juego, 2)
-#        print"cantoo"
-#        print canto.tipo
-#        ganador = canto.equipo_ganador
-#        print ganador
-        #Chequeo que la ronda no termino
-#        print '[%s]' % ', '.join(map(str, list(partida.ronda_set.all())))'''
+        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        # Obtengo los jugadores
+        jugadores = list(partida.jugadores.all())
+        # Creo una nueva ronda
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = list(partida.jugadores.all())
+        # La partida debe estar lista para crear una ronda
+        if partida.is_ready():
+            #Creo una ronda en la partida
+            ronda = partida.crear_ronda()
+            ronda.save()
+        self.assertEqual(len((jugadores[0].cartas.all())), 3)
+        self.assertEqual(len((jugadores[1].cartas.all())), 3)
+        # Obtengo la ultima ronda
+        ronda = partida.get_ronda_actual()
+        # Creo un canto envido
+        ronda.crear_canto(ENVIDO, jugadores[0])
+        opciones = ronda.get_opciones()
+        # Chequeo que la opcion que este disponible sea quiero y no quiero
+        self.assertEqual(opciones[0], QUIERO)
+        self.assertEqual(opciones[1], NO_QUIERO)
+        # Obtengo el ultimo canto
+        canto = ronda.get_ultimo_canto()
+        # Lo acepto
+        canto.aceptar()
+        # Chequeo que los puntos en juego sean 2
+        self.assertEqual(canto.pts_en_juego,2)
+        # Obtengo el ganador
+        canto.envido.get_ganador()
+        canto.save()
+        puntos_jugador1 = canto.envido.puntos_jugador(jugadores[0])
+        puntos_jugador2 = canto.envido.puntos_jugador(jugadores[1])
+        if puntos_jugador1 < puntos_jugador2:
+            self.assertEqual(canto.envido.maximo_puntaje, puntos_jugador2)
+        else:
+            self.assertEqual(canto.envido.maximo_puntaje, puntos_jugador1)
