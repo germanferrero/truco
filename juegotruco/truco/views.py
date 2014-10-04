@@ -11,6 +11,9 @@ from truco.forms import crear_partida_form
 from django.dispatch import receiver
 import pdb
 
+"""
+View Lobby: Se muestran las partidas donde aun hay lugar para mas jugadores.
+"""
 @login_required(login_url='/usuarios/login')
 def lobby(request):
     lobby = Lobby()
@@ -19,7 +22,11 @@ def lobby(request):
                'username': request.user.username}
     return render(request, 'truco/lobby.html',context)
 
-
+"""
+View index: Es la unica view de la aplicacion truco que puede accederse sin estar
+logueado, caso en el cual redirecciona al login. Si el usuario esta logueado lo
+redirige al lobby.
+"""
 def index(request):
     if request.method == 'POST':
         # Si hay un POST, se redirecciona a login o create_user
@@ -29,12 +36,16 @@ def index(request):
         # Si esta logueado entra al lobby directamente
         return redirect(reverse('truco:lobby'))
 
-
+"""
+View crear una partida: muestra el formulario para crear una nueva partida.
+Los campos nombre y puntos objetivo son obligatorios. El campo password es opcional.
+"""
 @login_required(login_url='/usuarios/login')
 def crear_partida(request):
     if request.method == "POST":
         form = crear_partida_form(data=request.POST)
         if form.is_valid():
+            # Si se llenaron los campos obligatorios
             lobby = Lobby()
             partida = lobby.crear_partida(request.user,
                                                 form.cleaned_data['nombre'],
@@ -42,33 +53,44 @@ def crear_partida(request):
                                                 form.cleaned_data['password'])
             return redirect(reverse('truco:partida', args=(partida.id,)))
         else:
-            # Si el formulario es incorrecto se muestran los errores.
+            # Si el formulario es incorrecto se muestran los errores
             return render(request, 'truco/crear_partida.html',{'form': form})
     else:
-        # SI hay un GET se muestra el formulario para crear partida.
+        # SI hay un GET se muestra el formulario para crear partida
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html', {'form': form})
 
-
+"""
+View unirse a una partida: Si se selecciona una partida a la que se puede ingresar,
+se redirige al usuario a la partida en la vista "en espera". Si no, si lo vuelve al lobby.
+El usuario no puede ingresar a una partida si no selecciono una partida de la lista
+que se muestra en el lobby o si ya tiene un jugador en la partida que eligio.
+"""
 @login_required(login_url='/usuarios/login')
 def unirse_partida(request):
     partida = Partida.objects.get(pk=request.POST['partida'])
     lobby = Lobby()
     if lobby.unirse_partida(request.user,partida) == -1:
+        # Si no puedo unirme a la partida
         return redirect(reverse('truco:lobby'))
     else:
+        # Si selecciona una partida a la que puede ingresar
         partida.actualizar_estado()
         return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
-
+"""
+View partida: Se encarga de definir cuando la partida debe continuar o terminar.
+Si se termina se redirige a la view index, si no, crea una nueva ronda.
+"""
 @login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     if partida:
         if partida.is_ready():
             partida.actualizar_puntajes()
+            # Si no hay un ganador y no hay una ronda en curso
             ronda = partida.crear_ronda()
-            partida.actualizar_mano()
+            partida.actualizar_mano()  # Se le da la mano al jugador de la derecha
             return redirect(reverse('truco:en_espera', args=(partida.id,)))
         else:
             context = {'partida' : partida,
@@ -79,12 +101,18 @@ def partida(request,partida_id):
     else:
         return redirect(reverse('truco:index'))
 
+"""
+View en espera: Se redirigen los jugadores a esta vista cuando no es su turno.
+Aqui solo se puede ver las cartas propias, las ya jugadas en la mesa y el mensaje
+del resultado del envido.
+"""
 @login_required(login_url='/usuarios/login')
 def en_espera(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
-    jugador = partida.find_jugador(request.user)
+    jugador = partida.find_jugador(request.user)  # jugador del usuario
     if ronda and jugador == ronda.get_turno():
+        # Si hay una ronda en curso y es el turno del jugador
         return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
         context = Context({'puntajes' : partida.get_puntajes(request.user),
@@ -100,12 +128,19 @@ def en_espera(request,partida_id):
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
         return render(request,'truco/en_espera.html', context)
 
+"""
+View ronda: Se muestran las opciones de juego que tiene un jugador en turno.
+Se evalua la opcion elegida y se redirige al jugador a la view "en espera"
+si canta, a la view responder canto si hay un canto no respondido y a la view tirar
+carta si eligio tirar una carta. Si hay un ganador, se lo redirige a la partida.
+"""
 @login_required(login_url='/usuarios/login')
 def ronda(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
     if request.method == "POST":
+        # El jugador eligio una opcion
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
             if opcion == CANTAR_ENVIDO:
@@ -120,6 +155,7 @@ def ronda(request,partida_id):
             return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
     else:
         if not ronda.hay_ganador():
+            # Si no se termino la ronda muestra las opciones
             context = {'puntajes' : partida.get_puntajes(request.user),
                         'partida' : partida,
                         'username' : request.user.username,
@@ -134,9 +170,14 @@ def ronda(request,partida_id):
                         'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador)
                       }
             return render(request,'truco/ronda.html', context)
-        else:
+        else:  # Se termino la ronda
             return redirect(reverse('truco:partida', args=(partida.id,)))
 
+"""
+View tirar carta: Maneja el caso donde la opcion elegida por el jugador en turno
+(view ronda) elige tirar una carta. Si no se termino la ronda, se crea un nuevo
+enfrentamiento. Si no se termino el enfrentamiento, agrega una carta y lo da por terminado.
+"""
 @login_required(login_url='/usuarios/login')
 def tirar_carta(request, partida_id, carta_id):
     partida = Partida.objects.get(pk=partida_id)
@@ -146,13 +187,18 @@ def tirar_carta(request, partida_id, carta_id):
     carta = Carta.objects.get(pk=carta_id)
     if not ultimo_enfrentamiento or ultimo_enfrentamiento.get_termino():
         # Si no hay un enfrentamiento o el ultimo enfrentamiento ya esta terminado
-        # Se crea un enfrentamiento nuevo
         ultimo_enfrentamiento = ronda.crear_enfrentamiento(jugador)
+        # Se crea un enfrentamiento nuevo
     ultimo_enfrentamiento.agregar_carta(Carta.objects.get(id=carta_id))
     jugador.cartas_disponibles.remove(carta)
     jugador.cartas_jugadas.add(carta)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
+"""
+View responder canto: Si hay un canto activo se redirige al jugador en turno a esta
+view. Se le muestran las opciones disponibles y se redirecciona a "en espera" luego
+de que elija la opcion.
+"""
 @login_required(login_url='/usuarios/login')
 def responder_canto(request, partida_id, opcion):
     partida = Partida.objects.get(pk=partida_id)

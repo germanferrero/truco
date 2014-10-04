@@ -81,12 +81,15 @@ class Lobby:
     """
     def unirse_partida(self, user, partida):
         result = 0
-        for j in partida.jugadores.all():
-            # Verifica que el usuario no este ya en la partida
-            if j.user.id == user.id:
-                result = -1
-        if result == 0:
-            partida.agregar_jugador(user)
+        if partida:
+            for j in partida.jugadores.all():
+                # Verifica que el usuario no este ya en la partida
+                if j.user.id == user.id:
+                    result = -1
+            if result == 0:
+                partida.agregar_jugador(user)
+        else:
+            result = -1
         return result
 
 
@@ -119,10 +122,9 @@ class Partida(models.Model):
     estan listos y no hay una ronda en curso.
     """
     def is_ready(self):
-        # Devuelve true si una partida esta lista para empezar nueva ronda
         rondas_terminadas = all([ronda.hay_ganador() for ronda in list(self.ronda_set.all())[-1:]])
         jugadores_listos = len(self.jugadores.all()) == self.cantidad_jugadores
-        ganador = self.get_ganador()
+        ganador = self.get_ganador()  # Si ganador = -1 no hay ganador aun
         return rondas_terminadas and jugadores_listos and ganador < 0
 
     """
@@ -459,7 +461,11 @@ class Ronda(models.Model):
     def hay_ganador(self):
         # Devuelve verdadero si hay un ganador de la ronda
         result = False
-        if (len(self.enfrentamiento_set.all()) == 3 and
+        canto = self.canto_set.filter(tipo=TRUCO)
+        if canto and canto[0].estado == RECHAZADO:
+            # Si no se quizo el truco
+            result = True
+        elif (len(self.enfrentamiento_set.all()) == 3 and
                 list(self.enfrentamiento_set.all())[-1].get_termino()):
             # Se jugaron los 3 enfrentamientos
             result = True
