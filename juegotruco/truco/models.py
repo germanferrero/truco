@@ -299,6 +299,7 @@ class Ronda(models.Model):
     def get_opciones(self):
         canto = self.canto_set.filter(estado=NO_CONTESTADO)  # Hay un canto no contestado
         primer_enfrentamiento = list(self.enfrentamiento_set.all())[:1]
+        opciones = [CANTAR_ENVIDO]
         if canto:
             # Si hay un canto que no fue contestado
             opciones = [QUIERO, NO_QUIERO]
@@ -309,10 +310,13 @@ class Ronda(models.Model):
         elif all([int(mi_canto.tipo) != ENVIDO for mi_canto in self.canto_set.all()]):
             # No se ha cantado envido aun y no se ha terminado el primer enfrentamiento
             opciones = [CANTAR_ENVIDO]
+            if primer_enfrentamiento and primer_enfrentamiento[0].get_termino():
+                # No se puede cantar envido si termina el primer enfrentamiento
+                opciones = []
         else:
             # Ya se ha cantado envido y estamos en el primer enfrentamiento o
             # ya se canto el truco y se respondio
-            opciones = None
+            opciones = []
         return opciones
 
     """

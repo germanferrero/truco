@@ -68,15 +68,20 @@ que se muestra en el lobby o si ya tiene un jugador en la partida que eligio.
 """
 @login_required(login_url='/usuarios/login')
 def unirse_partida(request):
-    partida = Partida.objects.get(pk=request.POST['partida'])
-    lobby = Lobby()
-    if lobby.unirse_partida(request.user,partida) == -1:
-        # Si no puedo unirme a la partida
-        return redirect(reverse('truco:lobby'))
+    partida = request.POST.get('partida', False)
+    if partida:
+        lobby = Lobby()
+        partida = Partida.objects.get(pk=request.POST['partida'])
+        if lobby.unirse_partida(request.user,partida) == -1:
+            # Si no puedo unirme a la partida
+            return redirect(reverse('truco:lobby'))
+        else:
+            # Si selecciona una partida a la que puede ingresar
+            partida.actualizar_estado()
+            return redirect(reverse('truco:en_espera', args=(partida.id,)))
     else:
-        # Si selecciona una partida a la que puede ingresar
-        partida.actualizar_estado()
-        return redirect(reverse('truco:en_espera', args=(partida.id,)))
+        # No se selecciono una partida
+        return redirect(reverse('truco:lobby'))
 
 """
 View partida: Se encarga de definir cuando la partida debe continuar o terminar.
