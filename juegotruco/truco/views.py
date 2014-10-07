@@ -127,9 +127,8 @@ def en_espera(request,partida_id):
         if ronda:
             context['ronda'] = ronda
             context['cartas_disponibles'] = jugador.get_cartas_diponibles()
-            context['cartas_jugadas'] = jugador.get_cartas_jugadas()
+            context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
             context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
-            context['cartas_jugadas_adversario'] = ronda.cartas_jugadas_adversario(jugador)
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
         return render(request,'truco/en_espera.html', context)
 
@@ -166,9 +165,8 @@ def ronda(request,partida_id):
                         'username' : request.user.username,
                         'ronda' : ronda,
                         'cartas_disponibles' : jugador.get_cartas_diponibles(),
-                        'cartas_jugadas' : jugador.get_cartas_jugadas(),
+                        'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
                         'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
-                        'cartas_jugadas_adversario' : ronda.cartas_jugadas_adversario(jugador),
                         'opciones' : ronda.get_opciones(),
                         'op_dict' : OPCIONES,
                         'puntajes' : partida.get_puntajes(request.user),
@@ -196,7 +194,6 @@ def tirar_carta(request, partida_id, carta_id):
         # Se crea un enfrentamiento nuevo
     ultimo_enfrentamiento.agregar_carta(Carta.objects.get(id=carta_id))
     jugador.cartas_disponibles.remove(carta)
-    jugador.cartas_jugadas.add(carta)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 """

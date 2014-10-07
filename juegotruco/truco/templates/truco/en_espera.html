@@ -18,7 +18,7 @@
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
-                {% for carta in cartas_jugadas_adversario %}
+                {% for carta in cartas_jugadas.1 %}
                     {% if forloop.counter == 1 %}
                         <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                     {% endif %}
@@ -32,7 +32,7 @@
             </div>
 
             <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
-                {% for carta in cartas_jugadas %}
+                {% for carta in cartas_jugadas.0 %}
                     {% if forloop.counter == 1 %}
                         <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                     {% endif %}

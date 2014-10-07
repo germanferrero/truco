@@ -33,7 +33,6 @@ class Jugador(models.Model):
     equipo = models.IntegerField(max_length=1)
     cartas = models.ManyToManyField(Carta, related_name='cartas')
     cartas_disponibles = models.ManyToManyField(Carta, related_name='cartas_disponibles')
-    cartas_jugadas = models.ManyToManyField(Carta, related_name='cartas_jugadas')
 
     """
     Asigna a cada jugador las cartas que se pasan como una lista de instancias de Carta.
@@ -41,7 +40,6 @@ class Jugador(models.Model):
     def asignar_cartas(self, cartas):
         self.cartas = cartas
         self.cartas_disponibles = cartas
-        self.cartas_jugadas = []
         self.save()
 
     """
@@ -50,11 +48,6 @@ class Jugador(models.Model):
     def get_cartas_diponibles(self):
         return list(self.cartas_disponibles.all())
 
-    """
-    Devuelve las cartas que el jugador ya tiro.
-    """
-    def get_cartas_jugadas(self):
-        return list(self.cartas_jugadas.all())
 
     def __str__(self):
         return self.nombre
@@ -283,6 +276,19 @@ class Ronda(models.Model):
             ultimo_canto = None
         return ultimo_canto
 
+    def get_cartas_jugadas(self,jugador):
+        jugador_pos = list(self.jugadores.all()).index(jugador)
+        enfrentamientos = list(self.enfrentamiento_set.all())
+        cant_jugadores = len(self.jugadores.all())
+        cartas = []
+        for i in range(cant_jugadores):
+            cartas_jugador = []
+            for enfrentamiento in enfrentamientos:
+                cartas_jugador.append(enfrentamiento.carta_jugador((jugador_pos+i)%cant_jugadores))
+            cartas_jugador = [carta for carta in cartas_jugador if carta is not None]
+            cartas.append(cartas_jugador)
+        return cartas
+
     """
     Devuelve las opciones que tiene disponibles un jugador segun el estado de la ronda.
     """
@@ -315,13 +321,6 @@ class Ronda(models.Model):
     def cant_cartas_adversario(self, jugador):
         cant_cartas = [len(i.get_cartas_diponibles()) for i in self.jugadores.all() if i != jugador]
         return cant_cartas[0]
-
-    """
-    Devuelve una lista con las cartas que jugo el adversario.
-    """
-    def cartas_jugadas_adversario(self, jugador):
-        cartas = [list(i.cartas_jugadas.all()) for i in self.jugadores.all() if i != jugador]
-        return cartas[0]
 
     """
     Calcula de quien es el turno actual segun el estado de la ronda.
@@ -512,7 +511,12 @@ class Envido(Canto):
     Dada una posicion de un jugador, devuelve su distancia al jugador mano.
     """
     def dist_mano(self, pos_jugador):
-        return (pos_jugador + 1) % (self.mano_pos + 1)
+        cantidad_jugadores = len(self.jugadores.all())
+        if pos_jugador >= self.mano_pos:
+            distancia = pos_jugador - self.mano_pos
+        else:
+            distancia = cantidad_jugadores - self.mano_pos + jugador_pos
+        return distancia
 
     """
     Calcula el ganador y los puntos del envido
@@ -599,6 +603,21 @@ class Enfrentamiento(models.Model):
         tirada = Tirada.objects.create(carta=carta, enfrentamiento=self, orden=len(self.cartas.all()))
         tirada.save()
 
+    """
+    Dada la posicion de un jugador devuelve su carta en el enfrentamiento,
+    si el jugador no posee carta en el enfrentamiento devuelve None
+    """
+    def carta_jugador(self, jugador_pos):
+        # Calculamos la posicion de la carta en el enfrentamiento
+        if jugador_pos >= self.jugador_empezo_pos:
+            pos_carta = jugador_pos - self.jugador_empezo_pos
+        else:
+            pos_carta = self.cantidad_jugadores - self.jugador_empezo_pos + jugador_pos
+        try:
+            carta = self.cartas.order_by("tirada__orden")[pos_carta]
+        except:
+            carta = None
+        return carta
 
 class Tirada(models.Model):
     carta = models.ForeignKey(Carta)
