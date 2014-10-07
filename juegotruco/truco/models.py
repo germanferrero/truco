@@ -188,15 +188,6 @@ class Partida(models.Model):
         return result
 
     """
-    Devuelve verdadero si se pueden agregar mas jugadores a la partida.
-    """
-    def acepta_jugadores(self):
-        result = False
-        if self.estado == EN_ESPERA:
-            result = True
-        return result
-
-    """
     Agrega jugadores a la partida, uno a cada equipo por orden de ingreso.
     """
     def agregar_jugador(self, user):
@@ -260,7 +251,6 @@ class Ronda(models.Model):
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     mazo = Mazo()
     mano_pos = models.IntegerField(max_length=1, default=0)
-    termino = models.BooleanField(default=False)
 
     """
     Devuelve un mensaje con el ganador del envido y su puntaje,
