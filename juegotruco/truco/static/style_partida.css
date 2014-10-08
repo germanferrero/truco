@@ -157,3 +157,27 @@ img {
     color: white;
     clear:right;
 }
+
+#cuadro_cantos_respuestas {
+    margin-top: 35px;
+    background-color:#424242;
+    border-radius: 10px;
+    height:80px;
+    width: 120px;
+    float: right;
+    text-align:center;
+    color: white;
+    clear: right;
+}
+
+#cuadro_tu_turno {
+    margin-top: 30px;
+    background-color:#424242;
+    border-radius: 10px;
+    height: 40px;
+    width: 120px;
+    float: right;
+    text-align:center;
+    color: white;
+    clear:right;
+}

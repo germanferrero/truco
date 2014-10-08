@@ -267,6 +267,19 @@ class Ronda(models.Model):
                             + ' puntos.')
         return mensaje
     """
+    Devuelve el mensaje con de juego, cantos y respuestas
+    """
+    def get_mensaje_canto(self):
+        mensaje = ''
+        ultimo_canto = self.get_ultimo_canto()
+        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+            mensaje = OPCIONES[int(ultimo_canto.tipo)]
+        elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
+            mensaje = OPCIONES[int(QUIERO)]
+        elif ultimo_canto and ultimo_canto.estado == NO_QUIERO:
+            mensaje = OPCIONES[int(NO_QUIERO)]
+        return mensaje
+    """
     Devuelve el ultimo canto de la ronda_set
     """
     def get_ultimo_canto(self):
@@ -289,23 +302,29 @@ class Ronda(models.Model):
             cartas.append(cartas_jugador)
         return cartas
 
+    def se_puede_tirar(self):
+        result = True
+        ultimo_canto = self.get_ultimo_canto()
+        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+            result = False
+        return result
     """
     Devuelve las opciones que tiene disponibles un jugador segun el estado de la ronda.
     """
     def get_opciones(self):
         canto = self.canto_set.filter(estado=NO_CONTESTADO)  # Hay un canto no contestado
         primer_enfrentamiento = list(self.enfrentamiento_set.all())[:1]
-        opciones = [CANTAR_ENVIDO]
+        opciones = [ENVIDO]
         if canto:
             # Si hay un canto que no fue contestado
             opciones = [QUIERO, NO_QUIERO]
         elif (primer_enfrentamiento and primer_enfrentamiento[0].get_termino()
                 and all([int(mi_canto.tipo) != TRUCO for mi_canto in self.canto_set.all()])):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
-            opciones = [CANTAR_TRUCO]
+            opciones = [TRUCO]
         elif all([int(mi_canto.tipo) != ENVIDO for mi_canto in self.canto_set.all()]):
             # No se ha cantado envido aun y no se ha terminado el primer enfrentamiento
-            opciones = [CANTAR_ENVIDO]
+            opciones = [ENVIDO]
             if primer_enfrentamiento and primer_enfrentamiento[0].get_termino():
                 # No se puede cantar envido si termina el primer enfrentamiento
                 opciones = []
@@ -515,7 +534,7 @@ class Envido(Canto):
         if pos_jugador >= self.mano_pos:
             distancia = pos_jugador - self.mano_pos
         else:
-            distancia = cantidad_jugadores - self.mano_pos + jugador_pos
+            distancia = cantidad_jugadores - self.mano_pos + pos_jugador
         return distancia
 
     """
