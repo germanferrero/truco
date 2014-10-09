@@ -27,11 +27,6 @@ logueado, caso en el cual redirecciona al login. Si el usuario esta logueado lo
 redirige al lobby.
 """
 def index(request):
-    if request.method == 'POST':
-        # Si hay un POST, se redirecciona a login o create_user
-        url = data=request.POST
-        return redirect(request, url)  #'truco/index.html')
-    else:
         # Si esta logueado entra al lobby directamente
         return redirect(reverse('truco:lobby'))
 
@@ -118,7 +113,7 @@ def en_espera(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)  # jugador del usuario
-    if ronda and (jugador == ronda.get_turno() or ronda.hay_ganador()):
+    if ronda and (jugador == ronda.get_turno()):
         # Si hay una ronda en curso y es el turno del jugador
         return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
