@@ -94,11 +94,11 @@ def partida(request,partida_id):
         if partida.get_ganador() < 0:
             # No hay un ganador de la partida
             partida.actualizar_puntajes()
-            if partida.is_ready():
-                # Si no hay un ganador y no hay una ronda en curso y los jugadores estan listos
-                ronda = partida.crear_ronda()
-                partida.actualizar_mano()  # Se le da la mano al jugador de la derecha
-                return redirect(reverse('truco:en_espera', args=(partida.id,)))
+        if partida.is_ready():
+            # Si no hay un ganador y no hay una ronda en curso y los jugadores estan listos
+            ronda = partida.crear_ronda()
+            partida.actualizar_mano()  # Se le da la mano al jugador de la derecha
+            return redirect(reverse('truco:en_espera', args=(partida.id,)))
         else:
             context = {'partida' : partida,
                        'puntajes' : partida.get_puntajes(request.user),
@@ -118,7 +118,7 @@ def en_espera(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)  # jugador del usuario
-    if ronda and jugador == ronda.get_turno():
+    if ronda and (jugador == ronda.get_turno() or ronda.hay_ganador()):
         # Si hay una ronda en curso y es el turno del jugador
         return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
