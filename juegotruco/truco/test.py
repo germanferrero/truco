@@ -166,7 +166,7 @@ class TrucoTests(TestCase):
         # Obtengo las opciones que tengo para cantar
         opciones = ronda.get_opciones()
         # Chequeo que la opcion que este disponible sea solo cantar envido
-        self.assertEqual(opciones[0], CANTAR_ENVIDO)
+        self.assertEqual(opciones[0], ENVIDO)
 
 
     def test_envido (self):

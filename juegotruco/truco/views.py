@@ -27,11 +27,6 @@ logueado, caso en el cual redirecciona al login. Si el usuario esta logueado lo
 redirige al lobby.
 """
 def index(request):
-    if request.method == 'POST':
-        # Si hay un POST, se redirecciona a login o create_user
-        url = data=request.POST
-        return redirect(request, url)  #'truco/index.html')
-    else:
         # Si esta logueado entra al lobby directamente
         return redirect(reverse('truco:lobby'))
 

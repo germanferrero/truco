@@ -40,13 +40,11 @@ class TrucoViewTests(TestCase):
 
     def test_index (self):
         # Hago un get a index, por lo tanto el usuario esta logueado
-        response = self.client.get(reverse('truco:index'), {})
+        response = self.client.get(reverse('truco:index'))
         #Debe devolver 200
         self.assertEqual(response.status_code, 302)
         # Debe redireccionar a el lobby
         self.assertRedirects(response, reverse('truco:lobby'))
-        # Falta hacer el post... ver como es....
-
 
     def test_crear_partida(self):
         user2 = User.objects.get (username = 'test_user2')
@@ -58,3 +56,8 @@ class TrucoViewTests(TestCase):
         self.assertTemplateUsed(response,'truco/crear_partida.html')
         # Testeo que el formilario que crea sea de la forma de crear_partida_form
         self.assertEqual(crear_partida_form, response.context['form'].__class__)
+#        response = self.client.post(reverse('truco:crear_partida'),
+#                                    {'user': user2,
+#                                     'nombre' : 'partida',
+#                                     'puntos_objetivo' : 15,
+#                                     'password' : ''})
