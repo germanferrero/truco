@@ -118,7 +118,9 @@ def en_espera(request,partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)  # jugador del usuario
-    if ronda and (jugador == ronda.get_turno() or ronda.hay_ganador()):
+    if partida.get_ganador() >= 0:
+        return redirect(reverse('truco:partida', args=(partida_id,)))
+    elif ronda and jugador == ronda.get_turno():
         # Si hay una ronda en curso y es el turno del jugador
         return redirect(reverse('truco:ronda', args=(partida_id,)))
     else:
@@ -150,14 +152,11 @@ def ronda(request,partida_id):
         # El jugador eligio una opcion
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
-            if opcion == ENVIDO:
-                canto = ronda.crear_canto(ENVIDO, jugador)
-                return redirect(reverse('truco:en_espera', args=(partida.id,)))
-            elif opcion == TRUCO:
-                canto = ronda.crear_canto(TRUCO, jugador)
-                return redirect(reverse('truco:en_espera', args=(partida.id,)))
-            elif opcion == QUIERO or opcion == NO_QUIERO:
+            if opcion == QUIERO or opcion == NO_QUIERO:
                 return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
+            else:
+                ronda.crear_canto(opcion,jugador)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
         elif 'carta' in request.POST:
             return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
     else:
@@ -213,12 +212,6 @@ def responder_canto(request, partida_id, opcion):
     canto_actual = ronda.get_ultimo_canto()
     if int(opcion) == QUIERO:
         canto_actual.aceptar()
-        if canto_actual.tipo == ENVIDO:
-            canto_actual.envido.get_ganador()
-            canto_actual.save()
     else:
         canto_actual.rechazar()
-        canto_actual.save()
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
-
-

@@ -25,6 +25,6 @@ OPCIONES={
 }
 
 PTS_CANTO={
-    TRUCO : 0,
+    TRUCO : 1,
     ENVIDO : 1,
 }
