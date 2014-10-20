@@ -92,7 +92,7 @@ class Partida(models.Model):
     puntos_e1 = models.IntegerField(max_length=2, default=0)
     puntos_e2 = models.IntegerField(max_length=2, default=0)
     puntos_objetivo = models.IntegerField(default=15)
-    password = models.CharField(max_length=16)
+    password = models.CharField(max_length=16, default=None)
     estado = models.IntegerField(default=EN_ESPERA)
     mano_pos = models.IntegerField(max_length=1, default=0)
     cantidad_jugadores = models.IntegerField(default=2)
@@ -108,6 +108,12 @@ class Partida(models.Model):
         except:
             partida = None
         return partida
+
+    """
+    Devuelve el password de la partida
+    """
+    def get_password(self):
+        return password
 
     """
     Devuelve true si una partida esta lista para empezar una nueva ronda.
