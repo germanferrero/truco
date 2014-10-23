@@ -452,56 +452,21 @@ pasar un usuario durante el juego.
     ·Precondiciones: · Hay una ronda en curso
                      · La partida se encuentra en el primer enfrentamiento.
                      · No se aceptó antes en la ronda el truco.
-                     · Hay una combinación posible para cantar(No se canto antes
-                       falta envido).
+                     · No se cantó antes el envido o alguno de los derivados.
     ·Escenario exitoso principal:
         1. El jugador hace click en uno de los botones disponibles('Envido', 'Real
         Envido', 'Falta Envido')
         2. El sistema registra el canto y por quién fue cantado.
-        3. El sistema le muestra al oponente las opciones "Quiero", "No quiero"
-        y demas opciones para re-cantar, dependiendo de cual fue el último canto,
-        a través de botones.
-        4. El sistema le cede el turno al oponente.
+        3. El sistema le cede el turno al oponente.
 
 
-3.2.10 ACEPTAR ENVIDO O DERIVADOS
-    ·Caso de uso: Se juega el envido o derivado.
-    ·Actor primario: Jugador en turno.
-    .Actor secundario: Sistema, el jugador contrincante
-    ·Precondiciones: · Hay una ronda en curso.
-                     · El oponente cantó envido o derivado en el turno anterior
-                       y consecuentemente el sistema muestra al jugador en turno
-                       las opciones "Quiero" y "No quiero" y opciones para re-cantar.
-    ·Escenario exitoso principal:
-        1. El jugador en turno hace click en "Quiero".
-        2. El sistema le pide al jugador mano que diga cuantos puntos tiene.
-        3. El jugador mano escribe sus puntos y son mostrados al oponente.
-        4. El sistema le muestra al contrincante las opciones "Son buenas",
-        "Son buenas, quiero verlas", y un campo para escribir sus puntos.
-        5. El sistema verifica quién canto el envido.
-        6. El sistema le cede el turno al jugador que cantó el envido.
-    ·Extensiones:
-        4.a El contrincante elige la opción "Son buenas":
-          1. El sistema registra al jugador mano como ganador y registra que no
-          se pidió que muestre los puntos.
-        4.b El contrincante elige la opción "Son buenas, quiero verlas":
-          1. El sistema registra al jugador mano como ganador y registra que se
-          pidió que muestre los puntos.
-        4.c El contrincante escribe sus puntos
-          1. El sistema muestra al jugador mano los puntos del contrincante y
-             registra al jugador con mayor puntaje como ganador.
-             Si el ganador es el jugador mano, el sistema registra que no debe mostrar
-             sus puntos al finalizar la ronda. Y si el ganador es el contrincante,
-             le muestra al jugador mano las opciones "Son buenas" y "Son buenas
-             quiero verlas". Dependiendo de lo que éste responda, el sistema
-             registra si debe mostrar sus puntos o no al finalizar la ronda.
-
-
-3.2.11 RE-CANTAR ENVIDO O DERIVADOS
+3.2.10 RE-CANTAR ENVIDO O DERIVADOS
     ·Caso de uso: Se re-canta envido o derivado.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
     ·Precondiciones: · Hay una ronda en curso.
+                     · La partida se encuentra en el primer enfrentamiento.
+                     · No se aceptó antes en la ronda el truco.
                      · El oponente cantó envido o derivado en el turno anterior
                        y consecuentemente el sistema muestra al jugador en turno
                        las opciones "Quiero" y "No quiero" y opciones para re-cantar.
@@ -509,7 +474,42 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en una de las opciones para re-cantar
         2. El sistema registra el canto
-        3. El sistema le cede el turno al contrincante.
+        3. El sistema le cede el turno al oponente.
+
+
+3.2.11 ACEPTAR ENVIDO O DERIVADOS
+    ·Caso de uso: Se juega el envido o derivado.
+    ·Actor primario: Jugador en turno.
+    .Actor secundario: Sistema
+    ·Precondiciones: · Hay una ronda en curso.
+                     · El oponente cantó envido o derivado en el turno anterior
+                       y consecuentemente el sistema muestra al jugador en turno
+                       las opciones "Quiero" y "No quiero" y opciones para re-cantar.
+    ·Escenario exitoso principal:
+        1. El jugador en turno hace click en "Quiero".
+        2. El sistema registra que el canto fue aceptado.
+        3. El sistema le cede el turno al jugador mano.
+
+
+3.2.12 CANTAR PUNTOS DEL ENVIDO
+    ·Caso de uso: Un jugador canta sus puntos
+    ·Actor primario: Jugador en turno.
+    .Actor secundario: Sistema
+    ·Precondiciones: · Hay una ronda en curso.
+                     · Se acepto el envido o alguno de sus derivados.
+                     · Los puntos de los jugadores que ya cantaron, son
+                       visibles por todos los jugadores
+    ·Escenario exitoso principal:
+        1. El sistema le muestra al jugador las opciones "Son Buenas"(exepto al
+        primer jugador mano), y un campo para escribir sus puntos.
+        2. El jugador escribe sus puntos.
+        3. El sistema le cede el turno al jugador de la derecha.
+    ·Escenario exepcional:
+        3.a El jugador en turno es el último en cantar los puntos.
+            1. El sistema verifica quién canto el puntaje mas grande.
+            2. El sistema registra al supuesto ganador.
+            3. El sistema le cede el turno al jugador que cantó la primera
+            instancia del envido.
 
 
 3.2.12 RECHAZAR ENVIDO O DERIVADOS
@@ -561,21 +561,21 @@ pasar un usuario durante el juego.
           2. El sistema inicia una nueva ronda.
 
 
-3.2.14 CANTAR TRUCO
-    ·Caso de uso: Un jugador canta truco.
+3.2.14 CANTAR TRUCO Y RE-CANTAR RE TUCO O QUIERO VALE 4
+    ·Caso de uso: Un jugador canta truco o re-canta re truco, o quiero vale 4.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Hay una ronda en curso
-                     · No se aceptó antes en la ronda el truco.
+                     · El jugador tiene disponibles las opciones de cantar truco
+                       (en el caso que no se haya cantado antes) o re-cantar
+                        alguno de los derivados(según la instancia).
     ·Escenario exitoso principal:
-        1. El jugador hace click en el botón 'Truco'
+        1. El jugador hace click en alguna de las opciones para cantar o re-cantar.
         2. El sistema registra el canto y por quién fue cantado.
-        3. El sistema le muestra al oponente las opciones "Quiero", "No quiero" y
-        "Re Truco" a través de botones.
         3. El sistema le cede el turno al oponente.
 
 
-3.2.15 ACEPTAR TRUCO O DERIVADOS
+3.2.16 ACEPTAR TRUCO O DERIVADOS
     ·Caso de uso: Se juega el truco o alguno de sus derivados.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
@@ -588,20 +588,6 @@ pasar un usuario durante el juego.
         1. El jugador en turno hace click en "Quiero".
         2. El sistema registra que el canto fue aceptado.
         3. El sistema le cede el turno al jugador que cantó el truco.
-
-
-3.2.16 RE-CANTAR RE TRUCO O QUIERO VALE 4
-    ·Caso de uso: Se re-canta "Re truco" o "Quiero vale 4"
-    ·Actor primario: Jugador en turno.
-    .Actor secundario: Sistema
-    ·Precondiciones: · Hay una ronda en curso.
-                     · El oponente cantó "Truco" o "Re truco" en el turno anterior
-                       y consecuentemente el sistema muestra al jugador en turno
-                       las opciones "Quiero" y "No quiero" y opciones para re-cantar.
-    ·Escenario exitoso principal:
-        1. El jugador en turno hace click en una de las opciones para re-cantar
-        2. El sistema registra el canto
-        3. El sistema le cede el turno al contrincante.
 
 
 3.2.17 RECHAZAR TRUCO O DERIVADOS
