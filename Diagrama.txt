@@ -118,14 +118,18 @@ view->Ronda: crear_canto(envido)
 view-->-browser: Redirect(EnEspera)
 
 
+RECANTAR ENVIDO
+
+browser->+view: request
+view->Envido: aumentar()
+view-->-browser: Redirect(EnEspera)
+
 ACEPTAR ENVIDO
 
 browser->+view: request(QUIERO)
 view->Envido: aceptar()
 Envido->Envido: set_puntos_en_juego()
-view->+Envido: get_ganador()
-Envido-->-view: ganador, puntaje
-view-->-browser: Redirect(EnEspera)
+view-->-browser: Redirect(CantarPuntos)
 
 
 RECHAZAR ENVIDO
@@ -143,17 +147,24 @@ view->Ronda: crear_canto(truco)
 view-->-browser: Redirect(EnEspera)
 
 
+RECANTAR TRUCO
+
+browser->+view: request
+view->+Truco: aumentar()
+view-->-browser: Redirect(EnEspera)
+
+
 ACEPTAR TRUCO
 
 browser->+view: request(QUIERO) 
-view->Canto: aceptar()
+view->Truco: aceptar()
 view-->-browser: Redirect(EnEspera)
 
 
 RECHAZAR TRUCO
 
 browser->+view: request(NO QUIERO) 
-view->Canto: rechazar()
+view->Truco: rechazar()
 view-->-browser: Redirect(EnEspera)
 
 
@@ -210,7 +221,7 @@ browser->+view: request(MostrarPuntos)
 view->+Envido: get_cartas_envido()
 Envido-->-view: puntos_ganador
 note left of view: Se muestran los puntos y la \nopción de ir a la siguiente ronda
-view-->-browser: mensaje_puntos_ganador()
+view-->-browser: Redirect(Partida)
 
 
 PEDIR PUNTOS
@@ -218,7 +229,17 @@ PEDIR PUNTOS
 browser->+view: request(PedirPuntos)
 view-->-browser: Redirect(MostrarPuntos)
 
+
 SIGUIENTE RONDA
 
 browser->+view: request(SigueinteRonda)
 view-->-browser: Redirect(Partida)
+
+
+CANTAR PUNTOS
+
+browser->+view: request(CantarPuntos)
+note right of view: Se muestran un formulario para \ndecir los puntos a cantar
+view->+Envido: get_ganador(puntos_cantados)
+Envido-->-view: ganador, puntaje
+view-->-browser: Redirect(EnEspera)
