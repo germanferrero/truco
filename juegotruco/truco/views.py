@@ -15,15 +15,11 @@ View Lobby: Se muestran las partidas donde aun hay lugar para mas jugadores.
 """
 @login_required(login_url='/usuarios/login')
 def lobby(request):
-    if request.method == "GET":
-        lobby = Lobby()
-        lista_de_partidas = lobby.get_lista_partidas()
-        context = {'lista_de_partidas': lista_de_partidas,
-                   'username': request.user.username}
-        return render(request, 'truco/lobby.html',context)
-    else:
-        partida_id = request.POST['partida']
-        return redirect('truco:unirse_partida', args=(partida_id,))
+    lobby = Lobby()
+    lista_de_partidas = lobby.get_lista_partidas()
+    context = {'lista_de_partidas': lista_de_partidas,
+               'username': request.user.username}
+    return render(request, 'truco/lobby.html',context)
 
 """
 View index: Es la unica view de la aplicacion truco que puede accederse sin estar
@@ -31,8 +27,8 @@ logueado, caso en el cual redirecciona al login. Si el usuario esta logueado lo
 redirige al lobby.
 """
 def index(request):
-    # Si esta logueado entra al lobby directamente
-    return redirect(reverse('truco:lobby'))
+        # Si esta logueado entra al lobby directamente
+        return redirect(reverse('truco:lobby'))
 
 """
 View crear una partida: muestra el formulario para crear una nueva partida.
@@ -54,7 +50,7 @@ def crear_partida(request):
             # Si el formulario es incorrecto se muestran los errores
             return render(request, 'truco/crear_partida.html',{'form': form})
     else:
-        # Si hay un GET se muestra el formulario para crear partida
+        # SI hay un GET se muestra el formulario para crear partida
         form = crear_partida_form()
         return render(request, 'truco/crear_partida.html', {'form': form})
 
@@ -65,28 +61,21 @@ El usuario no puede ingresar a una partida si no selecciono una partida de la li
 que se muestra en el lobby o si ya tiene un jugador en la partida que eligio.
 """
 @login_required(login_url='/usuarios/login')
-def unirse_partida(request,partida_id):
-    partida = Partida.objects.get(pk=partida_id)
-    password = partida.get_password
-    lobby = Lobby()
-    if password and request.method == "GET":
-        # Si la partida requeria password
-        form = unirse_partida_form()
-        return render(request, 'truco/unirse_partida.html', {'form': form,
-                                                             'partida': partida})
-    if (not password) or (password and password == form.cleaned_data['password']):
-        # Si la partida no requeria password o se ingreso bien la misma
+def unirse_partida(request):
+    partida = request.POST.get('partida', False)
+    if partida:
+        lobby = Lobby()
+        partida = Partida.objects.get(pk=request.POST['partida'])
         if lobby.unirse_partida(request.user,partida) == -1:
             # Si no puedo unirme a la partida
             return redirect(reverse('truco:lobby'))
         else:
-            # Si se pudo unir a la partida
+            # Si selecciona una partida a la que puede ingresar
             partida.actualizar_estado()
             return redirect(reverse('truco:en_espera', args=(partida.id,)))
     else:
-        # El password es incorrecto
-        return redirect(reverse('truco:unirse_partida', args=(partida.id,)))
-
+        # No se selecciono una partida
+        return redirect(reverse('truco:lobby'))
 
 """
 View partida: Se encarga de definir cuando la partida debe continuar o terminar.

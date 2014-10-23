@@ -26,7 +26,3 @@ class crear_partida_form(forms.Form):
             )
     password = forms.CharField(widget=forms.PasswordInput, required=False)
 
-
-class unirsse_partida_form(forms.Form):
-    password = forms.CharField(widget=forms.PasswordInput, required=True)
-

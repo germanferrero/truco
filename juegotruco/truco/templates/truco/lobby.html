@@ -15,10 +15,11 @@
         </div>
 
         <div id="pantalla_medio">
-            <form method="post">
+            <form action="{% url 'truco:unirse_partida' %}" method="post">
             {% csrf_token %}
                 {% for partida in lista_de_partidas %}
-                    <input type="radio" name="partida" id="partida{{ forloop.counter }}" value="{{ partida.id }}"/>{{ partida }}<br/>
+                    <input type="radio" name="partida" id="partida{{ forloop.counter }}" value="{{ partida.id }}" />
+                    <label for="partida{{ forloop.counter }}">{{ partida }}</label><br />
                 {% endfor %}
                 <input type="submit" value="Unirse a Partida" />
             </form>
