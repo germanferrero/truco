@@ -178,7 +178,7 @@ browser->+view: request()
 view->+Partida: partida_is_ready()
 alt Se terminó la ronda pero no la partida
     Partida-->-view: true
-    view-->-browser: Redirect(ronda)
+    view-->-browser: Redirect(PedirPuntos)
 else Se terminó la partida
     Partida-->-view: false
     view-->-browser: Redirect(index)
@@ -202,3 +202,23 @@ CERRAR SESIÓN
 browser->+view: request
 view->Auth: logout()
 view-->-browser: Redirect(lobby)
+
+
+MOSTRAR PUNTOS
+
+browser->+view: request(MostrarPuntos)
+view->+Envido: get_cartas_envido()
+Envido-->-view: puntos_ganador
+note left of view: Se muestran los puntos y la \nopción de ir a la siguiente ronda
+view-->-browser: mensaje_puntos_ganador()
+
+
+PEDIR PUNTOS
+
+browser->+view: request(PedirPuntos)
+view-->-browser: Redirect(MostrarPuntos)
+
+SIGUIENTE RONDA
+
+browser->+view: request(SigueinteRonda)
+view-->-browser: Redirect(Partida)
