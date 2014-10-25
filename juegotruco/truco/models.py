@@ -247,6 +247,8 @@ class Ronda(models.Model):
     primer_enfrentamiento = models.ForeignKey('Enfrentamiento',null=True,related_name='primer_enfrentamiento')
     segundo_enfrentamiento = models.ForeignKey('Enfrentamiento',null=True,related_name='segundo_enfrentamiento')
     tercer_enfrentamiento = models.ForeignKey('Enfrentamiento',null=True,related_name='tercer_enfrentamiento')
+    equipo_mazo = models.IntegerField(max_length=1, default=-1)
+
     """
     Devuelve un mensaje con el ganador del envido y su puntaje,
     personalizado para jugador
@@ -329,17 +331,17 @@ class Ronda(models.Model):
         elif (self.primer_enfrentamiento and self.primer_enfrentamiento.get_termino()
                 and not self.ultimo_truco):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
-            opciones = [TRUCO]
+            opciones = [TRUCO, IRSE_AL_MAZO]
         elif not self.ultimo_envido:
             # No se ha cantado envido aun
-            opciones = [ENVIDO]
+            opciones = [ENVIDO, IRSE_AL_MAZO]
             if self.primer_enfrentamiento and self.primer_enfrentamiento.get_termino():
                 # No se puede cantar envido si termina el primer enfrentamiento
-                opciones = []
+                opciones = [IRSE_AL_MAZO]
         else:
             # Ya se ha cantado envido y estamos en el primer enfrentamiento o
             # ya se canto el truco y se respondio
-            opciones = []
+            opciones = [IRSE_AL_MAZO]
         return opciones
 
     """
@@ -466,7 +468,11 @@ class Ronda(models.Model):
                 self.ultimo_truco.save()
                 puntajes[self.ultimo_truco.equipo_ganador] += self.ultimo_truco.pts_en_juego
             else:
-                puntajes[ganador_enfrentamientos] += 1
+                if not self.primer_enfrentamiento and not self.ultimo_envido:
+                    # Si el mano no canto envido y se fue en la primer mano
+                    puntajes[ganador_enfrentamientos] += 2
+                else:
+                    puntajes[ganador_enfrentamientos] += 1
         return puntajes
 
     def get_enfrentamientos(self):
@@ -478,21 +484,34 @@ class Ronda(models.Model):
     Si hay un empate devuelve el equipo del mano.
     """
     def get_ganador_enfrentamientos(self):
-        enfrentamientos_ganados = [0, 0]
-        enfrentamientos = self.get_enfrentamientos()
-        for enfrentamiento in enfrentamientos:
-            ganador = enfrentamiento.get_ganador()
-            if ganador >= 0:
-                # No hubo un empate
-                equipo_ganador = self.jugadores.get(posicion_mesa = ganador).equipo
-                enfrentamientos_ganados[equipo_ganador] += 1
-        if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
-            # Si se empataron los tres enfrentamientos
-            ganador = self.jugadores.all()[self.mano_pos].equipo
+        if self.equipo_mazo >= 0:
+            ganador = (self.equipo_mazo + 1 )% 2
+            print ganador
+            print "acaaa"
         else:
-            # Ganador es el equipo con mas enfrentamientos ganados
-            ganador = enfrentamientos_ganados.index(max(enfrentamientos_ganados))
+            enfrentamientos_ganados = [0, 0]
+            enfrentamientos = self.get_enfrentamientos()
+            for enfrentamiento in enfrentamientos:
+                ganador = enfrentamiento.get_ganador()
+                if ganador >= 0:
+                    # No hubo un empate
+                    equipo_ganador = self.jugadores.get(posicion_mesa = ganador).equipo
+                    enfrentamientos_ganados[equipo_ganador] += 1
+            if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
+                # Si se empataron los tres enfrentamientos
+                ganador = self.jugadores.all()[self.mano_pos].equipo
+            else:
+                # Ganador es el equipo con mas enfrentamientos ganados
+                ganador = enfrentamientos_ganados.index(max(enfrentamientos_ganados))
         return ganador
+
+    """
+    Este metodo se debe llamar cuando algun jugador se va al mazo
+    """
+    def irse_al_mazo (self, jugador):
+        #seteo el equipo que se fue al mazo
+        self.equipo_mazo = jugador.equipo
+        self.save()
 
     """
     Si hay un ganador de la ronda devuelve true, si no, false.
@@ -500,7 +519,12 @@ class Ronda(models.Model):
     def hay_ganador(self):
         # Devuelve verdadero si hay un ganador de la ronda
         result = False
-        if self.ultimo_truco and self.ultimo_truco.estado == RECHAZADO:
+        print self.equipo_mazo
+        print "acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+        if self.equipo_mazo >= 0:
+            # Si un jugador se fue al mazo hay un ganador
+            result = True
+        elif self.ultimo_truco and self.ultimo_truco.estado == RECHAZADO:
             # Si no se quizo el truco
             result = True
         elif self.tercer_enfrentamiento and self.tercer_enfrentamiento.get_termino():

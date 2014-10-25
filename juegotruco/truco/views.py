@@ -149,6 +149,9 @@ def ronda(request,partida_id):
             opcion = int(request.POST['opcion'])
             if opcion == QUIERO or opcion == NO_QUIERO:
                 return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
+            elif opcion == IRSE_AL_MAZO:
+                ronda.irse_al_mazo(jugador)
+                return redirect(reverse('truco:partida', args=(partida.id,)))
             else:
                 ronda.crear_canto(opcion,jugador)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
