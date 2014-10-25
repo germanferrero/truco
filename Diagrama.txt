@@ -214,32 +214,62 @@ browser->+view: request
 view->Auth: logout()
 view-->-browser: Redirect(lobby)
 
-
 MOSTRAR PUNTOS
 
 browser->+view: request(MostrarPuntos)
-view->+Envido: get_cartas_envido()
-Envido-->-view: puntos_ganador
-note left of view: Se muestran los puntos y la \nopción de ir a la siguiente ronda
-view-->-browser: Redirect(Partida)
+view->FinRonda: mostrar_puntos()
+FinRonda->FinRonda: set_puntos_mostrados()
+FinRonda->Envido: verificar_supuesto_ganador()
+view-->-browser: Redirect(EnEspera)
 
 
 PEDIR PUNTOS
 
-browser->+view: request(PedirPuntos)
-view-->-browser: Redirect(MostrarPuntos)
+browser->+view: request()
+view->FinRonda: pedir_puntos()
+FinRonda->FinRonda: set_puntos_pedidos()
+view-->-browser: redirect(EnEspera)
 
 
-SIGUIENTE RONDA
+SIGUIENTE RONDA, No Hay Envido
 
-browser->+view: request(SigueinteRonda)
-view-->-browser: Redirect(Partida)
+browser->+view: request(SiguienteRonda)
+view->+FinRonda: faltan_sr()
+FinRonda-->-view:
+alt Faltan sr
+view-->browser: Redirect(EnEspera)
+else No faltan
+view-->browser: Redirect(Partida)
 
+SIGUIENTE RONDA, Hay Envido, olvido pedir puntos
+
+browser->+view: request(SiguienteRonda)
+view->+FinRonda: faltan_sr()
+FinRonda->Ronda: confirm_supuesto_ganador_envido()
+FinRonda-->-view:
+alt Faltan sr
+view-->browser: Redirect(EnEspera)
+else No faltan
+view-->browser: Redirect(Partida)
+
+SIGUIENTE RONDA, Hay Envido, olvido mostrar puntos
+
+browser->+view: request(SiguienteRonda)
+view->+FinRonda: faltan_sr()
+FinRonda->Envido: rectificar_supuesto_ganador_envido()
+FinRonda-->-view:
+alt Faltan sr
+view-->browser: Redirect(EnEspera)
+else No faltan
+view-->browser: Redirect(Partida)
 
 CANTAR PUNTOS
 
-browser->+view: request(CantarPuntos)
+browser->view:request()
 note right of view: Se muestran un formulario para \ndecir los puntos a cantar
-view->+Envido: get_ganador(puntos_cantados)
-Envido-->-view: ganador, puntaje
-view-->-browser: Redirect(EnEspera)
+alt el jugador escribe sus puntos
+view->Envido: set_puntos(jugador,puntos_cantados)
+else el jugador dice "son buenas"
+view->Envido: set_puntos(jugador,0)
+end
+view-->browser: redirect(EnEspera)
