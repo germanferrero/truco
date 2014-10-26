@@ -27,6 +27,7 @@ class Mazo():
             return list(Carta.objects.order_by('?')[:cant_cartas])
 
 
+
 class Jugador(models.Model):
     user = models.ForeignKey(User, verbose_name='usuario')
     nombre = models.CharField(max_length=32)
@@ -51,6 +52,7 @@ class Jugador(models.Model):
 
     def __str__(self):
         return self.nombre
+
 
 
 class Lobby:
@@ -84,6 +86,7 @@ class Lobby:
         else:
             result = -1
         return result
+
 
 
 class Partida(models.Model):
@@ -433,6 +436,7 @@ class Ronda(models.Model):
         canto.mano_pos = self.mano_pos
         canto.tipo = tipo
         canto.save()
+
         if tipo in [ENVIDO]:
             self.ultimo_envido = canto
             self.save()
@@ -459,6 +463,7 @@ class Ronda(models.Model):
     Este metodo se debe llamar cuando se termina la ronda.
     """
     def calcular_puntos(self):
+        
         enfrentamientos_ganados = [0, 0]
         puntajes = self.calcular_puntos_envido()
         if self.ultimo_truco and self.ultimo_truco.estado == RECHAZADO:
@@ -556,10 +561,12 @@ class Ronda(models.Model):
         return result
 
 
+
 class Canto(models.Model):
+    
     ronda = models.ForeignKey(Ronda, verbose_name="ronda")
     tipo = models.CharField(max_length=1)
-    pts_en_juego = models.IntegerField(max_length=1, default=1)
+    pts_en_juego = models.IntegerField(max_length=2, default=1)
     pos_jugador_canto = models.IntegerField(max_length=1)
     estado = models.IntegerField(max_length=1, default=NO_CONTESTADO)
     class Meta:

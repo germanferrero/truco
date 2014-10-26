@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    {% load staticfiles %}
+    <head>
+        <link rel="stylesheet" href= {% static "style_partida.css" %}>
+        <title> Partida </title>
+        {% block refresh %}
+        <meta http-equiv="refresh" content="3">
+        {% endblock refresh %}
+    </head>
+
+    <body>
+        {% load staticfiles %}
+        <div id="barra_arriba">
+                <h4>Bienvenido {{ username }}</h4>
+                <h5>PARTIDA {{ partida }}</h5>
+                <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
+        </div>
+        <div id ="puntajes">
+            <table>
+                <tr>
+                    <td>Mi equipo</td>
+                    <td>Otro equipo</td>
+                </tr>
+                <tr>
+                    <td>{{ puntajes.0 }}</td>
+                    <td>{{ puntajes.1 }}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="mensajes">
+            {% block mensajes %}
+            <h2> {{mensaje_ganador}} </h2>
+            {% endblock mensajes%}
+        </div>
+        <div id="pantalla_de_juego">
+            {% block pantalla_de_juego %}
+            {% endblock pantalla_de_juego %}
+        </div>
+</html>
