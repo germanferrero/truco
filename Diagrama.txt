@@ -217,14 +217,14 @@ view-->-browser: Redirect(lobby)
 MOSTRAR PUNTOS
 
 browser->+view: request(MostrarPuntos)
-view->Ronda: set_puntos_mostrados()
+view->Envido: set_puntos_mostrados()
 view-->-browser: Redirect(EnEspera)
 
 
 PEDIR PUNTOS
 
 browser->+view: request(PedirPuntos)
-view->Ronda: set_puntos_pedidos()
+view->Envido: set_puntos_pedidos()
 view-->-browser: redirect(EnEspera)
 
 
