@@ -202,11 +202,11 @@ class TrucoTests(TestCase):
         # Chequeo que los puntos en juego sean 2
         self.assertEqual(canto.pts_en_juego,2)
         # Obtengo el ganador
-        canto.envido.get_ganador()
+        canto.get_ganador()
         canto.save()
-        puntos_jugador1 = canto.envido.puntos_jugador(jugadores[0])
-        puntos_jugador2 = canto.envido.puntos_jugador(jugadores[1])
+        puntos_jugador1 = canto.puntos_jugador(jugadores[0])
+        puntos_jugador2 = canto.puntos_jugador(jugadores[1])
         if puntos_jugador1 < puntos_jugador2:
-            self.assertEqual(canto.envido.maximo_puntaje, puntos_jugador2)
+            self.assertEqual(canto.maximo_puntaje, puntos_jugador2)
         else:
-            self.assertEqual(canto.envido.maximo_puntaje, puntos_jugador1)
+            self.assertEqual(canto.maximo_puntaje, puntos_jugador1)

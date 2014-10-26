@@ -486,8 +486,6 @@ class Ronda(models.Model):
     def get_ganador_enfrentamientos(self):
         if self.equipo_mazo >= 0:
             ganador = (self.equipo_mazo + 1 )% 2
-            print ganador
-            print "acaaa"
         else:
             enfrentamientos_ganados = [0, 0]
             enfrentamientos = self.get_enfrentamientos()
@@ -519,8 +517,6 @@ class Ronda(models.Model):
     def hay_ganador(self):
         # Devuelve verdadero si hay un ganador de la ronda
         result = False
-        print self.equipo_mazo
-        print "acaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
         if self.equipo_mazo >= 0:
             # Si un jugador se fue al mazo hay un ganador
             result = True
