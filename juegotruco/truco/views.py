@@ -145,6 +145,9 @@ def ronda(request,partida_id):
     jugador = partida.find_jugador(request.user)
     if request.method == "POST":
         # El jugador eligio una opcion
+        if 'puntos_cantados' in request.POST:
+            ronda.ultimo_envido.cantar_puntos(jugador,request.POST['puntos_cantados'])
+            return redirect(reverse('truco:en_espera', args=(partida.id,)))
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
             if opcion == QUIERO or opcion == NO_QUIERO:
@@ -152,6 +155,9 @@ def ronda(request,partida_id):
             elif opcion == IRSE_AL_MAZO:
                 ronda.irse_al_mazo(jugador)
                 return redirect(reverse('truco:partida', args=(partida.id,)))
+            elif opcion == SON_BUENAS:
+                ronda.ultimo_envido.cantar_puntos(jugador,0)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
                 ronda.crear_canto(opcion,jugador)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
@@ -172,7 +178,8 @@ def ronda(request,partida_id):
                         'puntajes' : partida.get_puntajes(request.user),
                         'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
                         'mensaje_canto' : ronda.get_mensaje_canto(),
-                        'puede_tirar_carta' : ronda.se_puede_tirar()
+                        'puede_tirar_carta' : ronda.se_puede_tirar(),
+                        'cantar_puntos' : ronda.se_debe_cantar_puntos()
                       }
             return render(request,'truco/ronda.html', context)
         else:  # Se termino la ronda

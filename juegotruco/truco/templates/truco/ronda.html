@@ -41,7 +41,14 @@
             </form>
             {% endfor %}
         </div>
-
+        <div id="cantar_puntos">
+            {% if cantar_puntos %}
+                <form action="{% url 'truco:ronda' partida.id %}" method="post">
+                {% csrf_token %}
+                <input type="text" name="puntos_cantados">
+                <input type="submit" name="cantar_puntos">
+            {% endif %}
+        </div>
         <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
             {% for carta in cartas_jugadas.0 %}
                 {% if forloop.counter == 1 %}
