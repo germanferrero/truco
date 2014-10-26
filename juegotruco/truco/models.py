@@ -251,6 +251,7 @@ class Ronda(models.Model):
     segundo_enfrentamiento = models.ForeignKey('Enfrentamiento',null=True,related_name='segundo_enfrentamiento')
     tercer_enfrentamiento = models.ForeignKey('Enfrentamiento',null=True,related_name='tercer_enfrentamiento')
     equipo_mazo = models.IntegerField(max_length=1, default=-1)
+    jugadores_listos = models.IntegerField(max_length=1, default=0)
 
     """
     Devuelve un mensaje con el ganador del envido y su puntaje,
@@ -560,7 +561,12 @@ class Ronda(models.Model):
                 result = True
         return result
 
+    def todos_jugadores_listos(self):
+        return(self.jugadores_listos == self.jugadores.count())
 
+    def jugador_listo(self):
+        self.jugadores_listos += 1
+        self.save()
 
 class Canto(models.Model):
     
@@ -672,6 +678,14 @@ class Envido(Canto):
 
     def todos_cantaron(self):
         return self.jugadores.count() == 2
+
+    def pedir_puntos(self):
+        self.puntos_pedidos = True
+        self.save()
+
+    def mostrar_puntos(self):
+        self.puntos_mostrados = True
+        self.save()
 
 class JugadorEnEnvido(models.Model):
     jugador = models.ForeignKey(Jugador,verbose_name='jugador')

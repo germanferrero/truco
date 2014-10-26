@@ -220,3 +220,45 @@ def responder_canto(request, partida_id, opcion):
     else:
         canto_actual.rechazar()
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
+
+"""
+View fin de ronda: Al finalizar la ronda, los jugadores tienen que seleccionar la
+opcion de pasar a la siguiente ronda. Si se jugo un envido durante la ronda, el
+perdedor del mismo puede pedir ver las cartas del otro equipo para rectificar el
+resultado.
+"""
+def fin_de_ronda(request, partida_id):
+    partida = Partida.objects.get(pk=partida_id)
+    ronda = partida.get_ronda_actual()
+    if request.method == "POST":
+        if opcion in request.POST:
+            opcion = int(request.POST['opcion'])
+            if opcion == SIGUIENTE_RONDA:
+                ronda.jugador_listo()
+                if ronda.todos_jugadores_listos():
+                    redirect(reverse('truco:partida', args=(partida.id,)))
+                else:
+                    redirect(reverse('truco:en_espera', args=(partida.id,)))
+            elif opcion == PEDIR_PUNTOS:
+                ronda.ultimo_envido.pedir_puntos()
+                redirect(reverse('truco:en_espera', args=(partida.id,)))
+            else:
+                ronda.ultimo_envido.mostrar_puntos()
+                redirect(reverse('truco:en_espera', args=(partida.id,)))
+#    else:
+#        if ronda.ultimo_envido:
+#        context = {
+#            'puntajes' : partida.get_puntajes(request.user),
+#            'partida' : partida,
+#            'username' : request.user.username,
+#            'ronda' : ronda,
+#            'cartas_disponibles' : jugador.get_cartas_diponibles(),
+#            'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
+#            'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+#            'opciones' : ronda.get_opciones(),
+#            'op_dict' : OPCIONES,
+#            'puntajes' : partida.get_puntajes(request.user),
+#            }
+#        return render(request,'truco/fin_de_ronda.html', context)
+#    else
+#        redirect(reverse('truco:en_espera', args=(partida.id)))
