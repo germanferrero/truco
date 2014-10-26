@@ -159,7 +159,8 @@ def ronda(request,partida_id):
                 ronda.ultimo_envido.cantar_puntos(jugador,0)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
-                ronda.crear_canto(opcion,jugador)
+                puntos_restantes = partida.get_min_pts_restantes()
+                ronda.crear_canto(opcion, jugador, puntos_restantes)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
         elif 'carta' in request.POST:
             return redirect(reverse('truco:tirar_carta', args=(partida.id,request.POST['carta'],)))
