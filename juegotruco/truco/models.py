@@ -602,7 +602,7 @@ class Ronda(models.Model):
 
     def turno_fin_ronda(self):
         cant_acciones = self.jugadores_listos
-        if self.ultimo_envido:
+        if self.ultimo_envido and self.ultimo_envido.estado == ACEPTADO:
             if self.ultimo_envido.puntos_pedidos:
                 cant_acciones +=1
             if self.ultimo_envido.puntos_mostrados:
