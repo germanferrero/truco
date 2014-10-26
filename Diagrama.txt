@@ -217,51 +217,28 @@ view-->-browser: Redirect(lobby)
 MOSTRAR PUNTOS
 
 browser->+view: request(MostrarPuntos)
-view->FinRonda: mostrar_puntos()
-FinRonda->FinRonda: set_puntos_mostrados()
-FinRonda->Envido: verificar_supuesto_ganador()
+view->Ronda: set_puntos_mostrados()
 view-->-browser: Redirect(EnEspera)
 
 
 PEDIR PUNTOS
 
-browser->+view: request()
-view->FinRonda: pedir_puntos()
-FinRonda->FinRonda: set_puntos_pedidos()
+browser->+view: request(PedirPuntos)
+view->Ronda: set_puntos_pedidos()
 view-->-browser: redirect(EnEspera)
 
 
-SIGUIENTE RONDA, No Hay Envido
+SIGUIENTE RONDA
 
 browser->+view: request(SiguienteRonda)
-view->+FinRonda: faltan_sr()
+view->Ronda: sumar_jugador_listo()
+view->+Ronda: faltan_jugadores_listos()
 FinRonda-->-view:
-alt Faltan sr
+alt Faltan jugadores listos
 view-->browser: Redirect(EnEspera)
 else No faltan
 view-->browser: Redirect(Partida)
 
-SIGUIENTE RONDA, Hay Envido, olvido pedir puntos
-
-browser->+view: request(SiguienteRonda)
-view->+FinRonda: faltan_sr()
-FinRonda->Ronda: confirm_supuesto_ganador_envido()
-FinRonda-->-view:
-alt Faltan sr
-view-->browser: Redirect(EnEspera)
-else No faltan
-view-->browser: Redirect(Partida)
-
-SIGUIENTE RONDA, Hay Envido, olvido mostrar puntos
-
-browser->+view: request(SiguienteRonda)
-view->+FinRonda: faltan_sr()
-FinRonda->Envido: rectificar_supuesto_ganador_envido()
-FinRonda-->-view:
-alt Faltan sr
-view-->browser: Redirect(EnEspera)
-else No faltan
-view-->browser: Redirect(Partida)
 
 CANTAR PUNTOS
 
