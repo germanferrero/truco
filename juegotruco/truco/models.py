@@ -240,7 +240,7 @@ class Partida(models.Model):
             self.save()
 
     def get_min_pts_restantes(self):
-        puntos_minimos = min (self.puntos_e1, self.puntos_e2)
+        puntos_minimos = min(15 - self.puntos_e1 % 15, 15 - self.puntos_e2 % 15)
         return puntos_minimos
 
 
@@ -424,7 +424,6 @@ class Ronda(models.Model):
             if not self.ultimo_envido:
                 canto = Envido(mano_pos=self.mano_pos, puntos_falta=puntos, ronda=self, pos_jugador_canto=jugador.posicion_mesa)
                 canto.save()
-                canto.pts_en_juego = PTS_CANTO[tipo]
                 self.ultimo_envido = canto
                 self.save()
             else:
@@ -436,7 +435,6 @@ class Ronda(models.Model):
             canto = Truco()
             self.ultimo_truco = canto
             self.save()
-        print ("LOS PUNTOS EN JUEGO SON: "+ str(canto.pts_en_juego) + "\n")
         canto.ronda = self
         canto.pos_jugador_canto = jugador.posicion_mesa
         # Se toma la posicion del jugador para el caso del empate del envido
@@ -498,7 +496,7 @@ class Ronda(models.Model):
     """
     def get_ganador_enfrentamientos(self):
         if self.equipo_mazo >= 0:
-            ganador = (self.equipo_mazo + 1 )% 2
+            ganador = (self.equipo_mazo + 1 ) % 2
         else:
             enfrentamientos_ganados = [0, 0]
             enfrentamientos = self.get_enfrentamientos()
@@ -589,18 +587,7 @@ class Canto(models.Model):
 
 
 class Truco(Canto):
-
-    """
-    Respuestas que tiene un jugador para contestar un truco o derivado
-    """
-    def get_respuestas(self):
-        if self.tipo == TRUCO:
-            opciones = [QUIERO, NO_QUIERO, RE_TRUCO]
-        elif self.tipo == RE_TRUCO:
-            opciones = [QUIERO, NO_QUIERO, VALE_4]
-        else:
-            opciones = [QUIERO, NO_QUIERO]
-        return opciones
+    pass
 
 
 
@@ -697,14 +684,18 @@ class Envido(Canto):
 
     def aceptar(self):
         self.estado = ACEPTADO
-        if self.tipo in str(FALTA_ENVIDO):
+        print self.tipo
             self.pts_en_juego = self.puntos_falta
         elif self.tipo ==  str(ENVIDO):
-            self.pts_en_juego += 2
+            self.pts_en_juego += 1
         elif self.tipo == str(DOBLE_ENVIDO):
-            self.pts_en_juego +=2
+            self.pts_en_juego += 2
         else:
-            self.pts_en_juego += 3
+            if self.pts_en_juego > 1:
+                # Si se canta real envido con otro canto antes
+                self.pts_en_juego += 3
+            else:
+                self.pts_en_juego += 2
         self.save()
 
 
