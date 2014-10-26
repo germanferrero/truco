@@ -154,7 +154,7 @@ def ronda(request,partida_id):
                 return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
             elif opcion == IRSE_AL_MAZO:
                 ronda.irse_al_mazo(jugador)
-                return redirect(reverse('truco:partida', args=(partida.id,)))
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == SON_BUENAS:
                 ronda.ultimo_envido.cantar_puntos(jugador,0)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
@@ -169,13 +169,11 @@ def ronda(request,partida_id):
             context = {'puntajes' : partida.get_puntajes(request.user),
                         'partida' : partida,
                         'username' : request.user.username,
-                        'ronda' : ronda,
                         'cartas_disponibles' : jugador.get_cartas_diponibles(),
                         'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
                         'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
                         'opciones' : ronda.get_opciones(),
                         'op_dict' : OPCIONES,
-                        'puntajes' : partida.get_puntajes(request.user),
                         'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
                         'mensaje_canto' : ronda.get_mensaje_canto(),
                         'puede_tirar_carta' : ronda.se_puede_tirar(),
@@ -183,7 +181,7 @@ def ronda(request,partida_id):
                       }
             return render(request,'truco/ronda.html', context)
         else:  # Se termino la ronda
-            return redirect(reverse('truco:partida', args=(partida.id,)))
+            return redirect(reverse('truco:fin_de_ronda', args=(partida.id,)))
 
 """
 View tirar carta: Maneja el caso donde la opcion elegida por el jugador en turno
@@ -230,35 +228,31 @@ resultado.
 def fin_de_ronda(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
+    jugador = partida.find_jugador(request.user)
     if request.method == "POST":
-        if opcion in request.POST:
+        if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
             if opcion == SIGUIENTE_RONDA:
                 ronda.jugador_listo()
                 if ronda.todos_jugadores_listos():
-                    redirect(reverse('truco:partida', args=(partida.id,)))
+                    return redirect(reverse('truco:partida', args=(partida.id,)))
                 else:
-                    redirect(reverse('truco:en_espera', args=(partida.id,)))
+                    return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == PEDIR_PUNTOS:
                 ronda.ultimo_envido.pedir_puntos()
-                redirect(reverse('truco:en_espera', args=(partida.id,)))
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
                 ronda.ultimo_envido.mostrar_puntos()
-                redirect(reverse('truco:en_espera', args=(partida.id,)))
-#    else:
-#        if ronda.ultimo_envido:
-#        context = {
-#            'puntajes' : partida.get_puntajes(request.user),
-#            'partida' : partida,
-#            'username' : request.user.username,
-#            'ronda' : ronda,
-#            'cartas_disponibles' : jugador.get_cartas_diponibles(),
-#            'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
-#            'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
-#            'opciones' : ronda.get_opciones(),
-#            'op_dict' : OPCIONES,
-#            'puntajes' : partida.get_puntajes(request.user),
-#            }
-#        return render(request,'truco/fin_de_ronda.html', context)
-#    else
-#        redirect(reverse('truco:en_espera', args=(partida.id)))
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
+    else:
+        context = {
+            'puntajes' : partida.get_puntajes(request.user),
+            'partida' : partida,
+            'username' : request.user.username,
+            'cartas_disponibles' : jugador.get_cartas_diponibles(),
+            'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
+            'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+            'opciones' : ronda.get_opciones_fin_ronda(),
+            'op_dict' : OPCIONES,
+            }
+        return render(request,'truco/fin_de_ronda.html', context)

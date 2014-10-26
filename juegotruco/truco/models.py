@@ -322,6 +322,8 @@ class Ronda(models.Model):
         ultimo_canto = self.get_ultimo_canto()
         if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
             result = False
+        elif self.se_debe_cantar_puntos():
+            result = False
         return result
 
     def se_debe_cantar_puntos(self):
@@ -369,7 +371,9 @@ class Ronda(models.Model):
     def get_turno(self):
         ultimo_canto = self.get_ultimo_canto()
         ultimo_enfrentamiento = self.get_ultimo_enfrentamiento()
-        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+        if self.hay_ganador() and not self.todos_jugadores_listos():
+            turno_pos = self.turno_fin_ronda()
+        elif ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
             # Hay un canto que no se contesto aun, el turno es de quien debe responder
             turno_pos = (ultimo_canto.pos_jugador_canto + 1) % self.jugadores.count()
         elif self.se_debe_cantar_puntos():
@@ -567,6 +571,33 @@ class Ronda(models.Model):
     def jugador_listo(self):
         self.jugadores_listos += 1
         self.save()
+
+    def get_opciones_fin_ronda(self):
+        opciones = [SIGUIENTE_RONDA]
+        if (self.ultimo_envido
+            and self.ultimo_envido.puntos_pedidos
+            and not self.ultimo_envido.puntos_mostrados):
+            opciones.append(MOSTRAR_PUNTOS)
+        elif (self.ultimo_envido
+              and self.jugadores_listos==0
+              and not self.ultimo_envido.puntos_pedidos):
+            opciones.append(PEDIR_PUNTOS)
+        return opciones
+
+    def turno_fin_ronda(self):
+        cant_acciones = self.jugadores_listos
+        if self.ultimo_envido:
+            if self.ultimo_envido.puntos_pedidos:
+                cant_acciones +=1
+            if self.ultimo_envido.puntos_mostrados:
+                cant_acciones +=1
+            pos_supuesto_ganador = self.ultimo_envido.get_supuesto_ganador()[0]
+            # Solo valido para 2 jugadores
+            pos_supuesto_perdedor = (pos_supuesto_ganador + 1) % self.jugadores.count()
+            turno_pos = (pos_supuesto_perdedor + cant_acciones) % self.jugadores.count()
+        else:
+            turno_pos = self.mano_pos
+        return turno_pos
 
 class Canto(models.Model):
     
