@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+    {% extends "truco/partida.html" %}
+    {% load staticfiles %}
+    {% load custom_filters %}
+    <head>
+        <title> Ronda </title>
+        {% block refresh %}
+        {% endblock refresh %}
+    </head>
+
+    <body>
+        {% load staticfiles %}
+        <div id="barra_arriba">
+                <h4>Bienvenido {{ username }}</h4>
+                <h5>PARTIDA {{ partida }}</h5>
+                <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
+        </div>
+        <div id ="puntajes">
+            <table>
+                <tr>
+                    <td>Mi equipo</td>
+                    <td>Otro equipo</td>
+                </tr>
+                <tr>
+                    <td>{{ puntajes.0 }}</td>
+                    <td>{{ puntajes.1 }}</td>
+                </tr>
+            </table>
+        </div>
+        <div id="mensajes">
+            {% block mensajes %}
+            {% endblock mensajes%}
+        </div>
+        <div id="pantalla_de_juego">
+            {% block pantalla_de_juego %}
+                <div id="cuadro_cartas_rival">
+                    {% for i in cant_cartas_adversario %}
+                        <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                    {% endfor %}
+                </div>
+
+                <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
+                    {% for carta in cartas_jugadas.1 %}
+                        {% if forloop.counter == 1 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                        {% endif %}
+                        {% if forloop.counter == 2 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                        {% endif %}
+                        {% if forloop.counter == 3 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div id="cuadro_botones">
+                    {% for opcion in opciones %}
+                    <form action="{% url 'truco:fin_de_ronda' partida.id %}" method="post">
+                    {% csrf_token %}
+                        <div id="botones_opciones">
+                            <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
+                        </div>
+                    </form>
+                    {% endfor %}
+                </div>
+
+                <div id="cantar_puntos">
+                    {% if cantar_puntos %}
+                        <form action="{% url 'truco:fin_de_ronda' partida.id %}" method="post">
+                        {% csrf_token %}
+                        <input type="text" name="puntos_cantados">
+                        <input type="submit" name="cantar_puntos">
+                    {% endif %}
+                </div>
+
+                <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
+                    {% for carta in cartas_jugadas.0 %}
+                        {% if forloop.counter == 1 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                        {% endif %}
+                        {% if forloop.counter == 2 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                        {% endif %}
+                        {% if forloop.counter == 3 %}
+                            <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+
+                <div id="cuadro_cartas_usuario">
+                    {% for carta in cartas_disponibles %}
+                        <img src={% static "truco/images/" %}{{carta}}/>
+                    {% endfor %}
+                </div>
+            {% endblock pantalla_de_juego %}
+        </div>
+</html>
