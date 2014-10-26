@@ -245,8 +245,8 @@ CANTAR PUNTOS
 browser->view:request()
 note right of view: Se muestran un formulario para \ndecir los puntos a cantar
 alt el jugador escribe sus puntos
-view->Envido: set_puntos(jugador,puntos_cantados)
+view->Envido: cantar_puntos(jugador,puntos_cantados)
 else el jugador dice "son buenas"
-view->Envido: set_puntos(jugador,0)
+view->Envido: cantar_puntos(jugador,0)
 end
 view-->browser: redirect(EnEspera)
