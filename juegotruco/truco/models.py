@@ -129,7 +129,7 @@ class Partida(models.Model):
     Devuelve la ronda actual si existe, None en caso contrario.
     """
     def get_ronda_actual(self):
-        #Devuelve la ronda acutal
+        #Devuelve la ronda actual
         return self.ronda_actual
     """
     Devuelve un mensaje si hay un equipo ganador, si no devuelve un string vacio.

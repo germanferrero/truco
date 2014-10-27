@@ -77,44 +77,19 @@ class TrucoTests(TestCase):
         user2 = User.objects.get(username ='test_user2')
         # Obtengo los jugadores de la partida
         jugadores =  list(partida.jugadores.all())
-        # La cantidad de jugadores en la partida debe ser uno
-        self.assertEqual(len(jugadores),1)
         # La partida esta en espera hasta que se una un nuevo jugador
         self.assertEqual(partida.estado, EN_ESPERA)
         #Agrego un nuevo jugador
         lobby.unirse_partida(user2, partida)
         # Seteo el estado de la partida
         partida.actualizar_estado()
-        # Obtengo los jugadores de la partida
-        jugadores = list(partida.jugadores.all())
-        # La cantidad de jugadores en la partida debe ser dos
-        self.assertEqual(len(jugadores),2)
         # La partida debe estar en curso una vez que tenga dos jugadores
         self.assertEqual(partida.estado, EN_CURSO)
 
-    """
-    Test que une a una partida creada al mismo usuario que la creo, y verifica que
-    no lo haya unido
-    """
-    def test_mismo_usuario(self):
-        lobby = Lobby()
-        partida = Partida.objects.get(nombre='Partida1 a 15 sin password')
-        # Mismo usuario que creo la partida
-        user1 = User.objects.get(username='test_user1')
-        result = lobby.unirse_partida(user1, partida)
-        # Obtengo los jugadores de la partida
-        jugadores = list(partida.jugadores.all())
-        # Chequeo que la cantidad de jugadores en la partida sea uno
-        self.assertEqual(len(jugadores),1)
-        # Chequeo que la partida siga teniendo el estado "EN_ESPERA"
-        self.assertEqual(partida.estado, EN_ESPERA)
-        # Chequeo que la funcion unirse_partida haya devueto "-1"
-        self.assertEqual(-1,result)
 
-    """
-    Test que verifica que la lista de partidas disponibles se cree cuando se crea
-    una nueva partida, pero que deje de estar cuando se haya unido un jugador a la partida
-    """
+
+    # Test que verifica que la lista de partidas disponibles se cree cuando se crea
+    # una nueva partida, pero que deje de estar cuando se haya unido un jugador a la partida"""
     def test_listas_partidas(self):
         ''        #Creo una lista para compararla con la real
         lista_partidas = [] 
