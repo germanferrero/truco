@@ -87,23 +87,22 @@ img {
 }
 
 #tiradas_usuario {
-    position:relative;
+    position:absolute;
     float:left;
     clear:both;
-    margin-left: 45%;
-    margin-top: 5%;
+    margin-left: -2%;
+    margin-top: 20%;
     display:inline-block;
 }
 
 #cuadro_cartas_usuario {
-    clear:left;
     float:left;
-    margin-left: 25%;
-    margin-top: 25%;
+    position:absolute;
+    margin-left: 10%;
+    margin-top: 30%;
 }
 
 .cuadro_cartas_tiradas {
-    clear:both;
 }
 
 .cuadro_cartas_tiradas #primera_imagen {
@@ -139,11 +138,17 @@ img {
 }
 
 #cuadro_botones {
-    float:right;
+    float :right;
+    display:inline;
+    position:relative;
 }
 
 #botones_opciones {
     float:right;
+}
+
+#form_opciones {
+    display:block;
 }
 
 #mensajes {
@@ -168,6 +173,7 @@ img {
     text-align:center;
     color: white;
     clear: right;
+    display:block;
 }
 
 #cuadro_tu_turno {
@@ -180,4 +186,12 @@ img {
     text-align:center;
     color: white;
     clear:right;
+}
+
+#cantar_puntos {
+    margin-right: 5px;
+}
+
+#puntos_cantados {
+    width:50px;
 }
