@@ -183,7 +183,7 @@ class TrucoTests(TestCase):
         jugador1 = jugadores[0]
         jugador2 = jugadores[1]
         # Se canta y acepta un truco simple
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.aceptar()
         # verificamos que se le den los 2 puntos al jugador que gano
@@ -206,7 +206,7 @@ class TrucoTests(TestCase):
         jugador2 = jugadores[1]
         puntaje = partida.puntos_e1
         # Se canta y se rechaza un truco simple
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.rechazar()
         # Si se rechaza corresponde 1 punto para el otro jugador
@@ -222,9 +222,9 @@ class TrucoTests(TestCase):
         jugador1 = jugadores[0]
         jugador2 = jugadores[1]
         # Se canta truco, se responde retruco y se acepta
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2)
+        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.aceptar()
         # verificamos que se le den los 3 puntos al jugador que gano
@@ -247,9 +247,9 @@ class TrucoTests(TestCase):
         jugador2 = jugadores[1]
         puntaje = partida.puntos_e2
         # Se canta truco, se responde retruco y se rechaza
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2)
+        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.rechazar()
         # Si se rechaza corresponde 2 punto para el otro jugador
@@ -260,11 +260,11 @@ class TrucoTests(TestCase):
         jugador1 = jugadores[0]
         jugador2 = jugadores[1]
         # Se canta truco, se responde retruco y vale cuatro y se acepta
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2)
+        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(VALE_CUATRO, jugador1)
+        ronda.crear_canto(VALE_CUATRO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.aceptar()
         # verificamos que se le den los 4 puntos al jugador que gano
@@ -285,18 +285,18 @@ class TrucoTests(TestCase):
         ronda, partida, jugadores = self.aux_truco_nueva_ronda()
         jugador1 = jugadores[0]
         jugador2 = jugadores[1]
-        puntaje = partida.puntos_e2
+        puntaje = partida.puntos_e1
         # Se canta truco, se responde retruco y vale cuatro y se rechaza
-        ronda.crear_canto(TRUCO, jugador1)
+        ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2)
+        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(VALE_CUATRO, jugador2)
+        ronda.crear_canto(VALE_CUATRO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
         canto.rechazar()
         # Si se rechaza corresponde 3 punto para el otro jugador
         partida.actualizar_puntajes()  # Se actualizan los puntajes de la ronda
-        self.assertEqual(partida.puntos_e2, puntaje + 3)
+        self.assertEqual(partida.puntos_e1, puntaje + 3)
 
     """
     Funcion auxiliar de los test del canto truco. Crea una nueva ronda con dos
@@ -305,8 +305,6 @@ class TrucoTests(TestCase):
     def aux_truco_nueva_ronda(self):
         # Configuramos una partida donde se termino el primer enfrentamiento
         partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
-        partida.agregar_jugador(User.objects.get(username='test_user1'))
-        partida.agregar_jugador(User.objects.get(username='test_user2'))
         partida.crear_ronda()
         # La partida ya esta lista para que los jugadores tiren las cartas
         jugadores = partida.jugadores.all()
@@ -348,44 +346,87 @@ class TrucoTests(TestCase):
         # Se devuelve el objeto jugador que corresponde al ganador de los enfrentamientos
         return ganador
 
-    #def test_envido (self):
-        #user1 = User.objects.get(username ='test_user1')
-        #user2 = User.objects.get(username ='test_user2')
-        #lobby = Lobby()
+    """
+    Verifica que los puntos que se suman a cada jugador al final de la ronda
+    sean los correspondientes al envido cantado durante la misma.
+    """
+    #def test_envido_puntos (self):
         #partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
         ## Obtengo los jugadores
-        #jugadores = list(partida.jugadores.all())
-        ## Creo una nueva ronda
-        #ronda = partida.crear_ronda()
-        ## Obtengo los jugadores
-        #jugadores = list(partida.jugadores.all())
-        ## La partida debe estar lista para crear una ronda
-        #if partida.is_ready():
-            ##Creo una ronda en la partida
-            #ronda = partida.crear_ronda()
-            #ronda.save()
-        #self.assertEqual(len((jugadores[0].cartas.all())), 3)
-        #self.assertEqual(len((jugadores[1].cartas.all())), 3)
-        ## Obtengo la ultima ronda
-        #ronda = partida.get_ronda_actual()
+        #jugadores = partida.jugadores.all()
+        #ronda = self.aux_envido_nueva_ronda(partida)
         ## Creo un canto envido
-        #ronda.crear_canto(ENVIDO, jugadores[0])
+        #ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
         #opciones = ronda.get_opciones()
-        ## Chequeo que la opcion que este disponible sea quiero y no quiero
-        #self.assertEqual(opciones[0], QUIERO)
-        #self.assertEqual(opciones[1], NO_QUIERO)
+        ## Verificamos las opciones disponibles
+        #self.assertTrue(QUIERO in opciones)
+        #self.assertTrue(NO_QUIERO in opciones)
+        #self.assertTrue(DOBLE_ENVIDO in opciones)
+        #self.assertTrue(REAL_ENVIDO in opciones)
+        #self.assertTrue(FALTA_ENVIDO in opciones)
         ## Obtengo el ultimo canto
         #canto = ronda.get_ultimo_canto()
-        ## Lo acepto
+        #self.assertEqual(canto.pts_en_juego,1)
         #canto.aceptar()
-        ## Chequeo que los puntos en juego sean 2
-        #self.assertEqual(canto.pts_en_juego,2)
         ## Obtengo el ganador
         #canto.get_ganador()
-        #canto.save()
         #puntos_jugador1 = canto.puntos_jugador(jugadores[0])
         #puntos_jugador2 = canto.puntos_jugador(jugadores[1])
         #if puntos_jugador1 < puntos_jugador2:
             #self.assertEqual(canto.maximo_puntaje, puntos_jugador2)
         #else:
             #self.assertEqual(canto.maximo_puntaje, puntos_jugador1)
+
+    #def test_envido_turno(self):
+        #pass
+
+    #"""
+    #Se verifica que en las opciones restantes de la partida queden las que
+    #corresponden, respecto al envido, segun el canto que este en juego.
+    #"""
+    #def test_envido_opciones(self):
+        #partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        ## Obtengo los jugadores
+        #jugadores = partida.jugadores.all()
+        #ronda = self.aux_envido_nueva_ronda(partida)
+        ## Se canta envido
+        #ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        #ronda.save()
+        #canto = ronda.get_ultimo_canto()
+        #canto.save()
+        #opciones = ronda.get_opciones()
+        ## Verificamos las opciones disponibles
+        #self.assertTrue(QUIERO in opciones)
+        #self.assertTrue(NO_QUIERO in opciones)
+        ##self.assertTrue(DOBLE_ENVIDO in opciones)
+        #self.assertTrue(REAL_ENVIDO in opciones)
+        #self.assertTrue(FALTA_ENVIDO in opciones)
+        ## Se responde envido (se juega un doble envido)
+        #ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        #opciones = ronda.get_opciones()
+        #self.assertTrue(QUIERO in opciones)
+        #self.assertTrue(NO_QUIERO in opciones)
+        #self.assertTrue(REAL_ENVIDO in opciones)
+        #self.assertTrue(FALTA_ENVIDO in opciones)
+        ## Se responde real envido
+        #ronda.crear_canto(REAL_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        #opciones = ronda.get_opciones()
+        #self.assertTrue(QUIERO in opciones)
+        #self.assertTrue(NO_QUIERO in opciones)
+        #self.assertTrue(FALTA_ENVIDO in opciones)
+        ## Se responde falta envido
+        #ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        #opciones = ronda.get_opciones()
+        #self.assertTrue(QUIERO in opciones)
+        #self.assertTrue(NO_QUIERO in opciones)
+
+
+    #def aux_envido_nueva_ronda(self, partida):
+        ## La partida debe estar lista para crear una ronda
+        #if partida.is_ready():
+            ##Creo una ronda en la partida
+            #ronda = partida.crear_ronda()
+            #ronda.save()
+        ## Obtengo la ultima ronda
+        #ronda = partida.get_ronda_actual()
+        #return ronda

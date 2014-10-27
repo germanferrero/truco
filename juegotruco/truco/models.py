@@ -451,8 +451,8 @@ class Ronda(models.Model):
         if tipo in [ENVIDO, DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]:
             if not self.ultimo_envido:
                 canto = Envido(mano_pos=self.mano_pos, puntos_falta=puntos, ronda=self, tipo=tipo)
-                canto.save()
                 canto.pos_jugador_canto = jugador.posicion_mesa
+                canto.save()
                 self.ultimo_envido = canto
                 self.save()
             else:
