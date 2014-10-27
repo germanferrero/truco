@@ -240,6 +240,11 @@ class Partida(models.Model):
             self.save()
 
 
+    def get_min_pts_restantes(self):
+        puntos_minimos = min(15 - self.puntos_e1 % 15, 15 - self.puntos_e2 % 15)
+        return puntos_minimos
+
+
 class Ronda(models.Model):
     partida = models.ForeignKey(Partida, verbose_name="partida")
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
@@ -274,15 +279,24 @@ class Ronda(models.Model):
     """
     Devuelve el mensaje con de juego, cantos y respuestas
     """
-    def get_mensaje_canto(self):
+    def get_mensaje_canto(self, jugador):
         mensaje = ''
-        ultimo_canto = self.get_ultimo_canto()
-        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
-            mensaje = OPCIONES[int(ultimo_canto.tipo)]
-        elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
-            mensaje = OPCIONES[int(QUIERO)]
-        elif ultimo_canto and ultimo_canto.estado == RECHAZADO:
-            mensaje = OPCIONES[int(NO_QUIERO)]
+        if self.get_turno() == jugador:
+            ultimo_canto = self.get_ultimo_canto()
+            if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+                mensaje = OPCIONES[int(ultimo_canto.tipo)]
+            elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
+                mensaje = OPCIONES[int(QUIERO)]
+                if int(ultimo_canto.tipo) in [ENVIDO, DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]:
+                    # Si es un canto de tipo envido y fue aceptado
+                    puntos_oponente = ultimo_canto.get_puntos_cantados_oponente()
+                    if puntos_oponente >= 0:
+                        # Si otro ya canto los puntos
+                        mensaje += (".\n El oponente canto: " + str(puntos_oponente))
+                    elif puntos_oponente == -2:
+                        mensaje += ".\n El oponente dijo: Son buenas"
+            elif ultimo_canto and ultimo_canto.estado == RECHAZADO:
+                mensaje = OPCIONES[int(NO_QUIERO)]
         return mensaje
 
     """
@@ -322,6 +336,8 @@ class Ronda(models.Model):
         ultimo_canto = self.get_ultimo_canto()
         if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
             result = False
+        elif self.se_debe_cantar_puntos():
+            result = False
         return result
 
     def se_debe_cantar_puntos(self):
@@ -334,24 +350,30 @@ class Ronda(models.Model):
     """
     def get_opciones(self):
         ultimo_canto = self.get_ultimo_canto()
+        opciones = []
         if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
             # Si hay un canto que no fue contestado
             opciones = [QUIERO, NO_QUIERO]
-            opciones.extend(ultimo_canto.get_respuesta(int(ultimo_canto.tipo)))
+            opciones.extend(ultimo_canto.get_respuestas())
         elif (self.primer_enfrentamiento and self.primer_enfrentamiento.get_termino()
                 and not self.ultimo_truco):
             # Termino el primer enfrentamiento y no se ha cantado truco aun
             opciones = [TRUCO, IRSE_AL_MAZO]
         elif not self.ultimo_envido:
             # No se ha cantado envido aun
-            opciones = [ENVIDO, IRSE_AL_MAZO]
+            opciones = [ENVIDO, REAL_ENVIDO, FALTA_ENVIDO, IRSE_AL_MAZO]
             if self.primer_enfrentamiento and self.primer_enfrentamiento.get_termino():
                 # No se puede cantar envido si termina el primer enfrentamiento
                 opciones = [IRSE_AL_MAZO]
         else:
             # Ya se ha cantado envido y estamos en el primer enfrentamiento o
             # ya se canto el truco y se respondio
-            opciones = [IRSE_AL_MAZO]
+            if self.se_debe_cantar_puntos() and self.ultimo_envido.jugadores.count() > 0:
+                opciones.extend([SON_BUENAS])
+            elif self.se_debe_cantar_puntos():
+                opciones = []
+            else:
+                opciones = [IRSE_AL_MAZO]
         return opciones
 
     """
@@ -367,7 +389,9 @@ class Ronda(models.Model):
     def get_turno(self):
         ultimo_canto = self.get_ultimo_canto()
         ultimo_enfrentamiento = self.get_ultimo_enfrentamiento()
-        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+        if self.hay_ganador() and not self.todos_jugadores_listos():
+            turno_pos = self.turno_fin_ronda()
+        elif ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
             # Hay un canto que no se contesto aun, el turno es de quien debe responder
             turno_pos = (ultimo_canto.pos_jugador_canto + 1) % self.jugadores.count()
         elif self.se_debe_cantar_puntos():
@@ -423,39 +447,36 @@ class Ronda(models.Model):
     """
     Crea un nuevo canto.
     """
-    def crear_canto(self, tipo, jugador):
-        if tipo in [ENVIDO]:
-            canto = Envido(mano_pos=self.mano_pos)
-            canto.pts_en_juego = PTS_CANTO[tipo]
-            canto.tipo = tipo
-            canto.ronda = self
-            canto.pos_jugador_canto = jugador.posicion_mesa
-            # Se toma la posicion del jugador para el caso del empate del envido
+    def crear_canto(self, tipo, jugador, puntos):
+        if tipo in [ENVIDO, DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]:
+            if not self.ultimo_envido:
+                canto = Envido(mano_pos=self.mano_pos, puntos_falta=puntos, ronda=self, tipo=tipo)
+                canto.save()
+                canto.pos_jugador_canto = jugador.posicion_mesa
+                self.ultimo_envido = canto
+                self.save()
+            else:
+                canto = self.ultimo_envido
+                canto = canto.aumentar(tipo, jugador.posicion_mesa)
+                self.ultimo_envido = canto
+                self.save()
             canto.mano_pos = self.mano_pos
             canto.save()
-            canto.jugadores = self.jugadores.all()
-            canto.save()
-        elif tipo in [TRUCO]:
-            canto = Truco()
-            canto.pts_en_juego = PTS_CANTO[tipo]
-            canto.tipo = tipo
-            canto.ronda = self
-            canto.pos_jugador_canto = jugador.posicion_mesa
-            # Se toma la posicion del jugador para el caso del empate del envido
-            canto.mano_pos = self.mano_pos
-            canto.save()
-            canto.jugadores = self.jugadores.all()
-            canto.save()
         else:
-            canto = self.get_ultimo_canto().aumentar(tipo,jugador.posicion_mesa)
-        if tipo in [ENVIDO]:
-            self.ultimo_envido = canto
-            self.save()
-        else:
+            if tipo in [TRUCO]:
+                canto = Truco()
+                canto.tipo = tipo
+                canto.ronda = self
+                canto.pos_jugador_canto = jugador.posicion_mesa
+                # Se toma la posicion del jugador para el caso del empate del envido
+                canto.mano_pos = self.mano_pos
+                canto.save()
+                canto.jugadores = self.jugadores.all()
+                canto.save()
+            else:
+                canto = self.get_ultimo_canto().aumentar(tipo,jugador.posicion_mesa)
             self.ultimo_truco = canto
             self.save()
-
-
     """
     Devuelve el ultimo enfrentamiento de la ronda.
     Si no hay ninguno devuelve None.
@@ -516,7 +537,7 @@ class Ronda(models.Model):
     """
     def get_ganador_enfrentamientos(self):
         if self.equipo_mazo >= 0:
-            ganador = (self.equipo_mazo + 1 )% 2
+            ganador = (self.equipo_mazo + 1 ) % 2
         else:
             enfrentamientos_ganados = [0, 0]
             enfrentamientos = self.get_enfrentamientos()
@@ -578,9 +599,37 @@ class Ronda(models.Model):
         self.jugadores_listos += 1
         self.save()
 
+    def get_opciones_fin_ronda(self):
+        opciones = [SIGUIENTE_RONDA]
+        if (self.ultimo_envido
+            and self.ultimo_envido.puntos_pedidos
+            and not self.ultimo_envido.puntos_mostrados):
+            opciones.append(MOSTRAR_PUNTOS)
+        elif (self.ultimo_envido
+              and self.jugadores_listos==0
+              and not self.ultimo_envido.puntos_pedidos
+              and self.ultimo_envido.estado == ACEPTADO):
+            opciones.append(PEDIR_PUNTOS)
+        return opciones
+
+    def turno_fin_ronda(self):
+        cant_acciones = self.jugadores_listos
+        if self.ultimo_envido and self.ultimo_envido.estado == ACEPTADO and cant_acciones <= 2:
+            if self.ultimo_envido.puntos_pedidos:
+                cant_acciones +=1
+            if self.ultimo_envido.puntos_mostrados:
+                cant_acciones +=1
+            pos_supuesto_ganador = self.ultimo_envido.get_supuesto_ganador()[0]
+            # Solo valido para 2 jugadores
+            pos_supuesto_perdedor = (pos_supuesto_ganador + 1) % self.jugadores.count()
+            turno_pos = (pos_supuesto_perdedor + cant_acciones) % self.jugadores.count()
+        else:
+            turno_pos = self.mano_pos + cant_acciones
+        return turno_pos
+
 class Canto(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name="ronda")
-    tipo = models.CharField(max_length=1)
+    tipo = models.IntegerField(max_length=1)
     pts_en_juego = models.IntegerField(max_length=2, default=1)
     pos_jugador_canto = models.IntegerField(max_length=1)
     estado = models.IntegerField(max_length=1, default=NO_CONTESTADO)
@@ -596,7 +645,8 @@ class Canto(models.Model):
     Actualiza el estado del canto.
     """
     def rechazar(self):
-        pass
+        self.estado = RECHAZADO
+        self.save()
 
 
 class Truco(Canto):
@@ -610,17 +660,11 @@ class Truco(Canto):
         self.save()
 
     """
-    Actualiza el estado del canto.
-    """
-    def rechazar(self):
-        self.estado = RECHAZADO
-        self.save()
-
-    """
     Devuelve las opciones posibles para recantar el truco
     """
-    def get_respuesta(self, nombre_canto):
+    def get_respuestas(self):
         result = []
+        nombre_canto = self.tipo
         # Aumenta la apuesta al siguiente canto
         if nombre_canto < VALE_CUATRO:
             nombre_canto += 1
@@ -649,6 +693,22 @@ class Envido(Canto):
     mano_pos = models.IntegerField(max_length=1)
     puntos_pedidos = models.BooleanField(default=False)
     puntos_mostrados = models.BooleanField(default=False)
+    puntos_falta = models.IntegerField(max_length=2,default=0) # Puntos en caso que se gane la falta envido
+
+    """
+    Respuestas que tiene un jugador para contestar un envido o derivado
+    """
+    def get_respuestas(self):
+        if self.tipo == str(ENVIDO):
+            opciones = [DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]
+        elif self.tipo == str(DOBLE_ENVIDO):
+            opciones = [REAL_ENVIDO, FALTA_ENVIDO]
+        elif self.tipo == str(REAL_ENVIDO):
+            opciones = [FALTA_ENVIDO]
+        else:
+            # Si es falta envido
+            opciones = []
+        return opciones
 
     """
     Dada una posicion de un jugador, devuelve su distancia al jugador mano.
@@ -701,6 +761,20 @@ class Envido(Canto):
         return(ganador_pos,maximo_puntaje)
 
 
+    """
+    Devuelve los puntos cantados por el adversario
+    """
+    def get_puntos_cantados_oponente(self):
+        puntos_oponente = -1
+        for jugador in self.jugadores.all():
+            # Agrego a la lista los puntos de los jugadores
+            if self.ronda.get_turno() != jugador:
+                # Se agrega el jugador oponente
+                jugador_EnEnvido = jugador.jugadorenenvido_set.get(envido=self)
+                puntos_oponente = jugador_EnEnvido.puntos_canto
+        return puntos_oponente
+
+
     def get_equipo_ganador(self):
         supuesto_ganador = self.get_supuesto_ganador()
         jugador_supuesto_ganador = self.jugadores.get(posicion_mesa=supuesto_ganador[0])
@@ -725,8 +799,36 @@ class Envido(Canto):
                                           puntos_canto=puntos)
         jugadorEnEnvido.save()
 
+
     def todos_cantaron(self):
         return self.jugadores.count() == 2
+
+
+    def aumentar(self, tipo, pos_jugador_canto):
+        self.aceptar()
+        self.save()
+        canto = Envido(puntos_falta=self.puntos_falta, ronda=self.ronda,
+                       pos_jugador_canto=pos_jugador_canto, pts_en_juego=self.pts_en_juego, 
+                       tipo=tipo)
+        canto.save()
+        return canto
+
+    def aceptar(self):
+        self.estado = ACEPTADO
+        if self.tipo == str(FALTA_ENVIDO):
+            self.pts_en_juego = self.puntos_falta
+        elif self.tipo ==  str(ENVIDO):
+            self.pts_en_juego += 1
+        elif self.tipo == str(DOBLE_ENVIDO):
+            self.pts_en_juego += 2
+        else:
+            if self.pts_en_juego > 1:
+                # Si se canta real envido con otro canto antes
+                self.pts_en_juego += 3
+            else:
+                self.pts_en_juego += 2
+        self.save()
+
 
     def pedir_puntos(self):
         self.puntos_pedidos = True
