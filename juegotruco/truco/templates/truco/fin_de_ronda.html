@@ -56,7 +56,7 @@
 
                 <div id="cuadro_botones">
                     {% for opcion in opciones %}
-                    <form action="{% url 'truco:fin_de_ronda' partida.id %}" method="post">
+                    <form id="form_opciones" action="{% url 'truco:fin_de_ronda' partida.id %}" method="post">
                     {% csrf_token %}
                         <div id="botones_opciones">
                             <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>

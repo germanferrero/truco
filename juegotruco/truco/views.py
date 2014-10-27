@@ -129,7 +129,7 @@ def en_espera(request,partida_id):
             context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
             context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
-            context['mensaje_canto'] = ronda.get_mensaje_canto()
+            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
         return render(request,'truco/en_espera.html', context)
 
 """
@@ -146,9 +146,16 @@ def ronda(request,partida_id):
     if request.method == "POST":
         # El jugador eligio una opcion
         if 'puntos_cantados' in request.POST:
-            ronda.ultimo_envido.cantar_puntos(jugador,request.POST['puntos_cantados'])
-            return redirect(reverse('truco:en_espera', args=(partida.id,)))
+            try:
+                puntos_cantados = int(request.POST['puntos_cantados'])
+                if (0 <= puntos_cantados <= 33):
+                        ronda.ultimo_envido.cantar_puntos(jugador,puntos_cantados)
+                        return redirect(reverse('truco:en_espera', args=(partida.id,)))
+            except:
+                pass
+            return redirect(reverse('truco:ronda', args=(partida_id,)))
         if 'opcion' in request.POST:
+            print request.POST['opcion']
             opcion = int(request.POST['opcion'])
             if opcion == QUIERO or opcion == NO_QUIERO:
                 return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
@@ -156,9 +163,12 @@ def ronda(request,partida_id):
                 ronda.irse_al_mazo(jugador)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == SON_BUENAS:
-                ronda.ultimo_envido.cantar_puntos(jugador,0)
+                ronda.ultimo_envido.cantar_puntos(jugador, -2)
+                # Se usa -2 para diferenciar con los casos: -1(no hay mensajes que
+                # mostrar al jugador), 0 (tener 0 puntos)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
+                # Es un canto
                 puntos_restantes = partida.get_min_pts_restantes()
                 ronda.crear_canto(opcion, jugador, puntos_restantes)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
@@ -176,7 +186,7 @@ def ronda(request,partida_id):
                         'opciones' : ronda.get_opciones(),
                         'op_dict' : OPCIONES,
                         'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
-                        'mensaje_canto' : ronda.get_mensaje_canto(),
+                        'mensaje_canto' : ronda.get_mensaje_canto(jugador),
                         'puede_tirar_carta' : ronda.se_puede_tirar(),
                         'cantar_puntos' : ronda.se_debe_cantar_puntos()
                       }
@@ -234,15 +244,21 @@ def fin_de_ronda(request, partida_id):
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
             if opcion == SIGUIENTE_RONDA:
+                # Marca que el jugador toco ya "siguiente ronda"
                 ronda.jugador_listo()
                 if ronda.todos_jugadores_listos():
+                    # Todos los jugadores tocaron "siguiente ronda"
                     return redirect(reverse('truco:partida', args=(partida.id,)))
                 else:
+                    # Falta que algun jugador toque "siguiente ronda"
                     return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == PEDIR_PUNTOS:
+                # Marca que se pidieron ver los puntos
                 ronda.ultimo_envido.pedir_puntos()
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
+                # Opcion "MOSTRAR_PUNTOS"
+                # Marca que se indico mostrar los puntos
                 ronda.ultimo_envido.mostrar_puntos()
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
     else:
