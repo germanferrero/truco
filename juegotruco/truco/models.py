@@ -46,7 +46,7 @@ class Jugador(models.Model):
     """
     Devuelve las cartas de un jugador.
     """
-    def get_cartas_diponibles(self):
+    def get_cartas_disponibles(self):
         return list(self.cartas_disponibles.all())
 
 
@@ -380,7 +380,7 @@ class Ronda(models.Model):
     Devuelve la cantidad de cartas que tiene el jugador adversario.
     """
     def cant_cartas_adversario(self, jugador):
-        cant_cartas = [len(i.get_cartas_diponibles()) for i in self.jugadores.all() if i != jugador]
+        cant_cartas = [len(i.get_cartas_disponibles()) for i in self.jugadores.all() if i != jugador]
         return cant_cartas[0]
 
     """
@@ -627,6 +627,12 @@ class Ronda(models.Model):
             turno_pos = (self.mano_pos + cant_acciones) % 2
         return turno_pos
 
+    def hay_que_mostrar_los_puntos(self):
+        return(self.ultimo_envido
+               and self.ultimo_envido.puntos_mostrados
+               and self.jugadores_listos == 0
+              )
+
 class Canto(models.Model):
     ronda = models.ForeignKey(Ronda, verbose_name="ronda")
     tipo = models.IntegerField(max_length=1)
@@ -722,31 +728,30 @@ class Envido(Canto):
         return distancia
 
     """
-    Calcula los puntos de envido de un jugador. Devuelve una tupla con los puntos y las cartas que conforman el envido
+    Calcula los puntos de envido de un jugador. Devuelve una tupla con los puntos y las cartas que los conforman.
     """
     def puntos_jugador(self, jugador):
         cartas = jugador.cartas.all()
         # Todas las combinaciones de sus cartas posibles
         comb = list(combinations(cartas, 2))
         # Maximo puntaje de una combinacion
-        puntaje_cartas = max(map(self.puntos_2_cartas, comb), key=itemgetter(1))
-        return puntaje_cartas
+        puntajes_cartas = map(self.puntos_2_cartas, comb)
+        maximo_puntaje = max(puntajes_cartas,key = itemgetter(0))
+        return maximo_puntaje
 
     """
     Dada dos cartas devuelve una lista con el puntaje de envido que suman entre ellas y las cartas que lo conforman.
     """
     def puntos_2_cartas(self, (carta1, carta2)):
-        puntos = 0
-        result = []
         if carta1.palo == carta2.palo:
             puntos = 20 + carta1.valor_envido + carta2.valor_envido
-            result = (puntos, carta1, carta2)
+            result = (puntos, [carta1, carta2])
         else:
             puntos = max(carta1.valor_envido, carta2.valor_envido)
             if puntos == carta1.valor_envido:
-                result = (puntos, carta1)
+                result = (puntos,[carta1])
             else:
-                result = (puntos, carta2)
+                result = (puntos, [carta2])
         return result
 
     def get_supuesto_ganador(self):
@@ -844,6 +849,18 @@ class Envido(Canto):
     def mostrar_puntos(self):
         self.puntos_mostrados = True
         self.save()
+
+    def get_puntos_a_mostrar(self):
+        pos_supuesto_ganador,supuestos_puntos_supuesto_ganador = self.get_supuesto_ganador()
+        jugador_supuesto_ganador = self.jugadores.get(posicion_mesa=pos_supuesto_ganador)
+        puntos_reales,cartas_de_puntos = self.puntos_jugador(jugador_supuesto_ganador)
+        if puntos_reales == supuestos_puntos_supuesto_ganador:
+            # Si el oponente canto bien, se muestran las cartas que componen el envido
+            cartas = cartas_de_puntos
+        else:
+            # Si el jugador mintio
+            cartas = list(jugador_supuesto_ganador.cartas.all())
+        return cartas
 
 class JugadorEnEnvido(models.Model):
     jugador = models.ForeignKey(Jugador,verbose_name='jugador')
