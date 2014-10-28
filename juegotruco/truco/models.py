@@ -722,7 +722,7 @@ class Envido(Canto):
         return distancia
 
     """
-    Calcula los puntos de envido de un jugador.
+    Calcula los puntos de envido de un jugador. Devuelve una tupla con los puntos y las cartas que conforman el envido
     """
     def puntos_jugador(self, jugador):
         cartas = jugador.cartas.all()
@@ -730,6 +730,8 @@ class Envido(Canto):
         comb = list(combinations(cartas, 2))
         # Maximo puntaje de una combinacion
         puntaje_cartas = max(map(self.puntos_2_cartas, comb), key=itemgetter(1))
+        print "LO QUE EL JUGADOR TIENEEEEE!\n"
+        print str(puntaje_cartas)
         return puntaje_cartas
 
     """

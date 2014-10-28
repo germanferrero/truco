@@ -125,9 +125,17 @@ def en_espera(request,partida_id):
                            })
         if ronda:
             context['ronda'] = ronda
-            context['cartas_disponibles'] = jugador.get_cartas_diponibles()
-            context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
-            context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
+            print "RONDA HAY GANADOR?\n"
+            print str(ronda.hay_ganador)
+            if ronda.ultimo_envido and ronda.ultimo_envido.puntos_mostrados:
+                # Para el momento donde se termina la ronda
+                context['cartas_disponibles'] = []
+                context['cartas_jugadas'] = []
+                context['cant_cartas_adversario'] = []
+            else:
+                context['cartas_disponibles'] = jugador.get_cartas_diponibles()
+                context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
+                context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
         return render(request,'truco/en_espera.html', context)
@@ -262,13 +270,34 @@ def fin_de_ronda(request, partida_id):
                 ronda.ultimo_envido.mostrar_puntos()
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
     else:
+        ultimo_envido = ronda.ultimo_envido
+        cartas = [] 
+        if ultimo_envido.puntos_mostrados:
+            # Si oponente toco "mostrar_puntos"
+            jugador_muestra_pos = ultimo_envido.get_supuesto_ganador()[0]
+            supuesto_ganador = ronda.jugadores.get(posicion_mesa=jugador_muestra_pos)
+            puntos_cartas = ultimo_envido.puntos_jugador(supuesto_ganador)
+            print ("El NOMBRE MIO! ES: " + str(jugador.nombre) + "\n")
+            print ("El DEL OTRO JUGADOR! ES: " + str(supuesto_ganador.nombre) + "\n")
+            print "LOS PUNTOS QUE CANTO SON: \n"
+            print str(ultimo_envido.get_puntos_cantados_oponente())
+            print "LOS PUNTOS QUE TIENE SON: \n"
+            print str(puntos_cartas[0])
+            if puntos_cartas[0] == ultimo_envido.get_puntos_cantados_oponente():
+                # Si el oponente canto bien, se muestran las cartas que componen el envido
+                cartas = puntos_cartas[1:]
+                print "EL OPONENTE CANTO BIEN\n"
+                print str(cartas)
+            else:
+                # Si el jugador mintio
+                cartas = list(supuesto_ganador.cartas.all())
+                print "EL OPONENTE mintio\n"
+                print str(cartas)
         context = {
             'puntajes' : partida.get_puntajes(request.user),
             'partida' : partida,
             'username' : request.user.username,
-            'cartas_disponibles' : jugador.get_cartas_diponibles(),
-            'cartas_jugadas' : ronda.get_cartas_jugadas(jugador),
-            'cant_cartas_adversario' : [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+            'cartas' : cartas,
             'opciones' : ronda.get_opciones_fin_ronda(),
             'op_dict' : OPCIONES,
             }
