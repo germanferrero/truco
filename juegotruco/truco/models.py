@@ -699,11 +699,11 @@ class Envido(Canto):
     Respuestas que tiene un jugador para contestar un envido o derivado
     """
     def get_respuestas(self):
-        if self.tipo == str(ENVIDO):
+        if self.tipo == ENVIDO:
             opciones = [DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]
-        elif self.tipo == str(DOBLE_ENVIDO):
+        elif self.tipo == DOBLE_ENVIDO:
             opciones = [REAL_ENVIDO, FALTA_ENVIDO]
-        elif self.tipo == str(REAL_ENVIDO):
+        elif self.tipo == REAL_ENVIDO:
             opciones = [FALTA_ENVIDO]
         else:
             # Si es falta envido
@@ -809,17 +809,17 @@ class Envido(Canto):
         self.save()
         canto = Envido(puntos_falta=self.puntos_falta, ronda=self.ronda,
                        pos_jugador_canto=pos_jugador_canto, pts_en_juego=self.pts_en_juego, 
-                       tipo=tipo)
+                       tipo=tipo, mano_pos=self.mano_pos)
         canto.save()
         return canto
 
     def aceptar(self):
         self.estado = ACEPTADO
-        if self.tipo == str(FALTA_ENVIDO):
+        if self.tipo == FALTA_ENVIDO:
             self.pts_en_juego = self.puntos_falta
-        elif self.tipo ==  str(ENVIDO):
+        elif self.tipo ==  ENVIDO:
             self.pts_en_juego += 1
-        elif self.tipo == str(DOBLE_ENVIDO):
+        elif self.tipo == DOBLE_ENVIDO:
             self.pts_en_juego += 2
         else:
             if self.pts_en_juego > 1:
