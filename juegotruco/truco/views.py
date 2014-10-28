@@ -125,8 +125,6 @@ def en_espera(request,partida_id):
                            })
         if ronda:
             context['ronda'] = ronda
-            print "RONDA HAY GANADOR?\n"
-            print str(ronda.hay_ganador)
             if ronda.ultimo_envido and ronda.ultimo_envido.puntos_mostrados:
                 # Para el momento donde se termina la ronda
                 context['cartas_disponibles'] = []
@@ -163,7 +161,6 @@ def ronda(request,partida_id):
                 pass
             return redirect(reverse('truco:ronda', args=(partida_id,)))
         if 'opcion' in request.POST:
-            print request.POST['opcion']
             opcion = int(request.POST['opcion'])
             if opcion == QUIERO or opcion == NO_QUIERO:
                 return redirect(reverse('truco:responder_canto', args=(partida.id,opcion,)))
@@ -277,22 +274,12 @@ def fin_de_ronda(request, partida_id):
             jugador_muestra_pos = ultimo_envido.get_supuesto_ganador()[0]
             supuesto_ganador = ronda.jugadores.get(posicion_mesa=jugador_muestra_pos)
             puntos_cartas = ultimo_envido.puntos_jugador(supuesto_ganador)
-            print ("El NOMBRE MIO! ES: " + str(jugador.nombre) + "\n")
-            print ("El DEL OTRO JUGADOR! ES: " + str(supuesto_ganador.nombre) + "\n")
-            print "LOS PUNTOS QUE CANTO SON: \n"
-            print str(ultimo_envido.get_puntos_cantados_oponente())
-            print "LOS PUNTOS QUE TIENE SON: \n"
-            print str(puntos_cartas[0])
             if puntos_cartas[0] == ultimo_envido.get_puntos_cantados_oponente():
                 # Si el oponente canto bien, se muestran las cartas que componen el envido
                 cartas = puntos_cartas[1:]
-                print "EL OPONENTE CANTO BIEN\n"
-                print str(cartas)
             else:
                 # Si el jugador mintio
                 cartas = list(supuesto_ganador.cartas.all())
-                print "EL OPONENTE mintio\n"
-                print str(cartas)
         context = {
             'puntajes' : partida.get_puntajes(request.user),
             'partida' : partida,

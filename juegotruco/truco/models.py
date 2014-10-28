@@ -730,8 +730,6 @@ class Envido(Canto):
         comb = list(combinations(cartas, 2))
         # Maximo puntaje de una combinacion
         puntaje_cartas = max(map(self.puntos_2_cartas, comb), key=itemgetter(1))
-        print "LO QUE EL JUGADOR TIENEEEEE!\n"
-        print str(puntaje_cartas)
         return puntaje_cartas
 
     """
