@@ -624,7 +624,7 @@ class Ronda(models.Model):
             pos_supuesto_perdedor = (pos_supuesto_ganador + 1) % self.jugadores.count()
             turno_pos = (pos_supuesto_perdedor + cant_acciones) % self.jugadores.count()
         else:
-            turno_pos = self.mano_pos + cant_acciones
+            turno_pos = (self.mano_pos + cant_acciones) % 2
         return turno_pos
 
 class Canto(models.Model):
@@ -729,18 +729,25 @@ class Envido(Canto):
         # Todas las combinaciones de sus cartas posibles
         comb = list(combinations(cartas, 2))
         # Maximo puntaje de una combinacion
-        return max(map(self.puntos_2_cartas, comb))
+        puntaje_cartas = max(map(self.puntos_2_cartas, comb), key=itemgetter(1))
+        return puntaje_cartas
 
     """
-    Dada dos cartas devuelve el puntaje de envido que suman entre ellas.
+    Dada dos cartas devuelve una lista con el puntaje de envido que suman entre ellas y las cartas que lo conforman.
     """
     def puntos_2_cartas(self, (carta1, carta2)):
         puntos = 0
+        result = []
         if carta1.palo == carta2.palo:
             puntos = 20 + carta1.valor_envido + carta2.valor_envido
+            result = (puntos, carta1, carta2)
         else:
             puntos = max(carta1.valor_envido, carta2.valor_envido)
-        return puntos
+            if puntos == carta1.valor_envido:
+                result = (puntos, carta1)
+            else:
+                result = (puntos, carta2)
+        return result
 
     def get_supuesto_ganador(self):
         puntos_jugadores = []
@@ -786,7 +793,7 @@ class Envido(Canto):
         elif not self.puntos_mostrados:
             ganador = equipo_supuesto_perdedor
         else:
-            puntos_supuesto_ganador = self.puntos_jugador(jugador_supuesto_ganador)
+            puntos_supuesto_ganador = self.puntos_jugador(jugador_supuesto_ganador)[0]
             if puntos_supuesto_ganador == supuestos_puntos_supuesto_ganador:
                 ganador = equipo_supuesto_ganador
             else:
