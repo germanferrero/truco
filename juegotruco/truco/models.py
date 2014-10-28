@@ -129,7 +129,7 @@ class Partida(models.Model):
     Devuelve la ronda actual si existe, None en caso contrario.
     """
     def get_ronda_actual(self):
-        #Devuelve la ronda acutal
+        #Devuelve la ronda actual
         return self.ronda_actual
     """
     Devuelve un mensaje si hay un equipo ganador, si no devuelve un string vacio.
@@ -451,8 +451,8 @@ class Ronda(models.Model):
         if tipo in [ENVIDO, DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]:
             if not self.ultimo_envido:
                 canto = Envido(mano_pos=self.mano_pos, puntos_falta=puntos, ronda=self, tipo=tipo)
-                canto.save()
                 canto.pos_jugador_canto = jugador.posicion_mesa
+                canto.save()
                 self.ultimo_envido = canto
                 self.save()
             else:
