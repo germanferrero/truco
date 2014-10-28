@@ -79,7 +79,7 @@ def unirse_partida(request):
 
 """
 View partida: Se encarga de definir cuando la partida debe continuar o terminar.
-Si se termina se redirige a la view index, si no, crea una nueva ronda.
+Si no se termina, crea una nueva ronda, de lo contrario, te muestra el html partida
 """
 @login_required(login_url='/usuarios/login')
 def partida(request,partida_id):
@@ -90,7 +90,7 @@ def partida(request,partida_id):
             # No hay un ganador de la partida
             partida.actualizar_puntajes()
         if partida.is_ready():
-            # Si no hay un ganador y no hay una ronda en curso y los jugadores estan listos
+            # Si no hay una ronda en curso y los jugadores estan listos
             ronda = partida.crear_ronda()
             partida.actualizar_mano()  # Se le da la mano al jugador de la derecha
             return redirect(reverse('truco:en_espera', args=(partida.id,)))

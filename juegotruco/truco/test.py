@@ -86,12 +86,12 @@ class TrucoTests(TestCase):
         # La partida debe estar en curso una vez que tenga dos jugadores
         self.assertEqual(partida.estado, EN_CURSO)
 
-
-
-    # Test que verifica que la lista de partidas disponibles se cree cuando se crea
-    # una nueva partida, pero que deje de estar cuando se haya unido un jugador a la partida"""
+    """
+    Test que verifica que la lista de partidas disponibles se cree cuando se crea
+    una nueva partida, pero que deje de estar cuando se haya unido un jugador a la partida
+    """
     def test_listas_partidas(self):
-        ''        #Creo una lista para compararla con la real
+        #Creo una lista para compararla con la real
         lista_partidas = [] 
         lobby = Lobby()
         partida1 = Partida.objects.get(nombre = 'Partida1 a 15 sin password')
@@ -333,12 +333,6 @@ class TrucoTests(TestCase):
         ## Creo un canto envido
         #ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
         #opciones = ronda.get_opciones()
-        ## Verificamos las opciones disponibles
-        #self.assertTrue(QUIERO in opciones)
-        #self.assertTrue(NO_QUIERO in opciones)
-        #self.assertTrue(DOBLE_ENVIDO in opciones)
-        #self.assertTrue(REAL_ENVIDO in opciones)
-        #self.assertTrue(FALTA_ENVIDO in opciones)
         ## Obtengo el ultimo canto
         #canto = ronda.get_ultimo_canto()
         #self.assertEqual(canto.pts_en_juego,1)
@@ -352,56 +346,91 @@ class TrucoTests(TestCase):
         #else:
             #self.assertEqual(canto.maximo_puntaje, puntos_jugador1)
 
-    #def test_envido_turno(self):
-        #pass
+    def test_envido_turno(self):
+        pass
 
-    #"""
-    #Se verifica que en las opciones restantes de la partida queden las que
-    #corresponden, respecto al envido, segun el canto que este en juego.
-    #"""
-    #def test_envido_opciones(self):
-        #partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
-        ## Obtengo los jugadores
-        #jugadores = partida.jugadores.all()
-        #ronda = self.aux_envido_nueva_ronda(partida)
-        ## Se canta envido
-        #ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
-        #ronda.save()
-        #canto = ronda.get_ultimo_canto()
-        #canto.save()
-        #opciones = ronda.get_opciones()
-        ## Verificamos las opciones disponibles
-        #self.assertTrue(QUIERO in opciones)
-        #self.assertTrue(NO_QUIERO in opciones)
-        ##self.assertTrue(DOBLE_ENVIDO in opciones)
-        #self.assertTrue(REAL_ENVIDO in opciones)
-        #self.assertTrue(FALTA_ENVIDO in opciones)
-        ## Se responde envido (se juega un doble envido)
-        #ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
-        #opciones = ronda.get_opciones()
-        #self.assertTrue(QUIERO in opciones)
-        #self.assertTrue(NO_QUIERO in opciones)
-        #self.assertTrue(REAL_ENVIDO in opciones)
-        #self.assertTrue(FALTA_ENVIDO in opciones)
-        ## Se responde real envido
-        #ronda.crear_canto(REAL_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
-        #opciones = ronda.get_opciones()
-        #self.assertTrue(QUIERO in opciones)
-        #self.assertTrue(NO_QUIERO in opciones)
-        #self.assertTrue(FALTA_ENVIDO in opciones)
-        ## Se responde falta envido
-        #ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
-        #opciones = ronda.get_opciones()
-        #self.assertTrue(QUIERO in opciones)
-        #self.assertTrue(NO_QUIERO in opciones)
+    """
+    Se verifica que en las opciones restantes de la partida queden las que
+    corresponden, respecto al envido, segun el canto que este en juego.
+    """
+    def test_envido_opciones(self):
+        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        ### NUEVA RONDA ###
+        ronda = self.aux_envido_nueva_ronda(partida)
+        # Se canta envido
+        ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        canto = ronda.get_ultimo_canto()
+        opciones = ronda.get_opciones()
+        # Verificamos las opciones disponibles
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        self.assertTrue(DOBLE_ENVIDO in opciones)
+        self.assertTrue(REAL_ENVIDO in opciones)
+        self.assertTrue(FALTA_ENVIDO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 5)
+        # Se responde envido (se juega un doble envido)
+        ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        self.assertTrue(REAL_ENVIDO in opciones)
+        self.assertTrue(FALTA_ENVIDO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 4)
+        # Se responde real envido
+        ronda.crear_canto(REAL_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        self.assertTrue(FALTA_ENVIDO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 3)
+        # Se responde falta envido
+        ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 2)
+        canto.rechazar()
+        ### NUEVA RONDA ###
+        ronda = self.aux_envido_nueva_ronda(partida)
+        # Se canta un real envido directamente
+        ronda.crear_canto(REAL_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        self.assertTrue(FALTA_ENVIDO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 3)
+        # Se responde falta envido
+        ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 2)
+        canto.rechazar()
+        ### NUEVA RONDA ###
+        ronda = self.aux_envido_nueva_ronda(partida)
+        # Se canta falta envido directamente
+        ronda.crear_canto(FALTA_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        opciones = ronda.get_opciones()
+        self.assertTrue(QUIERO in opciones)
+        self.assertTrue(NO_QUIERO in opciones)
+        # Verificamos que no tenga opciones extra
+        self.assertEqual(len(opciones), 2)
+        canto.rechazar()
 
-
-    #def aux_envido_nueva_ronda(self, partida):
-        ## La partida debe estar lista para crear una ronda
-        #if partida.is_ready():
-            ##Creo una ronda en la partida
-            #ronda = partida.crear_ronda()
-            #ronda.save()
-        ## Obtengo la ultima ronda
-        #ronda = partida.get_ronda_actual()
-        #return ronda
+    def aux_envido_nueva_ronda(self, partida):
+        # La partida debe estar lista para crear una ronda
+        if partida.is_ready():
+            #Creo una ronda en la partida
+            ronda = partida.crear_ronda()
+            ronda.save()
+        # Obtengo la ultima ronda
+        ronda = partida.get_ronda_actual()
+        return ronda
