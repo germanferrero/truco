@@ -722,7 +722,7 @@ class Envido(Canto):
         return distancia
 
     """
-    Calcula los puntos de envido de un jugador.
+    Calcula los puntos de envido de un jugador. Devuelve una tupla con los puntos y las cartas que conforman el envido
     """
     def puntos_jugador(self, jugador):
         cartas = jugador.cartas.all()
