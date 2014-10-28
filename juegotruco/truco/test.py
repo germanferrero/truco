@@ -322,32 +322,165 @@ class TrucoTests(TestCase):
         return ganador
 
     """
-    Verifica que los puntos que se suman a cada jugador al final de la ronda
-    sean los correspondientes al envido cantado durante la misma.
+    Funcion auxiliar de los tests de envido que simula que los jugadores cantan
+    los puntos y el mano decide irse al mazo para asi terminar la ronda.
     """
-    #def test_envido_puntos (self):
-        #partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
-        ## Obtengo los jugadores
-        #jugadores = partida.jugadores.all()
-        #ronda = self.aux_envido_nueva_ronda(partida)
-        ## Creo un canto envido
-        #ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
-        #opciones = ronda.get_opciones()
-        ## Obtengo el ultimo canto
-        #canto = ronda.get_ultimo_canto()
-        #self.assertEqual(canto.pts_en_juego,1)
-        #canto.aceptar()
-        ## Obtengo el ganador
-        #canto.get_ganador()
-        #puntos_jugador1 = canto.puntos_jugador(jugadores[0])
-        #puntos_jugador2 = canto.puntos_jugador(jugadores[1])
-        #if puntos_jugador1 < puntos_jugador2:
-            #self.assertEqual(canto.maximo_puntaje, puntos_jugador2)
-        #else:
-            #self.assertEqual(canto.maximo_puntaje, puntos_jugador1)
+    def aux_envido_jugar(self, ronda, jugadores, canto):
+        # El jugador mano canta 33 de mano
+        canto.cantar_puntos(jugadores[0], 33)
+        # El otro jugador canta 0 puntos
+        canto.cantar_puntos(jugadores[1], 0)
+        # Se calcula el ganador segun los puntos que se cantan
+        ganador, puntaje = canto.get_supuesto_ganador()
+        ronda.irse_al_mazo(jugadores[0])
 
-    def test_envido_turno(self):
-        pass
+    """
+    Funcion auxiliar de los tests de envido que crea una nueva ronda en la
+    partida que recibe como argumento.
+    """
+    def aux_envido_nueva_ronda(self, partida):
+        # La partida debe estar lista para crear una ronda
+        if partida.is_ready():
+            #Creo una ronda en la partida
+            ronda = partida.crear_ronda()
+            ronda.save()
+        # Obtengo la ultima ronda
+        ronda = partida.get_ronda_actual()
+        return ronda
+
+    """
+    Funcion auxiliar que devuelve la partida3 del setup pero con los puntajes
+    de los jugadores en 0 para simular una nueva partida respecto a los puntos.
+    """
+    def aux_envido_nueva_partida(self):
+        # Tomamos una partida creada y reseteamos el puntaje de los jugadores
+        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        partida.puntos_e1 = 0
+        partida.puntos_e2 = 0
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        # se crea una nueva ronda
+        ronda = self.aux_envido_nueva_ronda(partida)
+        return ronda, partida, jugadores
+
+    """
+    En una partida con dos jugadoes se canta un envido simple y se acepta
+    """
+    def test_envido_simple_aceptado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        # Verificamos que se de el turno al oponente
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.aceptar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se juega la ronda y se actualizan los puntajes
+        self.aux_envido_jugar(ronda, jugadores, canto)
+        partida.actualizar_puntajes()
+        self.assertEqual(partida.puntos_e1, 2)
+
+    """
+    En una partida con dos jugadoes se canta un envido simple y se rechaza
+    """
+    def test_envido_simple_rechazado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        # Verificamos que se de el turno al oponente
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.rechazar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se termina la ronda y se actualizan los puntajes
+        ronda.irse_al_mazo(jugadores[0])
+        partida.actualizar_puntajes()
+        self.assertEqual(partida.puntos_e1, 1)
+
+    """
+    En una partida con dos jugadoes se canta un envido, envido y se acepta.
+    Este test difiere del de envido simple ya que se usa el metodo aumentar de
+    envido.
+    """
+    def test_envido_doble_aceptado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        # Verificamos que se de el turno al oponente y de vuelta
+        ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.aceptar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se juega la ronda y se actualizan los puntajes
+        self.aux_envido_jugar(ronda, jugadores, canto)
+        partida.actualizar_puntajes()
+        self.assertEqual(partida.puntos_e1, 4)
+
+    """
+    En una partida con dos jugadoes se canta un envido, envido y se rechaza
+    Este test difiere del de envido simple ya que se usa el metodo aumentar de
+    envido. Se verifica que al rechazar una apuesta superior, los puntos que
+    se suman son los de la apuesta anterior aceptada.
+    """
+    def test_envido_doble_rechazado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        # Verificamos que se de el turno al oponente y de vuelta
+        ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.rechazar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se termina la ronda y se actualizan los puntajes
+        ronda.irse_al_mazo(jugadores[1])
+        partida.actualizar_puntajes()
+        self.assertEqual(partida.puntos_e2, 2)
+
+    """
+    En una partida con dos jugadoes se canta un falta envido y se acepta
+    Se verifica que se den el minimo de los puntos que faltan para ganar entre
+    ambos jugadores.
+    """
+    def test_falta_envido_aceptado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        partida.puntos_e1 = 13
+        partida.puntos_e2 = 14
+        ronda.crear_canto(FALTA_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        # Verificamos que se de el turno al oponente
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.aceptar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se juega la ronda y se actualizan los puntajes
+        self.aux_envido_jugar(ronda, jugadores, canto)
+        partida.actualizar_puntajes()
+        self.assertEqual(
+            partida.puntos_e1, partida.puntos_e1 + (
+                partida.puntos_objetivo - partida.puntos_e2
+                )
+            )
+
+    """
+    En una partida con dos jugadoes se canta un falta envido y se rechaza
+    """
+    def test_falta_envido_rechazado(self):
+        ronda, partida, jugadores = self.aux_envido_nueva_partida()
+        ronda.crear_canto(FALTA_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        # Verificamos que se de el turno al oponente
+        self.assertEqual(ronda.get_turno().posicion_mesa, 1)
+        canto = ronda.get_ultimo_canto()
+        # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
+        canto.rechazar()
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
+        # Se termina la ronda y se actualizan los puntajes
+        ronda.irse_al_mazo(jugadores[0])
+        partida.actualizar_puntajes()
+        self.assertEqual(partida.puntos_e1, 1)
 
     """
     Se verifica que en las opciones restantes de la partida queden las que
@@ -424,13 +557,3 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 2)
         canto.rechazar()
-
-    def aux_envido_nueva_ronda(self, partida):
-        # La partida debe estar lista para crear una ronda
-        if partida.is_ready():
-            #Creo una ronda en la partida
-            ronda = partida.crear_ronda()
-            ronda.save()
-        # Obtengo la ultima ronda
-        ronda = partida.get_ronda_actual()
-        return ronda
