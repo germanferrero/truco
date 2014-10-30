@@ -169,7 +169,7 @@ def ronda(request, partida_id):
             try:
                 puntos_cantados = int(request.POST['puntos_cantados'])
                 if (0 <= puntos_cantados <= 33):
-                        ronda.ultimo_envido.cantar_puntos(jugador, puntos_cantados)
+                        ronda.ultimo_envido().cantar_puntos(jugador, puntos_cantados)
                         return redirect(reverse('truco:en_espera', args=(partida.id, )))
             except:
                 pass
@@ -182,12 +182,15 @@ def ronda(request, partida_id):
                 ronda.irse_al_mazo(jugador)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == SON_BUENAS:
-                ronda.ultimo_envido.cantar_puntos(jugador, -2)
+                ronda.ultimo_envido().cantar_puntos(jugador, -2)
                 # Se usa -2 para diferenciar con los casos: -1(no hay mensajes que
                 # mostrar al jugador), 0 (tener 0 puntos)
                 return redirect(reverse('truco:en_espera', args=(partida.id, )))
+            elif opcion in [DOBLE_ENVIDO,REAL_ENVIDO,FALTA_ENVIDO] and ronda.ultimo_envido():
+                return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
+            elif opcion in [RETRUCO,VALE_CUATRO]:
+                return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
             else:
-                # Es un canto
                 puntos_restantes = partida.get_min_pts_restantes()
                 ronda.crear_canto(opcion, jugador, puntos_restantes)
                 return redirect(reverse('truco:en_espera', args=(partida.id, )))
@@ -248,11 +251,14 @@ de que elija la opcion.
 def responder_canto(request, partida_id, opcion):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()
+    jugador = partida.find_jugador(request.user)
     canto_actual = ronda.get_ultimo_canto()
     if int(opcion) == QUIERO:
         canto_actual.aceptar()
-    else:
+    elif int(opcion) == NO_QUIERO:
         canto_actual.rechazar()
+    else:
+        canto_actual.aumentar(int(opcion),jugador.posicion_mesa)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 
@@ -282,12 +288,12 @@ def fin_de_ronda(request, partida_id):
                     return redirect(reverse('truco:en_espera', args=(partida.id,)))
             elif opcion == PEDIR_PUNTOS:
                 # Marca que se pidieron ver los puntos
-                ronda.ultimo_envido.pedir_puntos()
+                ronda.ultimo_envido().pedir_puntos()
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
             else:
                 # Opcion "MOSTRAR_PUNTOS"
                 # Marca que se indico mostrar los puntos
-                ronda.ultimo_envido.mostrar_puntos()
+                ronda.ultimo_envido().mostrar_puntos()
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
     else:
         context = {
@@ -298,5 +304,5 @@ def fin_de_ronda(request, partida_id):
             'op_dict': OPCIONES,
             }
         if ronda.hay_que_mostrar_los_puntos():
-            context['cartas_a_mostrar'] = ronda.ultimo_envido.get_puntos_a_mostrar()
+            context['cartas_a_mostrar'] = ronda.ultimo_envido().get_puntos_a_mostrar()
         return render(request, 'truco/fin_de_ronda.html', context)
