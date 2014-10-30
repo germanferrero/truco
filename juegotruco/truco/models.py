@@ -66,8 +66,8 @@ class Lobby:
     """
     Crea una nueva partida y une al usuario a la misma.
     """
-    def crear_partida(self, user, nombre, puntos_objetivo, password):
-        partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo, password=password)
+    def crear_partida(self, user, nombre, puntos_objetivo):
+        partida = Partida(nombre=nombre, puntos_objetivo=puntos_objetivo)
         partida.save()
         partida.agregar_jugador(user)
         return partida
@@ -96,7 +96,7 @@ class Partida(models.Model):
     puntos_e1 = models.IntegerField(max_length=2, default=0)
     puntos_e2 = models.IntegerField(max_length=2, default=0)
     puntos_objetivo = models.IntegerField(default=15)
-    password = models.CharField(max_length=16)
+    password = models.CharField(max_length=16, null=True)
     estado = models.IntegerField(default=EN_ESPERA)
     mano_pos = models.IntegerField(max_length=1, default=0)
     cantidad_jugadores = models.IntegerField(default=2)
@@ -254,8 +254,6 @@ class Ronda(models.Model):
     jugadores = models.ManyToManyField(Jugador, verbose_name='jugadores')
     mazo = Mazo()
     mano_pos = models.IntegerField(max_length=1, default=0)
-    ultimo_envido = models.ForeignKey('Envido', null=True, related_name='ultimo envido')
-    ultimo_truco = models.ForeignKey('Truco', null=True, related_name='ultimo truco')
     primer_enfrentamiento = models.ForeignKey('Enfrentamiento', null=True, related_name='primer_enfrentamiento')
     segundo_enfrentamiento = models.ForeignKey('Enfrentamiento', null=True, related_name='segundo_enfrentamiento')
     tercer_enfrentamiento = models.ForeignKey('Enfrentamiento', null=True, related_name='tercer_enfrentamiento')
