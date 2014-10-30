@@ -136,8 +136,7 @@ utilizada por pares de personas.
 
    La aplicación de “TRUCO” debe cumplir con las siguientes funciones básicas
 para cada usuario:
-      * Gestionar una cuenta. Ya sea para crear una cuenta de usuario o para
-        modificar la misma cambiando la contraseña.
+      * Gestionar una cuenta(para crear una cuenta)
       * Llevar a cabo una partida de truco.
 
 
@@ -383,13 +382,12 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El usuario hace click en el botón "Crear Patida".
         2. El usuario elige un nombre para su partida.
-        3. El usuario elige una contraseña para su partida (opcional).
-        4. El usuario elige entre 15 o 30 puntos objetivos para su partida.
-        5. El usuario hace click en "Crear".
-        6. El sistema registra la nueva partida y la muestra en el lobby.
-        7. El sistema redirige al usuario a la mesa de juego.
+        3. El usuario elige entre 15 o 30 puntos objetivos para su partida.
+        4. El usuario hace click en "Crear".
+        5. El sistema registra la nueva partida y la muestra en el lobby.
+        6. El sistema redirige al usuario a la mesa de juego.
     ·Escenarios excepcionales:
-        5.a El usuario no ingresó los datos obligatorios.
+        4.a El usuario no ingresó los datos obligatorios.
             · El sistema muestra un mensaje de error indicando qué campos obligatorios
               no han sido ingresados.
 
@@ -403,13 +401,9 @@ pasar un usuario durante el juego.
                    para un jugador más.
     ·Escenario exitoso pricipal:
         1. El usuario hace click en "Unirse a partida".
-        2. El usuario ingresa la contraseña de la partida (si existe).
-        3. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
+        2. El sistema redirecciona el usuario a la mesa de juego de la partida seleccionada.
     ·Escenarios excepcionales:
-        2.a La contraseña ingresada es incorrecta.
-            El sistema muestra un mensaje de error pidiendo reingresar
-            la contraseña correcta.
-        3.a En medio del proceso la partida es eliminada por su dueño.
+        2.a En medio del proceso la partida es eliminada por su dueño.
             El sistema notifica al usuario que intentaba unirse a la partida y 
             lo redirecciona al lobby.
 
