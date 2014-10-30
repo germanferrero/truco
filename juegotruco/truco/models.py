@@ -701,6 +701,30 @@ class Envido(Canto):
     puntos_mostrados = models.BooleanField(default=False)
     puntos_falta = models.IntegerField(max_length=2,default=0) # Puntos en caso que se gane la falta envido
 
+    def aceptar(self):
+        self.estado = ACEPTADO
+        if self.tipo == FALTA_ENVIDO:
+            self.pts_en_juego = self.puntos_falta
+        elif self.tipo ==  ENVIDO:
+            self.pts_en_juego += 1
+        elif self.tipo == DOBLE_ENVIDO:
+            self.pts_en_juego += 2
+        else:
+            if self.pts_en_juego > 1:
+                # Si se canta real envido con otro canto antes
+                self.pts_en_juego += 3
+            else:
+                self.pts_en_juego += 2
+        self.save()
+    def aumentar(self, tipo, pos_jugador_canto):
+        self.aceptar()
+        self.save()
+        canto = Envido(puntos_falta=self.puntos_falta, ronda=self.ronda,
+                       pos_jugador_canto=pos_jugador_canto, pts_en_juego=self.pts_en_juego, 
+                       tipo=tipo, mano_pos=self.mano_pos)
+        canto.save()
+        return canto
+
     """
     Respuestas que tiene un jugador para contestar un envido o derivado
     """
@@ -816,30 +840,6 @@ class Envido(Canto):
         return self.jugadores.count() == 2
 
 
-    def aumentar(self, tipo, pos_jugador_canto):
-        self.aceptar()
-        self.save()
-        canto = Envido(puntos_falta=self.puntos_falta, ronda=self.ronda,
-                       pos_jugador_canto=pos_jugador_canto, pts_en_juego=self.pts_en_juego, 
-                       tipo=tipo, mano_pos=self.mano_pos)
-        canto.save()
-        return canto
-
-    def aceptar(self):
-        self.estado = ACEPTADO
-        if self.tipo == FALTA_ENVIDO:
-            self.pts_en_juego = self.puntos_falta
-        elif self.tipo ==  ENVIDO:
-            self.pts_en_juego += 1
-        elif self.tipo == DOBLE_ENVIDO:
-            self.pts_en_juego += 2
-        else:
-            if self.pts_en_juego > 1:
-                # Si se canta real envido con otro canto antes
-                self.pts_en_juego += 3
-            else:
-                self.pts_en_juego += 2
-        self.save()
 
 
     def pedir_puntos(self):
