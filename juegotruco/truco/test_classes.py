@@ -137,6 +137,7 @@ class TrucoTests(TestCase):
 
 
     def test_get_cartas_jugadas(self):
+        cartas_tiradas = []
         # Obtengo una partida con dos jugadores y una ronda ya creada
         partida = Partida.objects.get(nombre= "Partida con dos jugadores")
         # Obtengo la ronda actual
@@ -145,62 +146,30 @@ class TrucoTests(TestCase):
         jugadores = partida.jugadores.all()
         jugador1 = jugadores[0]
         jugador2 = jugadores[1]
-        carta_tirada = []
         # Obtengo las cartas de los jugadores
         carta1 = jugador1.get_cartas_disponibles()
         carta2 = jugador2.get_cartas_disponibles()
         # Creo un enfrentamiento
         enfrentamiento = ronda.crear_enfrentamiento(jugador1)
         # Elijo la primera carta
-        carta_tirada1 = carta1[0]
-        carta_tirada.append([carta1[0]])
+        carta_j1 = carta1[0]
+        
+        cartas_tiradas.append ([carta1[0]])
+        cartas_tiradas.append([])
         # Agrego una carta al enfrentamiento 
-        enfrentamiento.agregar_carta(carta_tirada1)
+        enfrentamiento.agregar_carta(carta_j1)
         # Hago el get
-        carta_tirada_del_get = ronda.get_cartas_jugadas(jugador1)[0][0] #Por que es lista de lista?
+        cartas_tiradas_del_get = ronda.get_cartas_jugadas(jugador1)
         # Verifico que devuelva bien las cartas
-#        self.assertEqual(carta_tirada1, carta_tirada_del_get)
+        self.assertEqual(cartas_tiradas, cartas_tiradas_del_get)
         # Elijo una carta del jugador 2
-        carta_tirada2 = carta2[0]
-        carta_tirada.append([carta2[0]])
+        cartas_tiradas = []
+        carta_j2 = carta2[0]
+        cartas_tiradas.append([carta2[0]])
+        cartas_tiradas.append([carta1[0]])
         # Agrego una carta al enfrentamiento 
-        enfrentamiento.agregar_carta(carta_tirada2)
+        enfrentamiento.agregar_carta(carta_j2)
         # Hago el get
-        carta_tirada_del_get = ronda.get_cartas_jugadas(jugador2) #Por que es lista de lista?
+        cartas_tiradas_del_get = ronda.get_cartas_jugadas(jugador2)
         # Verifico que devuelva bien las cartas
-#        self.assertEqual(carta_tirada, carta_tirada_del_get)
-
-
-"""    def test_get_mensaje_ganador_envido(self):
-        # Obtengo un user
-        user1 = User.objects.get(username ='test_user1')
-        # Obtengo una partida con dos jugadores
-        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
-        # Obtengo el jugador con nombre de usuario user1
-        jugador = partida.find_jugador(user1)
-        # Creo una ronda
-        ronda = partida.crear_ronda()
-        # Obtengo los jugadores
-        jugadores = partida.jugadores.all()
-        jugador1 = jugadores[0]
-        jugador2 = jugadores[1]
-        print jugador2
-        # Obtengo los puntos para la falta de envido
-        puntos = partida.get_min_pts_restantes()
-        # Crea un canto
-        ronda.crear_canto(ENVIDO, jugador, puntos)
-        # Obtengo el canto
-        canto = ronda.get_ultimo_canto()
-        # Acepto el canto
-        canto.aceptar()
-        # Obtengo las cartas
-        puntos_envido = ronda.calcular_puntos_envido()
-        print puntos_envido
-#       mensaje1 = ronda.get_mensaje_ganador_envido()
-  #      puntos1 = canto.puntos_jugador(jugador1)
-  #      puntos2 = canto.puntos_jugador(jugador2)
-  #      cartas_jugador1 = jugador1.get_cartas_disponibles()
-  #      cartas_jugador2 = jugador2.get_cartas_disponibles()"""
-
-
-
+        self.assertEqual(cartas_tiradas, cartas_tiradas_del_get)
