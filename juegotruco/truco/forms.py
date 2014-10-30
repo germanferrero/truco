@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from truco.constants import *
 
 
-
 class LoginForm(forms.Form):
     username = forms.CharField(max_length=255, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
@@ -20,9 +19,8 @@ class RegisterForm(UserCreationForm):
 
 
 class crear_partida_form(forms.Form):
-    nombre = forms.CharField(max_length=32,required=True)
+    nombre = forms.CharField(max_length=32, required=True)
     puntos_objetivo = forms.ChoiceField(
-            widget=forms.RadioSelect, choices=PUNTOS_OBJETIVO, required=True
-            )
+        widget=forms.RadioSelect, choices=PUNTOS_OBJETIVO, required=True
+        )
     password = forms.CharField(widget=forms.PasswordInput, required=False)
-

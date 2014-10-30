@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from truco.constants import *
 from truco.models import *
 
+
 class TrucoTests(TestCase):
 
     """
@@ -12,37 +13,36 @@ class TrucoTests(TestCase):
     def setUp(self):
         #Creo usuarios
         user1 = User.objects.create_user(username='test_user1', email='email@email.com',
-                                        password='asdf',)
+                                         password='asdf', )
         user1.save()
-        user2 = User.objects.create_user(username='test_user2',email='email2@email.com',
-                                        password='asdf',)
+        user2 = User.objects.create_user(username='test_user2', email='email2@email.com',
+                                         password='asdf', )
         user2.save()
-        user3 = User.objects.create_user(username='test_user3',email='email3@email.com',
-                                        password='asdf',)
+        user3 = User.objects.create_user(username='test_user3', email='email3@email.com',
+                                         password='asdf', )
         user3.save()
         lobby = Lobby()
         #Creo partidas
-        partida1 = lobby.crear_partida(user=user1, nombre = 'Partida1 a 15 sin password',
-                                    puntos_objetivo=15,password='')
+        partida1 = lobby.crear_partida(user=user1, nombre='Partida1 a 15 sin password',
+                                       puntos_objetivo=15, password='')
         partida1.save()
-        partida2 = lobby.crear_partida(user=user1, nombre = 'Partida2 a 30 sin password',
-                                    puntos_objetivo=15,password='')
+        partida2 = lobby.crear_partida(user=user1, nombre='Partida2 a 30 sin password',
+                                       puntos_objetivo=15, password='')
         partida2.save()
-        partida3 = lobby.crear_partida(user=user1, nombre = 'Partida3 a 30 sin password con dos jugadores',
-                                    puntos_objetivo=15,password='')
+        partida3 = lobby.crear_partida(user=user1, nombre='Partida3 a 30 sin password con dos jugadores',
+                                       puntos_objetivo=15, password='')
         partida3.save()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida3)
         # Actualizo el estado de la partida
         partida3.actualizar_estado()
 
-
         #Creo las cartas
         valor_otro = 7
-        for palo_carta in range(1,5):
-            for numero in range (1,13):
-                if numero!=8 and numero!=9:
-                    nombre_carta = str(numero)+" "+ 'de' + "" + str(palo_carta)
+        for palo_carta in range(1, 5):
+            for numero in range(1, 13):
+                if numero != 8 and numero != 9:
+                    nombre_carta = str(numero) + " " + 'de' + "" + str(palo_carta)
                     if nombre_carta == "1 de 1":
                         valor_jer = 1
                     elif nombre_carta == '1 de 2':
@@ -51,20 +51,18 @@ class TrucoTests(TestCase):
                         valor_jer = 3
                     elif nombre_carta == '7 de 3':
                         valor_jer = 4
-                    else :
+                    else:
                         valor_jer = valor_otro
                     if numero == 10 or numero == 11 or numero == 12:
                         envido = 0
                     else:
                         envido = numero
-                    carta = Carta.objects.create(nombre = nombre_carta, valor_jerarquico = valor_jer,
-                                            valor_envido = envido, palo = palo_carta, imagen = nombre_carta)
+                    carta = Carta.objects.create(nombre=nombre_carta, valor_jerarquico=valor_jer,
+                                                 valor_envido=envido, palo=palo_carta, imagen=nombre_carta)
                     carta.save()
                     valor_otro = valor_otro-1
                     if valor_otro == 4:
                         valor_otro = 14
-#        print len(list(Carta.objects.all()))
-#        print '[%s]' % ', '.join(map(str, list(Carta.objects.all())))
 
     """
     Test que se fija que una partida creada tiene seteado el estado en "EN_ESPERA".
@@ -72,11 +70,11 @@ class TrucoTests(TestCase):
     """
     def test_estado_partidas(self):
         lobby = Lobby()
-        partida = Partida.objects.get(nombre ='Partida1 a 15 sin password')
+        partida = Partida.objects.get(nombre='Partida1 a 15 sin password')
         # Usuario para agregar a la partida
-        user2 = User.objects.get(username ='test_user2')
+        user2 = User.objects.get(username='test_user2')
         # Obtengo los jugadores de la partida
-        jugadores =  list(partida.jugadores.all())
+        jugadores = list(partida.jugadores.all())
         # La partida esta en espera hasta que se una un nuevo jugador
         self.assertEqual(partida.estado, EN_ESPERA)
         #Agrego un nuevo jugador
@@ -92,12 +90,12 @@ class TrucoTests(TestCase):
     """
     def test_listas_partidas(self):
         #Creo una lista para compararla con la real
-        lista_partidas = [] 
+        lista_partidas = []
         lobby = Lobby()
-        partida1 = Partida.objects.get(nombre = 'Partida1 a 15 sin password')
-        partida2 = Partida.objects.get(nombre = 'Partida2 a 30 sin password')
-        user2 = User.objects.get(username ='test_user2')
-        user3 = User.objects.get(username = 'test_user3')
+        partida1 = Partida.objects.get(nombre='Partida1 a 15 sin password')
+        partida2 = Partida.objects.get(nombre='Partida2 a 30 sin password')
+        user2 = User.objects.get(username='test_user2')
+        user3 = User.objects.get(username='test_user3')
         # Agrego las partidas a la partida para compraralas luego
         lista_partidas.append(partida1)
         lista_partidas.append(partida2)
@@ -120,10 +118,9 @@ class TrucoTests(TestCase):
         # Compruebo que no esta en la lista de partidas en espera
         self.assertEqual(lista_partidas, list(lobby.get_lista_partidas()))
 
-
     def test_crear_ronda(self):
         user2 = User.objects.get(username='test_user2')
-        partida = Partida.objects.get(nombre = 'Partida1 a 15 sin password')
+        partida = Partida.objects.get(nombre='Partida1 a 15 sin password')
         lobby = Lobby()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida)
@@ -137,7 +134,7 @@ class TrucoTests(TestCase):
         self.assertNotEqual(list(partida.ronda_set.all()), [])
         # Obtengo los jugadores
         jugadores = list(partida.jugadores.all())
-        # Chequeo que se les hayan asignado 3 cartas a cada uno 
+        # Chequeo que se les hayan asignado 3 cartas a cada uno
         self.assertEqual(len((jugadores[0].cartas.all())), 3)
         self.assertEqual(len((jugadores[1].cartas.all())), 3)
         # Chequeo que la mano sea el que esta en la posicion 0 (El que creo la partida)
@@ -279,7 +276,7 @@ class TrucoTests(TestCase):
     """
     def aux_truco_nueva_ronda(self):
         # Configuramos una partida donde se termino el primer enfrentamiento
-        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        partida = Partida.objects.get(nombre='Partida3 a 30 sin password con dos jugadores')
         partida.crear_ronda()
         # La partida ya esta lista para que los jugadores tiren las cartas
         jugadores = partida.jugadores.all()
@@ -354,7 +351,7 @@ class TrucoTests(TestCase):
     """
     def aux_envido_nueva_partida(self):
         # Tomamos una partida creada y reseteamos el puntaje de los jugadores
-        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        partida = Partida.objects.get(nombre='Partida3 a 30 sin password con dos jugadores')
         partida.puntos_e1 = 0
         partida.puntos_e2 = 0
         # Obtengo los jugadores
@@ -487,7 +484,7 @@ class TrucoTests(TestCase):
     corresponden, respecto al envido, segun el canto que este en juego.
     """
     def test_envido_opciones(self):
-        partida = Partida.objects.get(nombre = 'Partida3 a 30 sin password con dos jugadores')
+        partida = Partida.objects.get(nombre='Partida3 a 30 sin password con dos jugadores')
         # Obtengo los jugadores
         jugadores = partida.jugadores.all()
         ### NUEVA RONDA ###
