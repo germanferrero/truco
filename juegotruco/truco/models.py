@@ -720,7 +720,7 @@ class Truco(Canto):
         return result
 
     """
-    Aumentar crea un nuevo canto de mayor valor, cob
+    Aumentar crea un nuevo canto de mayor valor, con
     los puntos que ya estan en juego. Es decir los que le corresponden
     a un jugador si el otro no quiere lo que se canto.
     """
