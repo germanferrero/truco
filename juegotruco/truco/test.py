@@ -24,13 +24,13 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo partidas
         partida1 = lobby.crear_partida(user=user1, nombre='Partida1 a 15 sin password',
-                                       puntos_objetivo=15, password='')
+                                       puntos_objetivo=15)
         partida1.save()
         partida2 = lobby.crear_partida(user=user1, nombre='Partida2 a 30 sin password',
-                                       puntos_objetivo=15, password='')
+                                       puntos_objetivo=15)
         partida2.save()
         partida3 = lobby.crear_partida(user=user1, nombre='Partida3 a 30 sin password con dos jugadores',
-                                       puntos_objetivo=15, password='')
+                                       puntos_objetivo=15)
         partida3.save()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida3)
@@ -196,7 +196,7 @@ class TrucoTests(TestCase):
         # Se canta truco, se responde retruco y se acepta
         ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
+        canto.aumentar(RETRUCO, jugador2.posicion_mesa)
         canto = ronda.get_ultimo_canto()
         canto.aceptar()
         # verificamos que se le den los 3 puntos al jugador que gano
@@ -221,7 +221,7 @@ class TrucoTests(TestCase):
         # Se canta truco, se responde retruco y se rechaza
         ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
+        canto.aumentar(RETRUCO, jugador2.posicion_mesa)
         canto = ronda.get_ultimo_canto()
         canto.rechazar()
         # Si se rechaza corresponde 2 punto para el otro jugador
@@ -234,9 +234,9 @@ class TrucoTests(TestCase):
         # Se canta truco, se responde retruco y vale cuatro y se acepta
         ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
+        canto.aumentar(RETRUCO, jugador2.posicion_mesa)
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(VALE_CUATRO, jugador1, partida.get_min_pts_restantes())
+        canto.aumentar(VALE_CUATRO, jugador1.posicion_mesa)
         canto = ronda.get_ultimo_canto()
         canto.aceptar()
         # verificamos que se le den los 4 puntos al jugador que gano
@@ -261,9 +261,9 @@ class TrucoTests(TestCase):
         # Se canta truco, se responde retruco y vale cuatro y se rechaza
         ronda.crear_canto(TRUCO, jugador1, partida.get_min_pts_restantes())
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(RETRUCO, jugador2, partida.get_min_pts_restantes())
+        canto.aumentar(RETRUCO, jugador2.posicion_mesa)
         canto = ronda.get_ultimo_canto()
-        ronda.crear_canto(VALE_CUATRO, jugador1, partida.get_min_pts_restantes())
+        canto.aumentar(VALE_CUATRO, jugador1.posicion_mesa)
         canto = ronda.get_ultimo_canto()
         canto.rechazar()
         # Si se rechaza corresponde 3 punto para el otro jugador
@@ -404,9 +404,9 @@ class TrucoTests(TestCase):
         # Verificamos que se de el turno al oponente y de vuelta
         ronda.crear_canto(ENVIDO, jugadores[0], partida.get_min_pts_restantes())
         self.assertEqual(ronda.get_turno().posicion_mesa, 1)
-        ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
-        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
         canto = ronda.get_ultimo_canto()
+        canto.aumentar(DOBLE_ENVIDO, jugadores[1].posicion_mesa)
+        self.assertEqual(ronda.get_turno().posicion_mesa, 0)
         # Aceptamos el canto y verificamos que se vuelva el turno al jugador mano
         canto.aceptar()
         self.assertEqual(ronda.get_turno().posicion_mesa, 0)
@@ -502,7 +502,8 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 5)
         # Se responde envido (se juega un doble envido)
-        ronda.crear_canto(DOBLE_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        canto = ronda.get_ultimo_canto()
+        aumentar(DOBLE_ENVIDO, jugadores[1].posicion_mesa)
         opciones = ronda.get_opciones()
         self.assertTrue(QUIERO in opciones)
         self.assertTrue(NO_QUIERO in opciones)
@@ -554,3 +555,4 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 2)
         canto.rechazar()
+
