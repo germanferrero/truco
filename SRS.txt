@@ -562,7 +562,7 @@ pasar un usuario durante el juego.
           2. El sistema inicia una nueva ronda.
 
 
-3.2.14 CANTAR TRUCO Y RE-CANTAR RE TUCO O QUIERO VALE 4
+3.2.14 CANTAR TRUCO Y RE-CANTAR RE TRUCO O QUIERO VALE 4
     ·Caso de uso: Un jugador canta truco o re-canta re truco, o quiero vale 4.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
@@ -607,19 +607,19 @@ pasar un usuario durante el juego.
 
 
 3.2.17 PEDIR PUNTOS
-	·Caso de uso: Se pide mostrar los puntos del supuesto ganador del Envido.
-	·Actor primario: Jugador en turno.
-	·Actor secundario: Sistema
-	·Precondiciones: · Finalizó una ronda.
-					 · El jugador en turno es el supuesto perdedor del Envido.
+    ·Caso de uso: Se pide mostrar los puntos del supuesto ganador del Envido.
+    ·Actor primario: Jugador en turno.
+    ·Actor secundario: Sistema
+    ·Precondiciones: · Finalizó una ronda.
+                     · El jugador en turno es el supuesto perdedor del Envido.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
                         sus derivados.
-					 · Se muestran las opciones "pedir puntos" y "siguiente ronda"
-	·Escenario exitoso principal:
-		1. El jugador en turno hace click en "pedir puntos"
-	·Escenario excepcional:
-		1.a El jugador no hace click en "pedir puntos" sino en "siguiente ronda".
-			1. Se registra como ganador del Envido al supuesto ganador del Envido.
+                     · Se muestran las opciones "pedir puntos" y "siguiente ronda"
+    ·Escenario exitoso principal:
+        1. El jugador en turno hace click en "pedir puntos"
+    ·Escenario excepcional:
+        1.a El jugador no hace click en "pedir puntos" sino en "siguiente ronda".
+            1. Se registra como ganador del Envido al supuesto ganador del Envido.
 
 3.2.18 MOSTRAR PUNTOS
     ·Caso de uso: Se muestran las cartas que conforman los puntos del envido, o
@@ -629,18 +629,18 @@ pasar un usuario durante el juego.
     ·Precondiciones: · Finalizó una ronda.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
                        sus derivados, y el perdedor pidió ver las cartas.
-					 · Consecuentemente, se muestra la opción "mostrar puntos" y "siguiente ronda"
+                     · Consecuentemente, se muestra la opción "mostrar puntos" y "siguiente ronda"
     ·Escenario exitoso principal:
-		1. El jugador en turno hace click en "mostrar puntos"
+        1. El jugador en turno hace click en "mostrar puntos"
         2. El sistema muestra a todos los jugadores las cartas que conforman los
            puntos del supuesto ganador
         3. El sistema guarda en registro al ganador.
     ·Escenario excepcional:
-		1.a El jugador no hace click en "mostrar puntos" sino en "siguiente ronda".
-			1. Se registra al oponente como ganador del envido.
+        1.a El jugador no hace click en "mostrar puntos" sino en "siguiente ronda".
+            1. Se registra al oponente como ganador del envido.
         2.a Los puntos del supuesto ganador no coinciden con los puntos reales.
-			1. El sistema muestra las tres cartas del supuesto ganador. Y una aclaración
-				de que mintió.
+            1. El sistema muestra las tres cartas del supuesto ganador. Y una aclaración
+            de que mintió.
 
 3.2.19 CERRAR SESIÓN
     ·Caso de uso: Cerrar sesión.
