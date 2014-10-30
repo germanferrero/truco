@@ -503,7 +503,7 @@ class TrucoTests(TestCase):
         self.assertEqual(len(opciones), 5)
         # Se responde envido (se juega un doble envido)
         canto = ronda.get_ultimo_canto()
-        aumentar(DOBLE_ENVIDO, jugadores[1].posicion_mesa)
+        canto.aumentar(DOBLE_ENVIDO, jugadores[1].posicion_mesa)
         opciones = ronda.get_opciones()
         self.assertTrue(QUIERO in opciones)
         self.assertTrue(NO_QUIERO in opciones)
@@ -512,7 +512,8 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 4)
         # Se responde real envido
-        ronda.crear_canto(REAL_ENVIDO, jugadores[0], partida.get_min_pts_restantes())
+        canto = ronda.get_ultimo_canto()
+        canto.aumentar(REAL_ENVIDO, jugadores[0].posicion_mesa)
         opciones = ronda.get_opciones()
         self.assertTrue(QUIERO in opciones)
         self.assertTrue(NO_QUIERO in opciones)
@@ -520,7 +521,8 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 3)
         # Se responde falta envido
-        ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        canto = ronda.get_ultimo_canto()
+        canto.aumentar(FALTA_ENVIDO, jugadores[0].posicion_mesa)
         opciones = ronda.get_opciones()
         self.assertTrue(QUIERO in opciones)
         self.assertTrue(NO_QUIERO in opciones)
@@ -538,7 +540,8 @@ class TrucoTests(TestCase):
         # Verificamos que no tenga opciones extra
         self.assertEqual(len(opciones), 3)
         # Se responde falta envido
-        ronda.crear_canto(FALTA_ENVIDO, jugadores[1], partida.get_min_pts_restantes())
+        canto = ronda.get_ultimo_canto()
+        canto.aumentar(FALTA_ENVIDO, jugadores[0].posicion_mesa)
         opciones = ronda.get_opciones()
         self.assertTrue(QUIERO in opciones)
         self.assertTrue(NO_QUIERO in opciones)

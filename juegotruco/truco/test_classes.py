@@ -18,7 +18,7 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo una partida
         partida3 = lobby.crear_partida(user=user1, nombre = 'Partida con dos jugadores',
-                                    puntos_objetivo=15,password='')
+                                    puntos_objetivo=15)
         partida3.save()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida3)
@@ -66,7 +66,7 @@ class TrucoTests(TestCase):
         self.assertEqual(lista_partidas,[])
         # Creo una nueva partida
         partida = lobby.crear_partida(user=user1, nombre = 'partida a 15',
-                                    puntos_objetivo=15,password='')
+                                    puntos_objetivo=15)
         # Obtengo la lista de partidas
         lista_partidas = list(lobby.get_lista_partidas())
         # Verifico que se haya agregado la partida
@@ -96,7 +96,7 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo una partida
         partida = lobby.crear_partida(user=user1, nombre = 'Partida a 30',
-                                    puntos_objetivo=30,password='')
+                                    puntos_objetivo=30)
         # Agrego un jugador a la partida
         lobby.unirse_partida(user2, partida)
         # Seteo el estado de la partida

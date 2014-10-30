@@ -19,7 +19,7 @@ class TrucoViewTests(TestCase):
         user2.save()
         lobby = Lobby()
         partida1 = lobby.crear_partida(user=user1, nombre='Partida1',
-                                       puntos_objetivo=15, password='')
+                                       puntos_objetivo=15)
         partida1.save()
         response = self.client.post(
             reverse('usuarios:create_user'),
@@ -69,8 +69,7 @@ class TrucoViewTests(TestCase):
         response = self.client.post(reverse('truco:crear_partida'),
                                     {'user': user2,
                                      'nombre': 'nombre_partida',
-                                     'puntos_objetivo': 15,
-                                     'password': ''})
+                                     'puntos_objetivo': 15,})
         partida = Partida.objects.get(nombre='nombre_partida')
         # Redirige a partida
         self.assertRedirects(response, reverse('truco:partida', args=(partida.id,)))
