@@ -23,4 +23,3 @@ class crear_partida_form(forms.Form):
     puntos_objetivo = forms.ChoiceField(
         widget=forms.RadioSelect, choices=PUNTOS_OBJETIVO, required=True
         )
-    password = forms.CharField(widget=forms.PasswordInput, required=False)

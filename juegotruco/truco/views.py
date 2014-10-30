@@ -52,8 +52,8 @@ def crear_partida(request):
             lobby = Lobby()
             partida = lobby.crear_partida(request.user,
                                           form.cleaned_data['nombre'],
-                                          form.cleaned_data['puntos_objetivo'],
-                                          form.cleaned_data['password'])
+                                          form.cleaned_data['puntos_objetivo']
+                                          )
             return redirect(reverse('truco:partida', args=(partida.id, )))
         else:
             # Si el formulario es incorrecto se muestran los errores
