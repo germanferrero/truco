@@ -5,4 +5,3 @@ admin.site.register(Jugador)
 admin.site.register(Partida)
 admin.site.register(Carta)
 admin.site.register(Ronda)
-
