@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_protect
 from truco.models import Lobby, Partida, Jugador, Carta, Ronda
 from truco.constants import *
 from truco.forms import crear_partida_form
+from truco.views_helper import *
 from django.dispatch import receiver
 
 
@@ -166,35 +167,23 @@ def ronda(request, partida_id):
     if request.method == "POST":
         # El jugador eligio una opcion
         if 'puntos_cantados' in request.POST:
-            try:
-                puntos_cantados = int(request.POST['puntos_cantados'])
-                if (0 <= puntos_cantados <= 33):
-                        ronda.ultimo_envido().cantar_puntos(jugador, puntos_cantados)
-                        return redirect(reverse('truco:en_espera', args=(partida.id, )))
-            except:
-                pass
-            return redirect(reverse('truco:ronda', args=(partida_id, )))
+            if puntos_cantados_validos(request.POST['puntos_cantados'], ronda, jugador):
+                return redirect(reverse('truco:en_espera', args=(partida.id, )))
+            else:
+                return redirect(reverse('truco:ronda', args=(partida_id, )))
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
-            if opcion == QUIERO or opcion == NO_QUIERO:
-                return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
-            elif opcion == IRSE_AL_MAZO:
-                ronda.irse_al_mazo(jugador)
-                return redirect(reverse('truco:en_espera', args=(partida.id,)))
-            elif opcion == SON_BUENAS:
-                ronda.ultimo_envido().cantar_puntos(jugador, -2)
-                # Se usa -2 para diferenciar con los casos: -1(no hay mensajes que
-                # mostrar al jugador), 0 (tener 0 puntos)
-                return redirect(reverse('truco:en_espera', args=(partida.id, )))
-            elif opcion in [DOBLE_ENVIDO,REAL_ENVIDO,FALTA_ENVIDO] and ronda.ultimo_envido():
-                return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
-            elif opcion in [RETRUCO,VALE_CUATRO]:
+            if (opcion in [DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO] and ronda.ultimo_envido()
+                    or opcion in [RETRUCO, VALE_CUATRO]
+                    or opcion in [QUIERO, NO_QUIERO]):
+                # Respuestas a cantos
                 return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
             else:
-                puntos_restantes = partida.get_min_pts_restantes()
-                ronda.crear_canto(opcion, jugador, puntos_restantes)
-                return redirect(reverse('truco:en_espera', args=(partida.id, )))
+                # Canto inicial
+                no_es_mas_mi_turno(partida, ronda, jugador, opcion)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
         elif 'carta' in request.POST:
+            # Jugar una carta
             return redirect(reverse('truco:tirar_carta', args=(partida.id, request.POST['carta'],)))
     else:
         if not ronda.hay_ganador():

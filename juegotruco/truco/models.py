@@ -35,6 +35,7 @@ class Jugador(models.Model):
     cartas = models.ManyToManyField(Carta, related_name='cartas')
     cartas_disponibles = models.ManyToManyField(Carta, related_name='cartas_disponibles')
     posicion_mesa = models.IntegerField(max_length=1)
+
     """
     Asigna a cada jugador las cartas que se pasan como una lista de instancias de Carta.
     """
