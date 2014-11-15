@@ -21,8 +21,10 @@ View Lobby: Se muestran las partidas donde aun hay lugar para mas jugadores.
 def lobby(request):
     lobby = Lobby()
     lista_de_partidas = lobby.get_lista_partidas()
-    context = {'lista_de_partidas': lista_de_partidas,
-               'username': request.user.username}
+    context = {
+        'lista_de_partidas': lista_de_partidas,
+        'username': request.user.username
+        }
     return render(request, 'truco/lobby.html', context)
 
 
@@ -51,10 +53,11 @@ def crear_partida(request):
         if form.is_valid():
             # Si se llenaron los campos obligatorios
             lobby = Lobby()
-            partida = lobby.crear_partida(request.user,
-                                          form.cleaned_data['nombre'],
-                                          form.cleaned_data['puntos_objetivo']
-                                          )
+            partida = lobby.crear_partida(
+                request.user,
+                form.cleaned_data['nombre'],
+                form.cleaned_data['puntos_objetivo']
+                )
             return redirect(reverse('truco:partida', args=(partida.id, )))
         else:
             # Si el formulario es incorrecto se muestran los errores
@@ -111,10 +114,12 @@ def partida(request, partida_id):
             partida.actualizar_mano()  # Se le da la mano al jugador de la derecha
             return redirect(reverse('truco:en_espera', args=(partida.id, )))
         else:
-            context = {'partida': partida,
-                       'puntajes': partida.get_puntajes(request.user),
-                       'username': request.user.username,
-                       'mensaje_ganador': partida.get_mensaje_ganador(request.user)}
+            context = {
+                'partida': partida,
+                'puntajes': partida.get_puntajes(request.user),
+                'username': request.user.username,
+                'mensaje_ganador': partida.get_mensaje_ganador(request.user)
+                }
             return render(request, 'truco/partida.html', context)
     else:
         return redirect(reverse('truco:index'))
@@ -138,10 +143,11 @@ def en_espera(request, partida_id):
         # Si hay una ronda en curso y es el turno del jugador
         return redirect(reverse('truco:ronda', args=(partida_id, )))
     else:
-        context = Context({'puntajes': partida.get_puntajes(request.user),
-                           'partida': partida,
-                           'username': request.user.username
-                           })
+        context = Context({
+            'puntajes': partida.get_puntajes(request.user),
+            'partida': partida,
+            'username': request.user.username
+            })
         if ronda and not ronda.hay_ganador():
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
             context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
@@ -173,14 +179,18 @@ def ronda(request, partida_id):
                 return redirect(reverse('truco:ronda', args=(partida_id, )))
         if 'opcion' in request.POST:
             opcion = int(request.POST['opcion'])
-            if (opcion in [DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO] and ronda.ultimo_envido()
-                    or opcion in [RETRUCO, VALE_CUATRO]
-                    or opcion in [QUIERO, NO_QUIERO]):
-                # Respuestas a cantos
+            if (respuestas_a_cantos(ronda, opcion)):
                 return redirect(reverse('truco:responder_canto', args=(partida.id, opcion, )))
-            else:
-                # Canto inicial
-                no_es_mas_mi_turno(partida, ronda, jugador, opcion)
+            elif opcion == IRSE_AL_MAZO:
+                ronda.irse_al_mazo(jugador)
+                return redirect(reverse('truco:en_espera', args=(partida.id,)))
+            elif opcion == SON_BUENAS:
+                set_perdedor_envido(ronda, jugador)
+                return redirect(reverse('truco:en_espera', args=(partida.id, )))
+            elif nuevo_canto(opcion):
+                # Hay un canto inicial
+                puntos_restantes = partida.get_min_pts_restantes()
+                ronda.crear_canto(opcion, jugador, puntos_restantes)
                 return redirect(reverse('truco:en_espera', args=(partida.id,)))
         elif 'carta' in request.POST:
             # Jugar una carta
@@ -188,19 +198,20 @@ def ronda(request, partida_id):
     else:
         if not ronda.hay_ganador():
             # Si no se termino la ronda muestra las opciones
-            context = {'puntajes': partida.get_puntajes(request.user),
-                       'partida': partida,
-                       'username': request.user.username,
-                       'cartas_disponibles': jugador.get_cartas_disponibles(),
-                       'cartas_jugadas': ronda.get_cartas_jugadas(jugador),
-                       'cant_cartas_adversario': [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
-                       'opciones': ronda.get_opciones(),
-                       'op_dict': OPCIONES,
-                       'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
-                       'mensaje_canto': ronda.get_mensaje_canto(jugador),
-                       'puede_tirar_carta': ronda.se_puede_tirar(),
-                       'cantar_puntos': ronda.se_debe_cantar_puntos()
-                       }
+            context = {
+                'puntajes': partida.get_puntajes(request.user),
+                'partida': partida,
+                'username': request.user.username,
+                'cartas_disponibles': jugador.get_cartas_disponibles(),
+                'cartas_jugadas': ronda.get_cartas_jugadas(jugador),
+                'cant_cartas_adversario': [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+                'opciones': ronda.get_opciones(),
+                'op_dict': OPCIONES,
+                'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
+                'mensaje_canto': ronda.get_mensaje_canto(jugador),
+                'puede_tirar_carta': ronda.se_puede_tirar(),
+                'cantar_puntos': ronda.se_debe_cantar_puntos()
+                }
             return render(request, 'truco/ronda.html', context)
         else:  # Se termino la ronda
             return redirect(reverse('truco:fin_de_ronda', args=(partida.id, )))
@@ -239,15 +250,8 @@ de que elija la opcion.
 @login_required(login_url='/usuarios/login')
 def responder_canto(request, partida_id, opcion):
     partida = Partida.objects.get(pk=partida_id)
-    ronda = partida.get_ronda_actual()
     jugador = partida.find_jugador(request.user)
-    canto_actual = ronda.get_ultimo_canto()
-    if int(opcion) == QUIERO:
-        canto_actual.aceptar()
-    elif int(opcion) == NO_QUIERO:
-        canto_actual.rechazar()
-    else:
-        canto_actual.aumentar(int(opcion),jugador.posicion_mesa)
+    responder_canto_aux(partida, jugador, opcion)
     return redirect(reverse('truco:en_espera', args=(partida.id,)))
 
 

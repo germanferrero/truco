@@ -9,18 +9,29 @@ def puntos_cantados_validos(puntos_cantados, ronda, jugador):
             ronda.ultimo_envido().cantar_puntos(jugador, puntos)
             result = True
     except:
-        pass
+        pass  # result = False
     return result
 
-def no_es_mas_mi_turno(partida, ronda, jugador, opcion):
-    if opcion == IRSE_AL_MAZO:
-        ronda.irse_al_mazo(jugador)
-    elif opcion == SON_BUENAS:
-        ronda.ultimo_envido().cantar_puntos(jugador, -2)
-        # Se usa -2 para diferenciar con los casos: -1(no hay mensajes que
-        # mostrar al jugador), 0 (tener 0 puntos)
-    elif opcion in [ENVIDO, TRUCO, REAL_ENVIDO, FALTA_ENVIDO]:
-        # Hay un canto inicial
-        puntos_restantes = partida.get_min_pts_restantes()
-        ronda.crear_canto(opcion, jugador, puntos_restantes)
+def respuestas_a_cantos(ronda, opcion):
+    return(opcion in [DOBLE_ENVIDO, REAL_ENVIDO, FALTA_ENVIDO]
+                    and ronda.ultimo_envido()
+                    or opcion in [RETRUCO, VALE_CUATRO]
+                    or opcion in [QUIERO, NO_QUIERO])
 
+def nuevo_canto(opcion):
+    return opcion in [ENVIDO, TRUCO, REAL_ENVIDO, FALTA_ENVIDO]
+
+def set_perdedor_envido(ronda, jugador):
+    ronda.ultimo_envido().cantar_puntos(jugador, -2)
+    # Se usa -2 para diferenciar con los casos: -1(no hay mensajes que
+    # mostrar al jugador), 0 (tener 0 puntos)
+
+def responder_canto_aux(partida, jugador, opcion):
+    ronda = partida.get_ronda_actual()
+    canto_actual = ronda.get_ultimo_canto()
+    if int(opcion) == QUIERO:
+        canto_actual.aceptar()
+    elif int(opcion) == NO_QUIERO:
+        canto_actual.rechazar()
+    else:
+        canto_actual.aumentar(int(opcion),jugador.posicion_mesa)
