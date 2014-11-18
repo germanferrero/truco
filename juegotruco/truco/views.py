@@ -15,8 +15,6 @@ from django.dispatch import receiver
 """
 View Lobby: Se muestran las partidas donde aun hay lugar para mas jugadores.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def lobby(request):
     lobby = Lobby()
@@ -33,8 +31,6 @@ View index: Es la unica view de la aplicacion truco que puede accederse sin esta
 logueado, caso en el cual redirecciona al login. Si el usuario esta logueado lo
 redirige al lobby.
 """
-
-
 def index(request):
         # Si esta logueado entra al lobby directamente
         return redirect(reverse('truco:lobby'))
@@ -44,8 +40,6 @@ def index(request):
 View crear una partida: muestra el formulario para crear una nueva partida.
 Los campos nombre y puntos objetivo son obligatorios. El campo password es opcional.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def crear_partida(request):
     if request.method == "POST":
@@ -56,7 +50,8 @@ def crear_partida(request):
             partida = lobby.crear_partida(
                 request.user,
                 form.cleaned_data['nombre'],
-                form.cleaned_data['puntos_objetivo']
+                form.cleaned_data['puntos_objetivo'],
+                form.cleaned_data['cantidad_jugadores']
                 )
             return redirect(reverse('truco:partida', args=(partida.id, )))
         else:
@@ -74,8 +69,6 @@ se redirige al usuario a la partida en la vista "en espera". Si no, si lo vuelve
 El usuario no puede ingresar a una partida si no selecciono una partida de la lista
 que se muestra en el lobby o si ya tiene un jugador en la partida que eligio.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def unirse_partida(request):
     partida = request.POST.get('partida', False)
@@ -98,8 +91,6 @@ def unirse_partida(request):
 View partida: Se encarga de definir cuando la partida debe continuar o terminar.
 Si no se termina, crea una nueva ronda, de lo contrario, te muestra el html partida
 """
-
-
 @login_required(login_url='/usuarios/login')
 def partida(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
@@ -130,8 +121,6 @@ View en espera: Se redirigen los jugadores a esta vista cuando no es su turno.
 Aqui solo se puede ver las cartas propias, las ya jugadas en la mesa y el mensaje
 del resultado del envido.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def en_espera(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
@@ -151,9 +140,9 @@ def en_espera(request, partida_id):
         if ronda and not ronda.hay_ganador():
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
             context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
-            context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
+            context['cant_cartas_adversario1'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
-            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
+            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
         return render(request, 'truco/en_espera.html', context)
 
 
@@ -163,8 +152,6 @@ Se evalua la opcion elegida y se redirige al jugador a la view "en espera"
 si canta, a la view responder canto si hay un canto no respondido y a la view tirar
 carta si eligio tirar una carta. Si hay un ganador, se lo redirige a la partida.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def ronda(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
@@ -208,7 +195,7 @@ def ronda(request, partida_id):
                 'opciones': ronda.get_opciones(),
                 'op_dict': OPCIONES,
                 'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
-                'mensaje_canto': ronda.get_mensaje_canto(jugador),
+                'mensaje_canto': ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados(),
                 'puede_tirar_carta': ronda.se_puede_tirar(),
                 'cantar_puntos': ronda.se_debe_cantar_puntos()
                 }
@@ -222,8 +209,6 @@ View tirar carta: Maneja el caso donde la opcion elegida por el jugador en turno
 (view ronda) elige tirar una carta. Si no se termino la ronda, se crea un nuevo
 enfrentamiento. Si no se termino el enfrentamiento, agrega una carta y lo da por terminado.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def tirar_carta(request, partida_id, carta_id):
     partida = Partida.objects.get(pk=partida_id)
@@ -245,8 +230,6 @@ View responder canto: Si hay un canto activo se redirige al jugador en turno a e
 view. Se le muestran las opciones disponibles y se redirecciona a "en espera" luego
 de que elija la opcion.
 """
-
-
 @login_required(login_url='/usuarios/login')
 def responder_canto(request, partida_id, opcion):
     partida = Partida.objects.get(pk=partida_id)
@@ -261,8 +244,6 @@ opcion de pasar a la siguiente ronda. Si se jugo un envido durante la ronda, el
 perdedor del mismo puede pedir ver las cartas del otro equipo para rectificar el
 resultado.
 """
-
-
 def fin_de_ronda(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()

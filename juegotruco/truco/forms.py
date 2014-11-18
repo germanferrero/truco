@@ -23,3 +23,6 @@ class crear_partida_form(forms.Form):
     puntos_objetivo = forms.ChoiceField(
         widget=forms.RadioSelect, choices=PUNTOS_OBJETIVO, required=True
         )
+    cantidad_jugadores = forms.ChoiceField(
+        widget=forms.RadioSelect, choices=CANTIDAD_JUGADORES, required=True
+        )
