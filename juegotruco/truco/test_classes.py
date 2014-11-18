@@ -86,8 +86,6 @@ class TrucoTests(TestCase):
         # Verifico que la partida ya no este disponible
         self.assertEqual(lista_partidas,[])
 
-
-
     def test_class_partida(self):
         # Obtengo los usuarios
         user1 = User.objects.get(username ='test_user1')
@@ -135,7 +133,6 @@ class TrucoTests(TestCase):
         # (que seria equipo1s segun como lo programamos)
         self.assertEqual(partida.get_ganador(), 1)
 
-
     def test_get_cartas_jugadas(self):
         cartas_tiradas = []
         # Obtengo una partida con dos jugadores y una ronda ya creada
@@ -153,7 +150,6 @@ class TrucoTests(TestCase):
         enfrentamiento = ronda.crear_enfrentamiento(jugador1)
         # Elijo la primera carta
         carta_j1 = carta1[0]
-        
         cartas_tiradas.append ([carta1[0]])
         cartas_tiradas.append([])
         # Agrego una carta al enfrentamiento 
@@ -173,3 +169,117 @@ class TrucoTests(TestCase):
         cartas_tiradas_del_get = ronda.get_cartas_jugadas(jugador2)
         # Verifico que devuelva bien las cartas
         self.assertEqual(cartas_tiradas, cartas_tiradas_del_get)
+
+
+        """    def test_get_mensaje_ganador_envido(self):
+        # Obtengo un user
+        user1 = User.objects.get(username ='test_user1')
+        # Obtengo una partida con dos jugadores
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo el jugador con nombre de usuario user1
+        jugador = partida.find_jugador(user1)
+        # Creo una ronda
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        print jugador2
+        # Obtengo los puntos para la falta de envido
+        puntos = partida.get_min_pts_restantes()
+        # Crea un canto
+        ronda.crear_canto(ENVIDO, jugador, puntos)
+        # Obtengo el canto
+        canto = ronda.get_ultimo_canto()
+        # Acepto el canto
+        canto.aceptar()
+        # Obtengo las cartas
+        puntos_envido = ronda.calcular_puntos_envido()
+        print puntos_envido
+        mensaje1 = ronda.get_mensaje_ganador_envido()
+        puntos1 = canto.puntos_jugador(jugador1)
+        puntos2 = canto.puntos_jugador(jugador2)
+        cartas_jugador1 = jugador1.get_cartas_disponibles()
+        cartas_jugador2 = jugador2.get_cartas_disponibles()"""
+
+
+    def test_get_cartas_jugadas(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        enfrentamiento = ronda.crear_enfrentamiento(jugador1)
+        cartas_jugador1 = jugador1.get_cartas_disponibles()
+        # Elijo la primera carta
+        carta_j1 = cartas_jugador1[0]
+        enfrentamiento.agregar_carta(carta_j1)
+        cartas_tiradas = []
+        cartas_tiradas.append ([cartas_jugador1[0]])
+        cartas_tiradas.append ([])
+        cartas_jugadas = ronda.get_cartas_jugadas(jugador1)
+        self.assertEqual(cartas_tiradas, cartas_jugadas)
+        cartas_jugador2 = jugador2.get_cartas_disponibles()
+        # Elijo la primera carta
+        carta_j2 = cartas_jugador2[0]
+        enfrentamiento.agregar_carta(carta_j2)
+        cartas_tiradas = []
+        cartas_tiradas.append ([cartas_jugador1[0]])
+        cartas_tiradas.append ([cartas_jugador2[0]])
+        cartas_jugadas = ronda.get_cartas_jugadas(jugador1)
+        self.assertEqual(cartas_tiradas, cartas_jugadas)
+
+    def test_get_ultimo_canto(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto, ronda.ultimo_envido())
+        ronda.crear_canto(TRUCO, jugador1, 3)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto, ronda.ultimo_truco())
+
+    def test_se_puede_tirar(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        result = ronda.se_puede_tirar()
+        self.assertEqual(True, result)
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        result = ronda.se_puede_tirar()
+        self.assertEqual(False, result)
+
+    def test_se_debe_cantar_puntos(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(None, result)
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        canto.aceptar()
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(True, result)
+        
+
+
+
