@@ -243,10 +243,10 @@ class TrucoTests(TestCase):
         jugador2 = jugadores[1]
         ronda.crear_canto(ENVIDO, jugador1, 10)
         canto = ronda.get_ultimo_canto()
-        self.assertEqual(canto, ronda.ultimo_envido)
+        self.assertEqual(canto, ronda.ultimo_envido())
         ronda.crear_canto(TRUCO, jugador1, 3)
         canto = ronda.get_ultimo_canto()
-        self.assertEqual(canto, ronda.ultimo_truco)
+        self.assertEqual(canto, ronda.ultimo_truco())
 
     def test_se_puede_tirar(self):
         # Obtengo una partida con dos jugadores y una ronda ya creada
@@ -262,4 +262,24 @@ class TrucoTests(TestCase):
         ronda.crear_canto(ENVIDO, jugador1, 10)
         result = ronda.se_puede_tirar()
         self.assertEqual(False, result)
+
+    def test_se_debe_cantar_puntos(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(None, result)
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        canto.aceptar()
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(True, result)
+        
+
+
 
