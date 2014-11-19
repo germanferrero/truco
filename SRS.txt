@@ -68,7 +68,7 @@ Ingeniería del Software I.
 
    La aplicación "Truco" será un simulador del juego de cartas omónimo popular argentino.
 Diseñada para ser utilizada por usuarios con conectividad a internet, 
-donde se enfrentarán en partidas “uno contra uno”.
+donde se enfrentarán en partidas “uno contra uno”, de cuatro, o de seis jugadores.
 
 
 
@@ -87,6 +87,7 @@ donde se enfrentarán en partidas “uno contra uno”.
 
 * SUPUESTO GANADOR ENVIDO: Jugador que cantó el mejor puntaje de envido de la ronda.
 			   No necesariamente los posee.
+* PIE: Último jugador del equipo en jugar en la ronda.
 
 1.4 REFERENCIAS
 
@@ -186,11 +187,11 @@ menor jerarquía en un enfrentamiento.
 
 
 __Envido
-    Un jugador puede cantar Envido o alguno de sus derivados(real envido, falta envido)
+    Un equipo puede cantar Envido o alguno de sus derivados(real envido, falta envido)
 y el oponente puede responder "quiero", "no quiero", o re-cantar.
     El Envido se juega por 2 puntos, el Real Envido por 3, y el Falta Envido se
 juega por la cantidad mínima de puntos que hace falta para que alguno de los
-jugadores llegue a 15 o 30 puntos.
+equipos llegue a 15 o 30 puntos.
     Además son acumulables (hasta 2 envidos y 1 real envido). Por lo tanto, las posibles
 combinaciones son:
 
@@ -205,8 +206,15 @@ combinaciones son:
     recibido si se hubiese aceptado y ganado la primera combinación, o 1 punto si la
     combinación es nula
 
-    En caso de haberse querido alguna de las combinaciones, el jugador con mas
-puntos será el ganador. En caso de empate gana el jugador que es mano.
+    En caso de haberse querido alguna de las combinaciones,se pasa a el canto de puntos.
+    Canto de puntos:
+      El primer jugador en decir cuantos puntos posee es el mano. Luego le sigue el jugador
+    de la derecha. Si este canta más puntos(i.e. lo supera), sigue el jugador de la derecha.
+    En caso contrario, (i.e el jugador canta menos puntos o dice son buenas), sigue el próximo jugador
+    del mismo equipo a la derecha. Así sucesivamente hasta que alguno supere al primero o
+    hayan cantado todos los del equipo. Si alguno de ellos los supera, debe cantar el jugador del otro
+    equipo, a derecha del último en cantar de su mismo equipo.
+    Gana el equipo que cantó el mejor de los puntajes, o en caso de empate, el equipo del jugador mano.
     Al terminar la ronda, quien lo haya ganado deberá mostrar las cartas que
 conformaron sus puntos, solo en el caso de que el contrincante lo haya pedido,
 de lo contrario no es necesario mostrarlas.
@@ -382,12 +390,13 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El usuario hace click en el botón "Crear Patida".
         2. El usuario elige un nombre para su partida.
-        3. El usuario elige entre 15 o 30 puntos objetivos para su partida.
-        4. El usuario hace click en "Crear".
-        5. El sistema registra la nueva partida y la muestra en el lobby.
-        6. El sistema redirige al usuario a la mesa de juego.
+        3. El usuario elige la cantidad de jugadores de la partida.
+        4. El usuario elige entre 15 o 30 puntos objetivos para su partida.
+        5. El usuario hace click en "Crear".
+        6. El sistema registra la nueva partida y la muestra en el lobby.
+        7. El sistema redirige al usuario a la mesa de juego.
     ·Escenarios excepcionales:
-        4.a El usuario no ingresó los datos obligatorios.
+        5.a El usuario no ingresó los datos obligatorios.
             · El sistema muestra un mensaje de error indicando qué campos obligatorios
               no han sido ingresados.
 
@@ -412,7 +421,7 @@ pasar un usuario durante el juego.
     ·Caso de uso: Se inicia una partida.
     ·Actor primario: Sistema.
     ·Actores secundarios: Jugadores
-    ·Precondición: Ambos jugadores están en la mesa de juego.
+    ·Precondición: Todos los jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en registros quién creó la partida y lo asigna como jugador mano.
         2. El sistema inicia una nueva ronda.
@@ -422,7 +431,7 @@ pasar un usuario durante el juego.
     ·Caso de uso: Se inicia una ronda.
     ·Actor primario: Sistema.
     ·Actores secundarios: Jugadores
-    ·Precondición: Hay una partida en curso, ambos jugadores están en la mesa de juego.
+    ·Precondición: Hay una partida en curso y todos los jugadores están en la mesa de juego.
     ·Escenario exitoso principal:
         1. El sistema verifica en los registros quién es el jugador mano.
         2. El sistema reparte 3 cartas al azar a cada uno de los jugadores 
@@ -452,7 +461,7 @@ pasar un usuario durante el juego.
         1. El jugador hace click en uno de los botones disponibles('Envido', 'Real
         Envido', 'Falta Envido')
         2. El sistema registra el canto y por quién fue cantado.
-        3. El sistema le cede el turno al oponente.
+        3. El sistema le cede el turno al pie del equipo contrario.
 
 
 3.2.10 RE-CANTAR ENVIDO O DERIVADOS
@@ -469,7 +478,7 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en una de las opciones para re-cantar
         2. El sistema registra el canto
-        3. El sistema le cede el turno al oponente.
+        3. El sistema le cede el turno al pie del oponente.
 
 
 3.2.11 ACEPTAR ENVIDO O DERIVADOS
@@ -505,6 +514,8 @@ pasar un usuario durante el juego.
             2. El sistema registra al supuesto ganador.
             3. El sistema le cede el turno al jugador que cantó la primera
             instancia del envido.
+        3.b El jugador canto menos puntos que el oponente.
+            1. El sistema le cede el turno al siguiente jugador del mismo equipo.
 
 
 3.2.12 RECHAZAR ENVIDO O DERIVADOS
@@ -536,20 +547,18 @@ pasar un usuario durante el juego.
         4. El sistema verifica si se terminó la partida
     ·Extensiones:
         2.a El enfrentamiento se terminó:
-          1. El sistema registra al ganador del enfrentamiento, o registra un empate,
+          1. El sistema registra al equipo ganador del enfrentamiento, o registra un empate,
            según las reglas del juego.
-          2. El sistema cede el turno al otro jugador.
+          2. El sistema cede el turno al jugador ganador del enfrentamiento.
         2.b El enfrentamiento no se terminó:
-          1. El sistema cede el turno al oponente.
+          1. El sistema cede el turno al jugador de la derecha.
         3.a La ronda se terminó:
           1. El sistema calcula los puntos y los registra.
         3.b La ronda no se terminó:
-          1. El sistema cede el turno al oponente.
+          1. El sistema cede el turno al jugador de la derecha del jugador mano.
         4.a La partida se terminó:
-          1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
-          2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
-          3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
-          4. El sistema redirige al lobby a ambos jugadores.
+          1. El sistema muestra un mensaje de felicitaciones al equipo ganador.
+          2. El sistema muestra un mensaje al equipo perdedor informándole: "Has perdido".
         4.b La partida no se terminó:
           1. El sistema registra que el jugador a la derecha del jugador mano
              actual, será mano en la siguiente ronda.
@@ -567,7 +576,7 @@ pasar un usuario durante el juego.
     ·Escenario exitoso principal:
         1. El jugador hace click en alguna de las opciones para cantar o re-cantar.
         2. El sistema registra el canto y por quién fue cantado.
-        3. El sistema le cede el turno al oponente.
+        3. El sistema le cede el turno al pie del equipo oponente.
 
 
 3.2.16 ACEPTAR TRUCO O DERIVADOS
@@ -597,7 +606,7 @@ pasar un usuario durante el juego.
                        posibilidad.
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "No Quiero".
-        2. El sistema guarda en registro al oponente como ganador.
+        2. El sistema guarda en registro al equipo oponente como ganador.
 
 
 3.2.17 PEDIR PUNTOS
@@ -605,7 +614,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema
     ·Precondiciones: · Finalizó una ronda.
-                     · El jugador en turno es el supuesto perdedor del Envido.
+                     · El jugador en turno es el pie del supuesto equipo perdedor del Envido.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
                         sus derivados.
                      · Se muestran las opciones "pedir puntos" y "siguiente ronda"
@@ -621,6 +630,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Finalizó una ronda.
+                     · El jugador en turno es el pie del supuesto equipo ganador del Envido.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
                        sus derivados, y el perdedor pidió ver las cartas.
                      · Consecuentemente, se muestra la opción "mostrar puntos" y "siguiente ronda"
@@ -655,16 +665,14 @@ pasar un usuario durante el juego.
                    ·El turno es del jugador en turno
     ·Escenario exitoso principal:
         1. El jugador hace click en "Irse ir al mazo".
-        2. El sistema registra como ganador de la ronda al otro jugador.
-        3. El sistema actualiza el puntaje de los jugadores según las reglas del
+        2. El sistema registra como ganador de la ronda al otro equipo.
+        3. El sistema actualiza el puntaje de los equipos según las reglas del
            juego.
         4. El sistema verifica si se terminó la partida
     ·Extensiones:
         4.a La partida se terminó:
-          1. El sistema muestra un mensaje de felicitaciones al jugador ganador.
-          2. El sistema muestra un mensaje al jugador perdedor informándole: "Has perdido".
-          3. El sistema registra la partida ganada en la cuenta de usuario del jugador ganador.
-          4. El sistema redirige al lobby a ambos jugadores.
+          1. El sistema muestra un mensaje de felicitaciones al equipo ganador.
+          2. El sistema muestra un mensaje al equipo perdedor informándole: "Has perdido".
         4.b La partida no se terminó:
           1. El sistema registra que el jugador a la derecha del jugador mano
              actual, será mano en la siguiente ronda.

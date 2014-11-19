@@ -15,7 +15,7 @@ from django.dispatch import receiver
 """
 View Lobby: Se muestran las partidas donde aun hay lugar para mas jugadores.
 """
-@login_required(login_url='/usuarios/login')
+@login_required(login_url='/usuarios/login')    
 def lobby(request):
     lobby = Lobby()
     lista_de_partidas = lobby.get_lista_partidas()
@@ -140,7 +140,7 @@ def en_espera(request, partida_id):
         if ronda and not ronda.hay_ganador():
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
             context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
-            context['cant_cartas_adversario1'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
+            context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
         return render(request, 'truco/en_espera.html', context)

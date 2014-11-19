@@ -11,74 +11,62 @@
 
     <body>
         {% block pantalla_de_juego %}
-        <div id="cuadro_cartas_rival">
-            {% for i in cant_cartas_adversario %}
-                <img src={% static "truco/images/cartas/naipe.jpg"%}/>
-            {% endfor %}
-        </div>
+            <div id="par_de_jugadores_uno">
+                <div id="jugador_arriba">
+                    <div id="cuadro_cartas_arriba">
+                        {% for i in cant_cartas_adversario %}
+                            <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                        {% endfor %}
+                    </div>
 
-        <div class="cuadro_cartas_tiradas" id="tiradas_adversario">
-            {% for carta in cartas_jugadas.1 %}
-                {% if forloop.counter == 1 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
-                {% endif %}
-                {% if forloop.counter == 2 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
-                {% endif %}
-                {% if forloop.counter == 3 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div id="cuadro_botones">
-            <div id="cantar_puntos">
-                {% if cantar_puntos %}
-                    <form action="{% url 'truco:ronda' partida.id %}" method="post">
-                        {% csrf_token %}
-                        <h5>Escriba sus puntos</h5></br>
-                        <input id="puntos_cantados" type="text" name="puntos_cantados"/>
-                        <input type="submit" name="cantar_puntos"/>
-                    </form>
-                {% endif %}
-            </div>
-            {% for opcion in opciones %}
-            <form id="form_opciones" action="{% url 'truco:ronda' partida.id %}" method="post">
-            {% csrf_token %}
-                <div id="botones_opciones">
-                    <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
+                    <div class="cuadro_cartas_tiradas">
+                        {% for carta in cartas_jugadas.1 %}
+                            {% if forloop.counter == 1 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                            {% endif %}
+                            {% if forloop.counter == 2 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                            {% endif %}
+                            {% if forloop.counter == 3 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
                 </div>
-            </form>
-            {% endfor %}
-        </div>
-        <div class="cuadro_cartas_tiradas" id="tiradas_usuario">
-            {% for carta in cartas_jugadas.0 %}
-                {% if forloop.counter == 1 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
-                {% endif %}
-                {% if forloop.counter == 2 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
-                {% endif %}
-                {% if forloop.counter == 3 %}
-                    <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div id="cuadro_cartas_usuario">
-            {% if puede_tirar_carta %}
-                {% for carta in cartas_disponibles %}
-                <form method="post">
-                {% csrf_token %}
-                    <button type="submit" name="carta" value="{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
-                </form>
-                {% endfor %}
-            {% else %}
-                {% for carta in cartas_disponibles %}
-                    <img src={% static "truco/images/"%}{{carta}}/>
-                {% endfor %}
-            {%endif%}
+
+                <div id="jugador_abajo">
+                    <div class="cuadro_cartas_tiradas">
+                        {% for carta in cartas_jugadas.0 %}
+                            {% if forloop.counter == 1 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
+                            {% endif %}
+                            {% if forloop.counter == 2 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="segunda_imagen"/>
+                            {% endif %}
+                            {% if forloop.counter == 3 %}
+                                <img src={% static "truco/images/"%}{{carta}} id ="tercera_imagen"/>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <div id="cuadro_cartas_usuario">
+                        {% if puede_tirar_carta %}
+                            {% for carta in cartas_disponibles %}
+                            <form method="post">
+                            {% csrf_token %}
+                                <button type="submit" name="carta" value="{{carta.id}}" style=""><img src={% static "truco/images/"%}{{carta}}/></button>
+                            </form>
+                            {% endfor %}
+                        {% else %}
+                            {% for carta in cartas_disponibles %}
+                                <img src={% static "truco/images/"%}{{carta}}/>
+                            {% endfor %}
+                        {%endif%}
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
         {% endblock pantalla_de_juego %}
+
         {% block mensajes%}
             {{ mensaje_envido }}
             <div id="cuadro_cantos_respuestas">
@@ -86,6 +74,26 @@
             </div>
             <div id="cuadro_tu_turno">
                 Es tu turno
+            </div>
+            <div id="cuadro_botones">
+                <div id="cantar_puntos">
+                    {% if cantar_puntos %}
+                        <form action="{% url 'truco:ronda' partida.id %}" method="post">
+                            {% csrf_token %}
+                            <h5>Escriba sus puntos</h5></br>
+                            <input id="puntos_cantados" type="text" name="puntos_cantados"/>
+                            <input type="submit" name="cantar_puntos"/>
+                        </form>
+                    {% endif %}
+                </div>
+                {% for opcion in opciones %}
+                    <form id="form_opciones" action="{% url 'truco:ronda' partida.id %}" method="post">
+                    {% csrf_token %}
+                        <div id="botones_opciones">
+                            <button type="submit" name="opcion" value="{{ opcion }}"> {{ op_dict|get_item:opcion}}</button>
+                        </div>
+                    </form>
+                {% endfor %}
             </div>
         {% endblock mensajes %}
     </body>
