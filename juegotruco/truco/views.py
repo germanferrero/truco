@@ -142,7 +142,8 @@ def en_espera(request, partida_id):
             context['cartas_jugadas'] = lista_cartas_jugadores(ronda.get_cartas_jugadas(jugador))
             context['cant_cartas_adversario'] = lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador))
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
-            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
+            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
+            context['mensaje_puntos_cantados'] = ronda.get_mensaje_puntos_cantados()
         return render(request, 'truco/en_espera.html', context)
 
 
@@ -195,7 +196,8 @@ def ronda(request, partida_id):
                 'opciones': ronda.get_opciones(),
                 'op_dict': OPCIONES,
                 'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
-                'mensaje_canto': ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados(),
+                'mensaje_canto' : ronda.get_mensaje_canto(jugador),
+                'mensaje_puntos_cantados' : ronda.get_mensaje_puntos_cantados(),
                 'puede_tirar_carta': ronda.se_puede_tirar(),
                 'cantar_puntos': ronda.se_debe_cantar_puntos()
                 }

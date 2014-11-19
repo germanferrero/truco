@@ -44,10 +44,7 @@ h5 {
 }
 
 #mensajes {
-    background-color:#424242;
     border-radius: 10px;
-    height:120px;
-    width: 120px;
     float: right;
     text-align:center;
     color: white;
@@ -66,17 +63,43 @@ h5 {
     float:left;
 }
 
-#cuadro_cantos_respuestas {
+#cuadro_mensaje_ganador_envido {
     background-color:#424242;
     border-radius: 10px;
-    height:120px;
+    height:60px;
     width: 120px;
     float: right;
     text-align:center;
     color: white;
-    margin-top: 1%;
+    margin-top: 10%;
     clear: right;
 }
+
+#cuadro_cantos_respuestas {
+    background-color:#424242;
+    border-radius: 10px;
+    height:30px;
+    width: 120px;
+    float: right;
+    text-align:center;
+    color: white;
+    margin-top: 10%;
+    clear: right;
+}
+
+#cuadro_puntos_cantados {
+    background-color:#424242;
+    border-radius: 10px;
+    height: 50px;
+    width: 120px;
+    float: right;
+    /*text-align:center;*/
+    color: white;
+    margin-top: 10%;
+    clear: right;
+    vertical-align: middle;
+}
+
 
 #cuadro_tu_turno {
     background-color:#424242;
