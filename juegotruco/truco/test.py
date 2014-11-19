@@ -24,13 +24,13 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo partidas
         partida1 = lobby.crear_partida(user=user1, nombre='Partida1 a 15 sin password',
-                                       puntos_objetivo=15)
+                                       puntos_objetivo=15, cantidad_jugadores=2)
         partida1.save()
         partida2 = lobby.crear_partida(user=user1, nombre='Partida2 a 30 sin password',
-                                       puntos_objetivo=15)
+                                       puntos_objetivo=15, cantidad_jugadores=2)
         partida2.save()
         partida3 = lobby.crear_partida(user=user1, nombre='Partida3 a 30 sin password con dos jugadores',
-                                       puntos_objetivo=15)
+                                       puntos_objetivo=15, cantidad_jugadores=2)
         partida3.save()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida3)

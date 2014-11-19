@@ -8,12 +8,14 @@
 
     <body>
     {% block mensajes%}
-        {{ mensaje_envido }}
+        <div id="cuadro_mensaje_ganador_envido">
+            {{mensaje_envido}}
+        </div>
         <div id="cuadro_cantos_respuestas">
             {{mensaje_canto}}
         </div>
-        <div id="cuadro_turno">
-            El turno es de {{jugador_en_turno}}
+        <div id="cuadro_puntos_cantados">
+            {{mensaje_puntos_cantados}}
         </div>
     {% endblock mensajes %}
     {% block pantalla_de_juego %}
