@@ -18,7 +18,7 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo una partida
         partida3 = lobby.crear_partida(user=user1, nombre = 'Partida con dos jugadores',
-                                    puntos_objetivo=15)
+                                    puntos_objetivo=15, cantidad_jugadores=2)
         partida3.save()
         # Agrego a un jugador a la partida
         lobby.unirse_partida(user2, partida3)
@@ -54,7 +54,7 @@ class TrucoTests(TestCase):
         #         print '[%s]' % ', '.join(map(str, list(Carta.objects.all())))
 
     # Test que verifica 
-'''    def test_class_Lobby(self):
+    def test_class_Lobby(self):
         # Obtengo los usuarios
         user1 = User.objects.get(username ='test_user1')
         user2 = User.objects.get(username ='test_user2')
@@ -66,7 +66,7 @@ class TrucoTests(TestCase):
         self.assertEqual(lista_partidas,[])
         # Creo una nueva partida
         partida = lobby.crear_partida(user=user1, nombre = 'partida a 15',
-                                    puntos_objetivo=15)
+                                    puntos_objetivo=15, cantidad_jugadores=2)
         # Obtengo la lista de partidas
         lista_partidas = list(lobby.get_lista_partidas())
         # Verifico que se haya agregado la partida
@@ -94,7 +94,7 @@ class TrucoTests(TestCase):
         lobby = Lobby()
         #Creo una partida
         partida = lobby.crear_partida(user=user1, nombre = 'Partida a 30',
-                                    puntos_objetivo=30)
+                                    puntos_objetivo=30, cantidad_jugadores=2)
         # Agrego un jugador a la partida
         lobby.unirse_partida(user2, partida)
         # Seteo el estado de la partida
@@ -262,7 +262,7 @@ class TrucoTests(TestCase):
         self.assertEqual(True, result)
         ronda.crear_canto(ENVIDO, jugador1, 10)
         result = ronda.se_puede_tirar()
-        self.assertEqual(False, result)'''
+        self.assertEqual(False, result)
 
 #######Test clase canto#######
     def test_canto_aceptar(self):
