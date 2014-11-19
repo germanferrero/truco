@@ -1,11 +1,11 @@
-from truco.models import Partida, Ronda, Carta
+from truco.models import Partida, Ronda, Carta, Jugador
 from truco.constants import *
 
 def puntos_cantados_validos(puntos_cantados, ronda, jugador):
     result = False
     try:
         puntos = int(puntos_cantados)
-        if 0 <= int(puntos) <= 33:
+        if (0 <= int(puntos)) and (int(puntos) <= 33):
             ronda.ultimo_envido().cantar_puntos(jugador, puntos)
             result = True
     except:
@@ -72,3 +72,41 @@ def lista_cartas_jugadores(lista):
     else:
         list_cartas_jugadores = lista
     return list_cartas_jugadores
+
+"""
+Extiende la lista de cartas jugadas de cada jugador, comenzando por el jugador que lo utiliza
+para usar en el template.
+"""
+def lista_cartas_jugadores(lista):
+    list_cartas_jugadores = [[] for i in range(6)]
+    cantidad_jugadores = len(lista)
+    list_cartas_jugadores[0] = lista[0]
+    if cantidad_jugadores == 2:
+        list_cartas_jugadores[5] = lista[1]
+    elif cantidad_jugadores == 4:
+        list_cartas_jugadores[1] = lista[1]
+        list_cartas_jugadores[4] = lista[2]
+        list_cartas_jugadores[5] = lista[3]
+    else:
+        list_cartas_jugadores = lista
+    return list_cartas_jugadores
+
+"""
+Extiende la lista de nombres de jugadores para usar en el template.
+"""
+def lista_nombres_jugadores(lista):
+    lista_nombres_jugadores = ['' for i in range(6)]
+    cantidad_jugadores = len(lista)
+    lista_nombres_jugadores[0] = lista[0]
+    if cantidad_jugadores == 2:
+        lista_nombres_jugadores[5] = lista[1]
+    elif cantidad_jugadores == 4:
+        lista_nombres_jugadores[1] = lista[1]
+        lista_nombres_jugadores[4] = lista[2]
+        lista_nombres_jugadores[5] = lista[3]
+    else:
+        lista_nombres_jugadores = lista
+    return lista_nombres_jugadores
+
+
+

@@ -143,6 +143,8 @@ def en_espera(request, partida_id):
             context['cant_cartas_adversario'] = lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador))
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
+            context['jugador_en_turno'] = ronda.get_turno().nombre
+            context['nombre_jugadores'] = lista_nombres_jugadores(ronda.nombres_jugadores(jugador))
         return render(request, 'truco/en_espera.html', context)
 
 
@@ -197,7 +199,8 @@ def ronda(request, partida_id):
                 'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
                 'mensaje_canto': ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados(),
                 'puede_tirar_carta': ronda.se_puede_tirar(),
-                'cantar_puntos': ronda.se_debe_cantar_puntos()
+                'cantar_puntos': ronda.se_debe_cantar_puntos(),
+                'nombre_jugadores': lista_nombres_jugadores(ronda.nombres_jugadores(jugador))
                 }
             return render(request, 'truco/ronda.html', context)
         else:  # Se termino la ronda

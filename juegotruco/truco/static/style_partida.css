@@ -56,13 +56,11 @@ h5 {
 }
 
 #pantalla_de_juego{
-    /*position: absolute;*/
     background-color:#424242;
     border-radius: 10px;
     height:600px;
     width: 90%;
     margin-top: -5%;
-    /*clear:left;*/
     float:left;
 }
 
@@ -78,11 +76,11 @@ h5 {
     clear: right;
 }
 
-#cuadro_tu_turno {
+#cuadro_turno {
     background-color:#424242;
     margin-top: 10%;
     border-radius: 10px;
-    height: 20px;
+    height: 40px;
     width: 120px;
     float: right;
     text-align:center;
@@ -91,31 +89,28 @@ h5 {
 }
 
 #par_de_jugadores_uno {
-    margin-top: 1%;
     float: left;
     margin-left: 1%;
     display: inline-block;
-    height: 95%;
+    height: 100%;
     width: 32%;
     /*border: solid blue 2px;*/
 }
 
 #par_de_jugadores_dos {
-    margin-top: 1%;
     float:left;
     margin-left: 1%;
     display: inline-block;
-    height:95%;
+    height:100%;
     width: 32%;
     /*border: solid blue 2px;*/
 }
 
 #par_de_jugadores_tres {
-    margin-top: 1%;
     margin-left: 0.5%;
     float:left;
     display: inline-block; 
-    height: 95%;
+    height: 100%;
     width: 32%;
     /*border: solid blue 2px;*/
 }
@@ -130,36 +125,43 @@ h5 {
     /*border: red solid 1px;*/
 }
 
+#nombre_jugador {
+    text-align: center;
+    height: 10%;
+    color: white;
+    /*border: solid yellow 2px;*/
+}
+
 #cuadro_cartas_arriba {
     text-align: center;
-    height: 40%;
-    margin-bottom: 1%;
+    height: 35%;
     /*border:blue solid 2px;*/
 }
 
 #cuadro_cartas_arriba img {
     height: 100%;
-    width: 20%;
+    width: 18%;
     display: inline-block;
 }
 
 #cuadro_cartas_abajo {
     text-align: center;
-    height: 40%;
+    height: 35%;
     /*border: yellow solid 2px;*/
 }
 
  /*Cuadro de cada carta del usuario, cuando esta en espera */
 #cuadro_cartas_abajo img { 
     height: 100%;
-    width: 20%;
+    width: 18%;
     display: inline-block;
 }
 
 .cuadro_cartas_tiradas {
-    height: 60%;
-    /*border:red solid 2px;*/
     text-align: center;
+    padding-top: 1%;
+    height: 55%;
+    /*border:yellow solid 2px;*/
 }
 
 .cuadro_cartas_tiradas #primera_imagen {
@@ -173,8 +175,8 @@ h5 {
     height: 17%;
     width: 6%;
     position: absolute;
-    margin-left: -2.5%;
-    margin-top: 2%;
+    margin-left: -3.5%;
+    margin-top: 1.5%;
     z-index:1;
 }
 
@@ -182,7 +184,8 @@ h5 {
     height: 17%;
     width: 6%;
     position: absolute;
-    margin-top: 4%;
+    margin-top: 3%;
+    margin-left: -1.5%;
     z-index:2;
 }
 

@@ -469,6 +469,19 @@ class Ronda(models.Model):
         return cant_cartas
 
     """
+    Devuelve una lista con todos los jugadores, comenzando con el nombre del jugador que se pasa como
+    parametro y continuando hacia los jugadores a la derecha
+    """
+    def nombres_jugadores(self, jugador):
+        cantidad_jugadores = self.jugadores.count()
+        nombres = []
+        for i in range(cantidad_jugadores):
+            posicion = (jugador.posicion_mesa + i) % cantidad_jugadores
+            jugador_observado = self.jugadores.get(posicion_mesa=posicion)
+            nombres.append(jugador_observado.nombre)
+        return nombres
+
+    """
     Calcula de quien es el turno actual segun el estado de la ronda y devuelve al jugador en turno
     """
     def get_turno(self):

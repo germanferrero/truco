@@ -12,10 +12,16 @@
         <div id="cuadro_cantos_respuestas">
             {{mensaje_canto}}
         </div>
+        <div id="cuadro_turno">
+            El turno es de {{jugador_en_turno}}
+        </div>
     {% endblock mensajes %}
     {% block pantalla_de_juego %}
         <div id="par_de_jugadores_uno">
             <div id="jugador_arriba">
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.5}}
+                </div>
                 <div id="cuadro_cartas_arriba">
                     {% for i in cant_cartas_adversario.4 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
@@ -56,11 +62,17 @@
                         <img src={% static "truco/images/"%}{{carta}}/>
                     {% endfor %}
                 </div>
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.0}}
+                </div>
             </div>
         </div>
 
         <div id="par_de_jugadores_dos">
             <div id="jugador_arriba">
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.4}}
+                </div>
                 <div id="cuadro_cartas_arriba">
                     {% for i in cant_cartas_adversario.3 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
@@ -100,11 +112,17 @@
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                     {% endfor %}
                 </div>
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.1}}
+                </div>
             </div>
         </div>
 
         <div id="par_de_jugadores_tres">
             <div id="jugador_arriba">
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.3}}
+                </div>
                 <div id="cuadro_cartas_arriba">
                     {% for i in cant_cartas_adversario.2 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
@@ -143,6 +161,9 @@
                     {% for i in cant_cartas_adversario.1 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                     {% endfor %}
+                </div>
+                <div id="nombre_jugador">
+                    {{nombre_jugadores.2}}
                 </div>
             </div>
         </div>
