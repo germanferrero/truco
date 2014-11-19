@@ -139,7 +139,7 @@ def en_espera(request, partida_id):
             })
         if ronda and not ronda.hay_ganador():
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
-            context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
+            context['cartas_jugadas'] = lista_cartas_jugadores(ronda.get_cartas_jugadas(jugador))
             context['cant_cartas_adversario'] = lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador))
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
@@ -190,7 +190,7 @@ def ronda(request, partida_id):
                 'partida': partida,
                 'username': request.user.username,
                 'cartas_disponibles': jugador.get_cartas_disponibles(),
-                'cartas_jugadas': ronda.get_cartas_jugadas(jugador),
+                'cartas_jugadas': lista_cartas_jugadores(ronda.get_cartas_jugadas(jugador)),
                 'cant_cartas_adversario' : lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador)),
                 'opciones': ronda.get_opciones(),
                 'op_dict': OPCIONES,

@@ -18,9 +18,8 @@
                             <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                         {% endfor %}
                     </div>
-
                     <div class="cuadro_cartas_tiradas">
-                        {% for carta in cartas_jugadas.1 %}
+                        {% for carta in cartas_jugadas.5 %}
                             {% if forloop.counter == 1 %}
                                 <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                             {% endif %}
@@ -33,7 +32,6 @@
                         {% endfor %}
                     </div>
                 </div>
-
                 <div id="jugador_abajo">
                     <div class="cuadro_cartas_tiradas">
                         {% for carta in cartas_jugadas.0 %}
@@ -61,10 +59,10 @@
                                 <img src={% static "truco/images/"%}{{carta}}/>
                             {% endfor %}
                         {%endif%}
-                        </div>
                     </div>
                 </div>
             </div>
+
             <div id="par_de_jugadores_dos">
                 <div id="jugador_arriba">
                     <div id="cuadro_cartas_arriba">
@@ -74,7 +72,7 @@
                     </div>
 
                     <div class="cuadro_cartas_tiradas">
-                        {% for carta in cartas_jugadas.1 %}
+                        {% for carta in cartas_jugadas.4 %}
                             {% if forloop.counter == 1 %}
                                 <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                             {% endif %}
@@ -87,10 +85,9 @@
                         {% endfor %}
                     </div>
                 </div>
-
                 <div id="jugador_abajo">
                     <div class="cuadro_cartas_tiradas">
-                        {% for carta in cartas_jugadas.0 %}
+                        {% for carta in cartas_jugadas.1 %}
                             {% if forloop.counter == 1 %}
                                 <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                             {% endif %}
@@ -104,11 +101,12 @@
                     </div>
                     <div id="cuadro_cartas_abajo">
                         {% for i in cant_cartas_adversario.0 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                            <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                         {% endfor %}
                     </div>
                 </div>
             </div>
+
             <div id="par_de_jugadores_tres">
                 <div id="jugador_arriba">
                     <div id="cuadro_cartas_arriba">
@@ -118,7 +116,7 @@
                     </div>
 
                     <div class="cuadro_cartas_tiradas">
-                        {% for carta in cartas_jugadas.1 %}
+                        {% for carta in cartas_jugadas.3 %}
                             {% if forloop.counter == 1 %}
                                 <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                             {% endif %}
@@ -131,10 +129,9 @@
                         {% endfor %}
                     </div>
                 </div>
-
                 <div id="jugador_abajo">
                     <div class="cuadro_cartas_tiradas">
-                        {% for carta in cartas_jugadas.0 %}
+                        {% for carta in cartas_jugadas.2 %}
                             {% if forloop.counter == 1 %}
                                 <img src={% static "truco/images/"%}{{carta}} id ="primera_imagen"/>
                             {% endif %}
@@ -148,7 +145,7 @@
                     </div>
                     <div id="cuadro_cartas_abajo">
                         {% for i in cant_cartas_adversario.1 %}
-                        <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                            <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                         {% endfor %}
                     </div>
                 </div>

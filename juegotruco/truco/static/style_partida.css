@@ -61,8 +61,9 @@ h5 {
     border-radius: 10px;
     height:600px;
     width: 90%;
-    margin-top: -2%;
-    clear:left;
+    margin-top: -5%;
+    /*clear:left;*/
+    float:left;
 }
 
 #cuadro_cantos_respuestas {
@@ -90,7 +91,7 @@ h5 {
 }
 
 #par_de_jugadores_uno {
-    margin-top: -5%;
+    margin-top: 1%;
     float: left;
     margin-left: 1%;
     display: inline-block;
@@ -101,28 +102,32 @@ h5 {
 
 #par_de_jugadores_dos {
     margin-top: 1%;
+    float:left;
     margin-left: 1%;
     display: inline-block;
     height:95%;
     width: 32%;
+    /*border: solid blue 2px;*/
 }
 
 #par_de_jugadores_tres {
     margin-top: 1%;
     margin-left: 0.5%;
+    float:left;
     display: inline-block; 
     height: 95%;
     width: 32%;
+    /*border: solid blue 2px;*/
 }
 
 #jugador_arriba {
     height: 50%;
-    /*border: blue solid 1px;*/
+    /*border: red solid 1px;*/
 }
 
 #jugador_abajo {
     height: 50%;
-    /*border: blue solid 1px;*/
+    /*border: red solid 1px;*/
 }
 
 #cuadro_cartas_arriba {
