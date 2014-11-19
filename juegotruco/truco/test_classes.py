@@ -323,3 +323,23 @@ class TrucoTests(TestCase):
         ronda.crear_canto(ENVIDO, jugador1, 10)
         envido = ronda.ultimo_envido()
 
+    def test_se_debe_cantar_puntos(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(None, result)
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        canto.aceptar()
+        result = ronda.se_debe_cantar_puntos()
+        self.assertEqual(True, result)
+        
+
+
+

@@ -1,6 +1,7 @@
 EN_ESPERA = 0
 EN_CURSO = 1
 PUNTOS_OBJETIVO = (('15', "15"), ('30', "30"))
+CANTIDAD_JUGADORES = (('2', "2"), ('4', "4"), ('6', "6"))
 CARTAS_JUGADOR = 3
 
 #ESTADO DE CANTO

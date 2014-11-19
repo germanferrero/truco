@@ -10,11 +10,10 @@
     </head>
 
     <body>
-        {% load staticfiles %}
         <div id="barra_arriba">
                 <h4>Bienvenido {{ username }}</h4>
                 <h5>PARTIDA {{ partida }}</h5>
-                <button type="submit"><a href="/truco/lobby">Retirarse</a></button>
+                <button id="boton_retirarse" type="submit"><a href="/truco/lobby">Retirarse</a></button>
         </div>
         <div id ="puntajes">
             <table>
