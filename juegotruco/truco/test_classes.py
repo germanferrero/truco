@@ -54,7 +54,7 @@ class TrucoTests(TestCase):
         #         print '[%s]' % ', '.join(map(str, list(Carta.objects.all())))
 
     # Test que verifica 
-    def test_class_Lobby(self):
+'''    def test_class_Lobby(self):
         # Obtengo los usuarios
         user1 = User.objects.get(username ='test_user1')
         user2 = User.objects.get(username ='test_user2')
@@ -133,6 +133,7 @@ class TrucoTests(TestCase):
         # (que seria equipo1s segun como lo programamos)
         self.assertEqual(partida.get_ganador(), 1)
 
+########TESTS DE CLASE RONDA########
     def test_get_cartas_jugadas(self):
         cartas_tiradas = []
         # Obtengo una partida con dos jugadores y una ronda ya creada
@@ -243,10 +244,10 @@ class TrucoTests(TestCase):
         jugador2 = jugadores[1]
         ronda.crear_canto(ENVIDO, jugador1, 10)
         canto = ronda.get_ultimo_canto()
-        self.assertEqual(canto, ronda.ultimo_envido)
+        self.assertEqual(canto, ronda.ultimo_envido())
         ronda.crear_canto(TRUCO, jugador1, 3)
         canto = ronda.get_ultimo_canto()
-        self.assertEqual(canto, ronda.ultimo_truco)
+        self.assertEqual(canto, ronda.ultimo_truco())
 
     def test_se_puede_tirar(self):
         # Obtengo una partida con dos jugadores y una ronda ya creada
@@ -261,5 +262,64 @@ class TrucoTests(TestCase):
         self.assertEqual(True, result)
         ronda.crear_canto(ENVIDO, jugador1, 10)
         result = ronda.se_puede_tirar()
-        self.assertEqual(False, result)
+        self.assertEqual(False, result)'''
+
+#######Test clase canto#######
+    def test_canto_aceptar(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        #Aceptar un canto de tipo envido
+        ronda.crear_canto(REAL_ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto.estado, NO_CONTESTADO)
+        canto.aceptar()
+        self.assertEqual(canto.estado, ACEPTADO)
+        #Aceptar un canto de tipo truco
+        ronda.crear_canto(TRUCO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto.estado, NO_CONTESTADO)
+        canto.aceptar()
+        self.assertEqual(canto.estado, ACEPTADO)
+
+    def test_canto_rechazar(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        #Rechazar un canto de tipo envido
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto.estado, NO_CONTESTADO)
+        canto.rechazar()
+        self.assertEqual(canto.estado, RECHAZADO)
+        #Rechazar un canto de tipo truco
+        ronda.crear_canto(TRUCO, jugador1, 10)
+        canto = ronda.get_ultimo_canto()
+        self.assertEqual(canto.estado, NO_CONTESTADO)
+        canto.aceptar()
+        self.assertEqual(canto.estado, RECHAZADO)
+
+#######Test clase envido#######
+    def test_canto_rechazar(self):
+        # Obtengo una partida con dos jugadores y una ronda ya creada
+        partida = Partida.objects.get(nombre= "Partida con dos jugadores")
+        # Obtengo la ronda actual
+        ronda = partida.crear_ronda()
+        # Obtengo los jugadores
+        jugadores = partida.jugadores.all()
+        jugador1 = jugadores[0]
+        jugador2 = jugadores[1]
+        #Rechazar un canto de tipo envido
+        ronda.crear_canto(ENVIDO, jugador1, 10)
+        envido = ronda.ultimo_envido()
 

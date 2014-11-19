@@ -573,6 +573,10 @@ class Ronda(models.Model):
                     # No hubo un empate
                     equipo_ganador = self.jugadores.get(posicion_mesa=ganador).equipo
                     enfrentamientos_ganados[equipo_ganador] += 1
+                else:
+                    if enfrentamiento == self.tercer_enfrentamiento and self.primer_enfrentamiento.get_ganador() > 0:
+                        equipo_ganador = self.primer_enfrentamiento.get_ganador()
+                        enfrentamientos_ganados[equipo_ganador] += 1
             if enfrentamientos_ganados[0] == enfrentamientos_ganados[1]:
                 # Si se empataron los tres enfrentamientos
                 ganador = self.jugadores.all()[self.mano_pos].equipo
