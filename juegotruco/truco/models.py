@@ -695,9 +695,11 @@ class Ronda(models.Model):
     def get_opciones_fin_ronda(self):
         opciones = [SIGUIENTE_RONDA]
         envido = self.ultimo_envido()
-        if (envido and envido.puntos_pedidos and not envido.puntos_mostrados
-                and self.get_turno().posicion_mesa == envido.get_supuesto_ganador()[0]):
-            opciones.append(MOSTRAR_PUNTOS)
+        if (envido and envido.puntos_pedidos and not envido.puntos_mostrados):
+                supuesto_ganador = self.jugadores.get(posicion_mesa=envido.get_supuesto_ganador()[0])
+                posicion_pie = self.get_pie(supuesto_ganador.equipo)
+                if self.get_turno().posicion_mesa == posicion_pie:
+                    opciones.append(MOSTRAR_PUNTOS)
         elif (envido and self.jugadores_listos == 0 and not envido.puntos_pedidos
                 and envido.estado == ACEPTADO):
             opciones.append(PEDIR_PUNTOS)
