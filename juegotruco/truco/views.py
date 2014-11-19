@@ -140,7 +140,7 @@ def en_espera(request, partida_id):
         if ronda and not ronda.hay_ganador():
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
             context['cartas_jugadas'] = ronda.get_cartas_jugadas(jugador)
-            context['cant_cartas_adversario'] = ([i+1 for i in range(ronda.cant_cartas_adversario(jugador))])
+            context['cant_cartas_adversario'] = lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador))
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador) + '. ' + ronda.get_mensaje_puntos_cantados()
         return render(request, 'truco/en_espera.html', context)
@@ -191,7 +191,7 @@ def ronda(request, partida_id):
                 'username': request.user.username,
                 'cartas_disponibles': jugador.get_cartas_disponibles(),
                 'cartas_jugadas': ronda.get_cartas_jugadas(jugador),
-                'cant_cartas_adversario': [i+1 for i in range(ronda.cant_cartas_adversario(jugador))],
+                'cant_cartas_adversario' : lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador)),
                 'opciones': ronda.get_opciones(),
                 'op_dict': OPCIONES,
                 'mensaje_envido': ronda.get_mensaje_ganador_envido(jugador),
@@ -244,6 +244,7 @@ opcion de pasar a la siguiente ronda. Si se jugo un envido durante la ronda, el
 perdedor del mismo puede pedir ver las cartas del otro equipo para rectificar el
 resultado.
 """
+@login_required(login_url='/usuarios/login')
 def fin_de_ronda(request, partida_id):
     partida = Partida.objects.get(pk=partida_id)
     ronda = partida.get_ronda_actual()

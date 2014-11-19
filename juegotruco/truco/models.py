@@ -453,11 +453,19 @@ class Ronda(models.Model):
         return opciones
 
     """
-    Devuelve la cantidad de cartas que tiene el jugador adversario.
+    Devuelve un arreglo con la cantidad de cartas de todos los jugadores, a excepcion
+    del jugador que se pasa como parametro.
     """
-    def cant_cartas_adversario(self, jugador):
-        cant_cartas = [len(i.get_cartas_disponibles()) for i in self.jugadores.all() if i != jugador]
-        return cant_cartas[0]
+    def cant_cartas_adversario(self, jugador): #___Cambiar le nombre por adversarios
+        cantidad_jugadores = self.jugadores.count()
+        cant_cartas = []
+        for i in range(cantidad_jugadores - 1):
+            # Para todos los demas jugadores
+            posicion = (jugador.posicion_mesa + 1 + i) % cantidad_jugadores
+            # jugador_observado: es el jugador del cual se estan calculando las cartas que posee
+            jugador_observado = self.jugadores.get(posicion_mesa=posicion)
+            cant_cartas.append(len(jugador_observado.get_cartas_disponibles()))
+        return cant_cartas
 
     """
     Calcula de quien es el turno actual segun el estado de la ronda y devuelve al jugador en turno

@@ -17,7 +17,7 @@
         <div id="par_de_jugadores_uno">
             <div id="jugador_arriba">
                 <div id="cuadro_cartas_arriba">
-                    {% for i in cant_cartas_adversario %}
+                    {% for i in cant_cartas_adversario.4 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                     {% endfor %}
                 </div>
@@ -52,7 +52,7 @@
                     {% endfor %}
                 </div>
 
-                <div id="cuadro_cartas_usuario">
+                <div id="cuadro_cartas_abajo">
                     {% for carta in cartas_disponibles %}
                         <img src={% static "truco/images/"%}{{carta}}/>
                     {% endfor %}
@@ -63,7 +63,7 @@
         <div id="par_de_jugadores_dos">
             <div id="jugador_arriba">
                 <div id="cuadro_cartas_arriba">
-                    {% for i in cant_cartas_adversario %}
+                    {% for i in cant_cartas_adversario.3 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                     {% endfor %}
                 </div>
@@ -83,14 +83,17 @@
                 </div>
             </div>
 
-            <div id="jugador_abajo">
+            <div id="cuadro_cartas_abajo">
+                {% for i in cant_cartas_adversario.0 %}
+                    <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                {% endfor %}
             </div>
         </div>
 
         <div id="par_de_jugadores_tres">
             <div id="jugador_arriba">
                 <div id="cuadro_cartas_arriba">
-                    {% for i in cant_cartas_adversario %}
+                    {% for i in cant_cartas_adversario.2 %}
                         <img src={% static "truco/images/cartas/naipe.jpg"%}/>
                     {% endfor %}
                 </div>
@@ -109,7 +112,10 @@
                     {% endfor %}
                 </div>
             </div>
-            <div id="jugador_abajo">
+            <div id="cuadro_cartas_abajo">
+                {% for i in cant_cartas_adversario.1 %}
+                    <img src={% static "truco/images/cartas/naipe.jpg"%}/>
+                {% endfor %}
             </div>
         </div>
     {% endblock pantalla_de_juego %}

@@ -138,14 +138,14 @@ h5 {
     display: inline-block;
 }
 
-#cuadro_cartas_usuario {
+#cuadro_cartas_abajo {
     text-align: center;
     height: 40%;
     /*border: yellow solid 2px;*/
 }
 
  /*Cuadro de cada carta del usuario, cuando esta en espera */
-#cuadro_cartas_usuario img { 
+#cuadro_cartas_abajo img { 
     height: 100%;
     width: 20%;
     display: inline-block;
@@ -181,21 +181,21 @@ h5 {
     z-index:2;
 }
 
-#cuadro_cartas_usuario form {
+#cuadro_cartas_abajo form {
     height: 100%;
     width: 20%;
     display: inline-block;
     /*border: blue solid 2px;*/
 }
 
-#cuadro_cartas_usuario form button {
+#cuadro_cartas_abajo form button {
     height: 100%;
     width: 100%;
     display: inline-block;*/
     /*border: yellow solid 2px;*/
 }
 
-#cuadro_cartas_usuario form button img {
+#cuadro_cartas_abajo form button img {
     border: solid red 3px;
     margin-top: -7%;
     margin-left: -15%;
