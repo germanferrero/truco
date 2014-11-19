@@ -199,7 +199,8 @@ def ronda(request, partida_id):
                 'mensaje_canto' : ronda.get_mensaje_canto(jugador),
                 'mensaje_puntos_cantados' : ronda.get_mensaje_puntos_cantados(),
                 'puede_tirar_carta': ronda.se_puede_tirar(),
-                'cantar_puntos': ronda.se_debe_cantar_puntos()
+                'cantar_puntos': ronda.se_debe_cantar_puntos(),
+                'nombre_jugadores': lista_nombres_jugadores(ronda.nombres_jugadores(jugador))
                 }
             return render(request, 'truco/ronda.html', context)
         else:  # Se termino la ronda
