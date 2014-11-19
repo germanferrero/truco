@@ -403,6 +403,7 @@ class Ronda(models.Model):
             # Si el mano ya canto sus puntos
             ultimo_canto_perdiendo = envido.ultimo_que_canto_equipo_perdiendo()
             if ultimo_canto_perdiendo >= 0:
+                # Alguno de los que va perdiendo cantos
                 turno = (envido.ultimo_que_canto_equipo_perdiendo() + 2) % self.jugadores.count()
             else:
                 turno = (self.mano_pos + 1) % self.jugadores.count()
@@ -1022,7 +1023,7 @@ class Envido(Canto):
     def ultimo_que_canto_equipo_perdiendo(self):
         # Ya canto puntos algun jugador
         ganador_parcial_pos = self.get_supuesto_ganador()[0]
-        equipo_perdiendo = self.jugadores.get(posicion_mesa=ganador_parcial_pos).equipo + 1 % 2
+        equipo_perdiendo = (self.jugadores.get(posicion_mesa=ganador_parcial_pos).equipo + 1) % 2
         # Jugadores que ya cantaron del equipo que va perdiendo.
         jug_equipo_perdiendo_que_ya_cantaron = self.jugadores.filter(equipo=equipo_perdiendo)
         ultimo_en_cantar = -1 # Este valor indica que ninguno del equipo que esta perdiendo canto aun.
