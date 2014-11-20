@@ -446,7 +446,8 @@ class Ronda(models.Model):
             elif self.se_debe_cantar_puntos():
                 opciones = []
             elif self.ultimo_truco():
-                if not self.get_turno().posicion_mesa == self.ultimo_truco().pos_jugador_canto:
+                jugador_canto = self.jugadores.get(posicion_mesa=self.ultimo_truco().pos_jugador_canto)
+                if not self.get_turno().equipo == jugador_canto.equipo:
                     opciones = self.ultimo_truco().get_respuestas()
                 opciones.append(IRSE_AL_MAZO)
             else:
