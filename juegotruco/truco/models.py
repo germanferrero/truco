@@ -817,7 +817,8 @@ class Truco(Canto):
     a un jugador si el otro no quiere lo que se canto.
     """
     def aumentar(self, nombre_canto, pos_jugador_canto):
-        self.aceptar()
+        if self.estado == NO_CONTESTADO:
+            self.aceptar()
         # Se crea una nueva instancia para el canto de mayor valor
         result = Truco(
             ronda=self.ronda,
