@@ -137,15 +137,18 @@ def en_espera(request, partida_id):
             'partida': partida,
             'username': request.user.username
             })
-        if ronda and not ronda.hay_ganador():
+        if ronda:
             context['cartas_disponibles'] = jugador.get_cartas_disponibles()
             context['cartas_jugadas'] = lista_cartas_jugadores(ronda.get_cartas_jugadas(jugador))
             context['cant_cartas_adversario'] = lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador))
-            context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
-            context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
-            context['mensaje_puntos_cantados'] = ronda.get_mensaje_puntos_cantados()
             context['nombre_jugadores'] = lista_nombres_jugadores(ronda.nombres_jugadores(jugador))
-            context['jugador_en_turno'] = ronda.get_turno().nombre
+            if not ronda.hay_ganador():
+                context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
+                context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
+                context['mensaje_puntos_cantados'] = ronda.get_mensaje_puntos_cantados()
+                context['jugador_en_turno'] = ronda.get_turno().nombre
+            if ronda.hay_que_mostrar_los_puntos():
+                context['cartas_a_mostrar'] = ronda.ultimo_envido().get_puntos_a_mostrar()
         return render(request, 'truco/en_espera.html', context)
 
 
@@ -280,6 +283,9 @@ def fin_de_ronda(request, partida_id):
             'puntajes': partida.get_puntajes(request.user),
             'partida': partida,
             'username': request.user.username,
+            'cartas_disponibles': jugador.get_cartas_disponibles(),
+            'cartas_jugadas': lista_cartas_jugadores(ronda.get_cartas_jugadas(jugador)),
+            'cant_cartas_adversario' : lista_cantidad_cartas(ronda.cant_cartas_adversario(jugador)),
             'opciones': ronda.get_opciones_fin_ronda(),
             'op_dict': OPCIONES,
             }

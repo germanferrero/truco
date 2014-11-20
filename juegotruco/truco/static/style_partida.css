@@ -234,6 +234,10 @@ h5 {
     width: 120%;
 }
 
+#botones_opciones_chicos{
+    height: 30px;
+}
+
 #cuadro_botones {
     background-color:#424242;
     margin-top: 10%;
@@ -264,9 +268,9 @@ button {
 }
 
 #cartas_conforman_puntos {
-    text-align: center;
-    margin-top: -5%;
     height: 30%;
+    position: relative;
+    z-index: 1;
 }
 
 #cartas_conforman_puntos img{

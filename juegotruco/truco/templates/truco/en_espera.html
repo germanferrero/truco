@@ -18,10 +18,19 @@
             {{mensaje_puntos_cantados}}
         </div>
         <div id="cuadro_turno">
-            El turno es de {{jugador_en_turno}}
+            {% if jugador_en_turno %}
+                El turno es de {{jugador_en_turno}}
+            {% endif %}
         </div>
     {% endblock mensajes %}
     {% block pantalla_de_juego %}
+        {% if cartas_a_mostrar %}
+        <div id="cartas_conforman_puntos">
+                {% for carta in cartas_a_mostrar %}
+                    <img src={% static "truco/images/" %}{{carta}}/>
+                {% endfor %}
+        </div>
+        {% endif %}
         <div id="par_de_jugadores_uno">
             <div id="jugador_arriba">
                 <div id="nombre_jugador">
