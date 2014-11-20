@@ -56,10 +56,10 @@ CONTENIDO
 
     Este documento pretende dejar en claro las descripciones preeliminares de la
 aplicación web “TRUCO”, dejando asentados los requerimientos para el desarrollo de la misma,
- cumpliendo las características de una buena SRS según norma IEEE 830,
- a modo de contrato entre el cliente y el desarrollador.
+cumpliendo las características de una buena SRS según norma IEEE 830,
+a modo de contrato entre el cliente y el desarrollador.
     El mismo está dirigido a los desarrolladores de la aplicación, el grupo FFHR,
-y a los clientes interesados en el software, profesores de la cátedra de 
+y a los clientes interesados en el software, profesores de la cátedra de
 Ingeniería del Software I.
 
 
@@ -68,7 +68,7 @@ Ingeniería del Software I.
 
    La aplicación "Truco" será un simulador del juego de cartas omónimo popular argentino.
 Diseñada para ser utilizada por usuarios con conectividad a internet, 
-donde se enfrentarán en partidas “uno contra uno”, de cuatro, o de seis jugadores.
+donde se enfrentarán en partidas “uno contra uno”, "dos contra dos" o "tres contra tres".
 
 
 
@@ -77,17 +77,16 @@ donde se enfrentarán en partidas “uno contra uno”, de cuatro, o de seis jug
 * USUARIO: persona que utilizará la aplicación.
 * CANTAR: sinónimo de la acción de proponer Envido, Truco, o cualquier derivado.
 * PUNTOS OBJETIVO: meta a alcanzar por los jugadores para poder ganar el juego.
-* PARTIDA: juego entre dos personas hasta alcanzar los puntos objetivo.
+* PARTIDA: juego entre personas hasta alcanzar los puntos objetivo.
 * REGISTRO DE PARTIDA: historial de la partida en curso, la cuál involucra tanto
                        el historial de puntos ya anotados, puntos a anotar al
                        finalizar la ronda y registro del estado de la ronda actual.
 * MANO: el usuario al que le toca jugar primero en la ronda.
-* LOBBY: pantalla principal del juego donde se puede crear una nueva partida o 
+* PIE: Último jugador del equipo en jugar, en la ronda.
+* LOBBY: pantalla principal del juego donde se puede crear una nueva partida o
          unirse a una ya creada.
-
 * SUPUESTO GANADOR ENVIDO: Jugador que cantó el mejor puntaje de envido de la ronda.
-			   No necesariamente los posee.
-* PIE: Último jugador del equipo en jugar en la ronda.
+                           No necesariamente los posee.
 
 1.4 REFERENCIAS
 
@@ -145,7 +144,7 @@ para cada usuario:
 2.3 CARACTERÍSTICAS DEL USUARIO
 
    Los usuarios potenciales del sistema son todas aquellas personas interesadas
-en el juego de truco que deseen jugar partidas uno-a-uno contra otras personas
+en el juego de truco que deseen jugar partidas contra otras personas
 en diferentes partes del mundo a través de la web.
    Todos los usuarios se ubican dentro de un mismo nivel jerárquico y pueden
 realizar las funciones descriptas en el inciso 2.2.
@@ -155,12 +154,12 @@ realizar las funciones descriptas en el inciso 2.2.
 2.4 RESTRICCIONES GENERALES
 
     * La aplicación tiene que estar desarrollada en Django.
-    * Fecha límite de entrega del software es 02 de Octubre de 2014
+    * Fecha límite de entrega del software es 19 de Noviembre de 2014
     * El juego será regido por las siguientes reglas:
 
     El juego consiste en emplear las tres cartas que se poseen, de la mejor manera
 posible, para ganar al menos dos de las tres partes que componen cada ronda.
-    El objetivo es ser el primero en llegar a los quince o treinta puntos, meta
+    El objetivo es ser el primer equipo en llegar a los quince o treinta puntos, meta
 establecida antes de iniciar la partida.
 
 
@@ -188,7 +187,7 @@ menor jerarquía en un enfrentamiento.
 
 __Envido
     Un equipo puede cantar Envido o alguno de sus derivados(real envido, falta envido)
-y el oponente puede responder "quiero", "no quiero", o re-cantar.
+y el equipo oponente puede responder "quiero", "no quiero", o re-cantar.
     El Envido se juega por 2 puntos, el Real Envido por 3, y el Falta Envido se
 juega por la cantidad mínima de puntos que hace falta para que alguno de los
 equipos llegue a 15 o 30 puntos.
@@ -200,13 +199,13 @@ combinaciones son:
 3) Envido + Envido: 4 puntos aceptado / 2 puntos no aceptado
 4) Envido + Real envido: 5 puntos aceptado / 2 puntos no aceptado
 5) Envido + Envido + Real envido: 7 puntos aceptado / 4 puntos no aceptado
-6) Cualquier combinación + Falta envido = cantidad mínima para que el jugador
+6) Cualquier combinación + Falta envido = cantidad mínima para que el equipo
     que ganó alcance los 15 o 30 puntos si fue aceptado/ en el caso que no fuera
-    aceptada, al ganador le corresponden la cantidad de puntos que hubiera
+    aceptada, a los ganadores le corresponden la cantidad de puntos que hubieran
     recibido si se hubiese aceptado y ganado la primera combinación, o 1 punto si la
     combinación es nula
 
-    En caso de haberse querido alguna de las combinaciones,se pasa a el canto de puntos.
+    En caso de haberse querido alguna de las combinaciones, se pasa a el canto de puntos.
     Canto de puntos:
       El primer jugador en decir cuantos puntos posee es el mano. Luego le sigue el jugador
     de la derecha. Si este canta más puntos(i.e. lo supera), sigue el jugador de la derecha.
@@ -216,11 +215,11 @@ combinaciones son:
     equipo, a derecha del último en cantar de su mismo equipo.
     Gana el equipo que cantó el mejor de los puntajes, o en caso de empate, el equipo del jugador mano.
     Al terminar la ronda, quien lo haya ganado deberá mostrar las cartas que
-conformaron sus puntos, solo en el caso de que el contrincante lo haya pedido,
+conformaron sus puntos, solo en el caso de que los contrincantes lo hayan pedido,
 de lo contrario no es necesario mostrarlas.
-    Un jugador podrá mentir en la cantidad de puntos que tiene. Si el contrincante
-no le pide que muestre las cartas, puede ganar. De lo contrario, debe mostrar las
-cartas y pierde el envido, dándole los puntos al contrincante.
+    Un jugador podrá mentir en la cantidad de puntos que tiene. Si los contrincantes
+no le piden que muestre las cartas, puede ganar. De lo contrario, debe mostrar las
+cartas y pierde el envido, dándole los puntos a los contrincantes.
 
 
 
@@ -238,30 +237,27 @@ cartas de diferente palo, los tantos equivalen al puntaje de mayor jerarquía.
 __Juego
     Se mezclan las cartas al azar y luego se reparten, una por vez, comenzando por el
 jugador que es mano, tres cartas a cada jugador.
-    Empieza jugando el jugador mano, quien puede bajar una carta, o cantar Envido o Truco.
+    Empieza jugando el jugador mano, quien puede bajar una carta, o cantar Envido.
     Si se canta el envido, se entra en la fase del Envido mismo y luego el mano
-tiene la posibilidad de cantar truco o bajar una carta. Si canta truco, el oponente
-debe contestar "quiero" o "no quiero" o re-cantar.
-    En el caso que se haya aceptado, el ganador de los enfrentamientos se llevará
-2 puntos, caso contrario, el ganador(el jugador que cantó) se lleva 1 punto y la
-ronda finaliza inmediatamente.
-    Si se canta Truco y se acepta, entonces el jugador que ha aceptado puede subir la apuesta y
-cantar Retruco. Si es aceptado se juega por 3 puntos. De lo contrario, el jugador que cante el
-Retruco gana 2 puntos inmediatamente y se termina la ronda.
-Si el Retruco es aceptado, se puede subir aún más la apuesta cantando “Quiero Vale 4”. En
-caso de ser aceptado, se juega por 4 puntos. De lo contrario, el jugador que cantó “Quiero Vale
-4” gana 3 puntos inmediatamente y termina la ronda.
-    En el caso de que se haya cantado Truco o alguno de los cantos siguientes, y
-luego se haya aceptado, el jugador que cantó debe bajar una carta.
-    Luego, el oponente puede cantar Envido, o derivados y/o Truco (en caso de que
-no los haya cantado la mano, o que no se haya querido todavia el truco), y luego
-bajar una carta.
+tiene que bajar una carta.
     Luego se verifica el ganador del primer enfrentamiento, y comienza el segundo
 enfrentamiento el ganador del primero. En caso de empate coninúa la mano.
+    A partir del segundo enfrentamiento, los jugadores tienen permitido cantar truco,
+    Si se canta Truco y se acepta, entonces el equipo que ha aceptado puede subir la apuesta y
+cantar Retruco. Si es aceptado se juega por 3 puntos. De lo contrario, el equipo que cante el
+Retruco gana 2 puntos inmediatamente y se termina la ronda.
+Si el Retruco es aceptado, se puede subir aún más la apuesta cantando “Quiero Vale 4”. En
+caso de ser aceptado, se juega por 4 puntos. De lo contrario, el equipo que cantó “Quiero Vale
+4” gana 3 puntos inmediatamente y termina la ronda.
+    En el caso de que se haya cantado Truco o alguno de los cantos siguientes, y
+luego se haya aceptado, el equipo ganador de los enfrentamientos se llevará
+2 puntos, caso contrario, los ganadores(el equipo del jugador que cantó) se lleva 1 punto y la
+ronda finaliza inmediatamente.
+    Una vez contestado, el jugador que cantó debe bajar una carta y se continuan con los enfrentamientos.
     Se repiten los pasos anteriores relacionados a los enfrentamientos, a excepción
 de la parte del Envido.
-    Una vez que uno de los jugadores gana dos de los tres enfrentamientos, dá por
-ganador al jugador que más enfrentamientos haya ganado. En el poco probable caso
+    Una vez que uno de los equipos gana dos de los tres enfrentamientos, dá por
+ganador al equipo que más enfrentamientos haya ganado. En el poco probable caso
 de un empate, se procede de esta manera:
 
 
@@ -282,13 +278,13 @@ Ganador del primer      Ganador del segundo       Ganador del tercer        Gana
 
     En cada uno de los turnos de un jugador, siempre y cuando no tenga que responder
 a un canto, éste, tiene la posibilidad de irse al mazo. En ese caso, se termina la
-ronda automáticamente y se da por ganador al oponente.
+ronda automáticamente y se da por ganador al equipo oponente.
     Una vez que se termina la ronda, se suman los puntos correspondientes a cada
-jugador.
-    Cuando uno de los jugadores llegue a los puntos establecidos como objetivo,
-entonces se lo considera ganador de la partida.
-    Si ambos jugadores llegan en la misma ronda al puntaje objetivo, entonces el
-ganador será el que llegó con los puntos del Envido.
+equipo.
+    Cuando uno de los equipos llegue a los puntos establecidos como objetivo,
+entonces se los considera ganadores de la partida.
+    Si ambos equipos llegan en la misma ronda al puntaje objetivo, entonces los
+ganadores serán los que llegaron con los puntos del Envido.
 
 
 
@@ -322,7 +318,6 @@ en las pantallas de un navegador.
     El usuario debe poder manejar la aplicación con la utilización de un
 mouse y un teclado(para poder ingresar los datos necesarios para la creación y loggin
 de una cuenta, y para poder crear una partida).
---------------------------------------------------------------------------------------- modificacion de cuenta -----------
 
 
 3.2. REQUERIMIENTOS FUNCIONALES
@@ -455,7 +450,6 @@ pasar un usuario durante el juego.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Hay una ronda en curso
                      · La partida se encuentra en el primer enfrentamiento.
-                     · No se aceptó antes en la ronda el truco.
                      · No se cantó antes el envido o alguno de los derivados.
     ·Escenario exitoso principal:
         1. El jugador hace click en uno de los botones disponibles('Envido', 'Real
@@ -471,14 +465,14 @@ pasar un usuario durante el juego.
     ·Precondiciones: · Hay una ronda en curso.
                      · La partida se encuentra en el primer enfrentamiento.
                      · No se aceptó antes en la ronda el truco.
-                     · El oponente cantó envido o derivado en el turno anterior
+                     · El equipo oponente cantó envido o derivado en el turno anterior
                        y consecuentemente el sistema muestra al jugador en turno
                        las opciones "Quiero" y "No quiero" y opciones para re-cantar.
-                     · El oponente no cantó "Falta Envido" en el turno anterior.
+                     · El equipo oponente no cantó "Falta Envido" en el turno anterior.
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en una de las opciones para re-cantar
         2. El sistema registra el canto
-        3. El sistema le cede el turno al pie del oponente.
+        3. El sistema le cede el turno al pie del equipo contrario.
 
 
 3.2.11 ACEPTAR ENVIDO O DERIVADOS
@@ -486,7 +480,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
     ·Precondiciones: · Hay una ronda en curso.
-                     · El oponente cantó envido o derivado en el turno anterior
+                     · El equipo oponente cantó envido o derivado en el turno anterior
                        y consecuentemente el sistema muestra al jugador en turno
                        las opciones "Quiero" y "No quiero" y opciones para re-cantar.
     ·Escenario exitoso principal:
@@ -501,7 +495,7 @@ pasar un usuario durante el juego.
     .Actor secundario: Sistema
     ·Precondiciones: · Hay una ronda en curso.
                      · Se acepto el envido o alguno de sus derivados.
-                     · Los puntos de los jugadores que ya cantaron, son
+                     · Los puntos del ultimo jugador de los que ya cantaron, son
                        visibles por todos los jugadores
     ·Escenario exitoso principal:
         1. El sistema le muestra al jugador las opciones "Son Buenas"(exepto al
@@ -510,7 +504,7 @@ pasar un usuario durante el juego.
         3. El sistema le cede el turno al jugador de la derecha.
     ·Escenario exepcional:
         3.a El jugador en turno es el último en cantar los puntos.
-            1. El sistema verifica quién canto el puntaje mas grande.
+            1. El sistema verifica que equipo canto el puntaje mas alto.
             2. El sistema registra al supuesto ganador.
             3. El sistema le cede el turno al jugador que cantó la primera
             instancia del envido.
@@ -523,7 +517,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Hay una ronda en curso.
-                     · El oponente cantó envido o derivado en el turno anterior
+                     · El equipo oponente cantó envido o derivado en el turno anterior
                        y consecuentemente el sistema muestra al jugador en turno
                        las opciones "Quiero", "No quiero" y opciones para re-cantar.
     ·Escenario exitoso principal:
@@ -584,7 +578,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     .Actor secundario: Sistema
     ·Precondiciones: · Hay una ronda en curso
-                     · El oponente cantó truco o alguno de sus derivados en el
+                     · El equipo oponente cantó truco o alguno de sus derivados en el
                        turno anterior y consecuentemente el sistema muestra al
                        jugador en turno las opciones "Quiero", "No quiero" y
                        opciones para re-cantar en el caso que todavía se pueda.
@@ -599,7 +593,7 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Hay una ronda en curso.
-                     · El oponente cantó truco o alguno de sus derivados en el
+                     · El equipo oponente cantó truco o alguno de sus derivados en el
                        turno anterior y consecuentemente el sistema muestra al
                        jugador en turno las opciones "Quiero", "No quiero" y opciones
                        para re-cantar en caso de que el jugador aún tenga esa
@@ -616,7 +610,7 @@ pasar un usuario durante el juego.
     ·Precondiciones: · Finalizó una ronda.
                      · El jugador en turno es el pie del supuesto equipo perdedor del Envido.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
-                        sus derivados.
+                       sus derivados.
                      · Se muestran las opciones "pedir puntos" y "siguiente ronda"
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "pedir puntos"
@@ -626,25 +620,25 @@ pasar un usuario durante el juego.
 
 3.2.18 MOSTRAR PUNTOS
     ·Caso de uso: Se muestran las cartas que conforman los puntos del envido, o
-                  derivado, del jugador que ganó.
+                  derivado, del jugador que supuestamente lo ganó.
     ·Actor primario: Jugador en turno.
     ·Actor secundario: Sistema.
     ·Precondiciones: · Finalizó una ronda.
                      · El jugador en turno es el pie del supuesto equipo ganador del Envido.
                      · Durante la ronda se cantó y aceptó el Envido, o alguno de
-                       sus derivados, y el perdedor pidió ver las cartas.
+                       sus derivados, y el equipo perdedor pidió ver las cartas.
                      · Consecuentemente, se muestra la opción "mostrar puntos" y "siguiente ronda"
     ·Escenario exitoso principal:
         1. El jugador en turno hace click en "mostrar puntos"
-        2. El sistema muestra a todos los jugadores las cartas que conforman los
+        2. El sistema muestra al jugador pie del otro equipo las cartas que conforman los
            puntos del supuesto ganador
         3. El sistema guarda en registro al ganador.
     ·Escenario excepcional:
         1.a El jugador no hace click en "mostrar puntos" sino en "siguiente ronda".
-            1. Se registra al oponente como ganador del envido.
+            1. Se registra al equipo oponente como ganador del envido.
         2.a Los puntos del supuesto ganador no coinciden con los puntos reales.
-            1. El sistema muestra las tres cartas del supuesto ganador. Y una aclaración
-            de que mintió.
+            1. El sistema muestra las tres cartas del supuesto ganador.
+
 
 3.2.19 CERRAR SESIÓN
     ·Caso de uso: Cerrar sesión.
@@ -662,7 +656,6 @@ pasar un usuario durante el juego.
     ·Actor primario: Jugador en turno
     ·Actor secundario: Sistema.
     ·Precondición: ·Hay una ronda en curso.
-                   ·El turno es del jugador en turno
     ·Escenario exitoso principal:
         1. El jugador hace click en "Irse ir al mazo".
         2. El sistema registra como ganador de la ronda al otro equipo.
@@ -677,5 +670,4 @@ pasar un usuario durante el juego.
           1. El sistema registra que el jugador a la derecha del jugador mano
              actual, será mano en la siguiente ronda.
           2. El sistema inicia una nueva ronda.
-
 
