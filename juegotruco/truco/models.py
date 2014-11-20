@@ -289,14 +289,14 @@ class Ronda(models.Model):
             mensaje = jugador_canto.nombre + " canto " + OPCIONES[int(ultimo_canto.tipo)]
         elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
             if jugador.equipo == jugador_canto.equipo:
-                mensaje = "Respondimos " + OPCIONES[int(QUIERO)]
-            else:
                 mensaje = "Respondieron " + OPCIONES[int(QUIERO)]
+            else:
+                mensaje = "Respondimos " + OPCIONES[int(QUIERO)]
         elif ultimo_canto and ultimo_canto.estado == RECHAZADO:
             if jugador.equipo == jugador_canto.equipo:
-                mensaje = "Respondimos " + OPCIONES[int(NO_QUIERO)]
-            else:
                 mensaje = "Respondieron " + OPCIONES[int(NO_QUIERO)]
+            else:
+                mensaje = "Respondimos " + OPCIONES[int(NO_QUIERO)]
         return mensaje
 
     """
@@ -311,9 +311,9 @@ class Ronda(models.Model):
             nombre_jugador = self.jugadores.get(posicion_mesa=jugador).nombre
         if puntos >= 0:
             # Si el jugador canto puntos
-            mensaje += ("El jugador '" + str(nombre_jugador) + "' canto " + str(puntos) + " puntos" + "\n")
+            mensaje += ("El jugador " + str(nombre_jugador) + " canto " + str(puntos) + " puntos" + "\n")
         elif puntos == -2:
-            mensaje += "El jugador '" + str(nombre_jugador) + "' dijo: Son buenas\n"
+            mensaje += "El jugador " + str(nombre_jugador) + " dijo: Son buenas\n"
         return mensaje
 
     """

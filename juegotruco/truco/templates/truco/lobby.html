@@ -19,7 +19,7 @@
             {% csrf_token %}
                 {% for partida in lista_de_partidas %}
                     <input type="radio" name="partida" id="partida{{ forloop.counter }}" value="{{ partida.id }}" />
-                    <label for="partida{{ forloop.counter }}">{{ partida }}</label><br />
+                    <label for="partida{{ forloop.counter }}">{{ partida }}({{ partida.cantidad_jugadores }})</label><br />
                 {% endfor %}
                 <input type="submit" value="Unirse a Partida" />
             </form>
