@@ -76,7 +76,7 @@ h5 {
 #cuadro_cantos_respuestas {
     background-color:#424242;
     border-radius: 10px;
-    height:70px;
+    height:30px;
     width: 120px;
     float: right;
     text-align:center;
@@ -98,8 +98,12 @@ h5 {
     vertical-align: middle;
 }
 
-
+<<<<<<< HEAD
 #cuadro_turno {
+=======
+
+#cuadro_tu_turno {
+>>>>>>> 8270f9873f047b7b85fad84ebfb67608e3ab7d77
     background-color:#424242;
     margin-top: 10%;
     border-radius: 10px;
