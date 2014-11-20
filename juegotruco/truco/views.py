@@ -144,6 +144,8 @@ def en_espera(request, partida_id):
             context['mensaje_envido'] = ronda.get_mensaje_ganador_envido(jugador)
             context['mensaje_canto'] = ronda.get_mensaje_canto(jugador)
             context['mensaje_puntos_cantados'] = ronda.get_mensaje_puntos_cantados()
+            context['nombre_jugadores'] = lista_nombres_jugadores(ronda.nombres_jugadores(jugador))
+            context['jugador_en_turno'] = ronda.get_turno().nombre
         return render(request, 'truco/en_espera.html', context)
 
 

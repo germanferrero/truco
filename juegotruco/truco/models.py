@@ -282,14 +282,21 @@ class Ronda(models.Model):
     """
     def get_mensaje_canto(self, jugador):
         mensaje = ''
-        if self.get_turno() == jugador:
-            ultimo_canto = self.get_ultimo_canto()
-            if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
-                mensaje = OPCIONES[int(ultimo_canto.tipo)]
-            elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
-                mensaje = OPCIONES[int(QUIERO)]
-            elif ultimo_canto and ultimo_canto.estado == RECHAZADO:
-                mensaje = OPCIONES[int(NO_QUIERO)]
+        ultimo_canto = self.get_ultimo_canto()
+        if ultimo_canto:
+            jugador_canto = self.jugadores.get(posicion_mesa=ultimo_canto.pos_jugador_canto)
+        if ultimo_canto and ultimo_canto.estado == NO_CONTESTADO:
+            mensaje = jugador_canto.nombre + " canto " + OPCIONES[int(ultimo_canto.tipo)]
+        elif ultimo_canto and ultimo_canto.estado == ACEPTADO:
+            if jugador.equipo == jugador_canto.equipo:
+                mensaje = "Respondimos " + OPCIONES[int(QUIERO)]
+            else:
+                mensaje = "Respondieron " + OPCIONES[int(QUIERO)]
+        elif ultimo_canto and ultimo_canto.estado == RECHAZADO:
+            if jugador.equipo == jugador_canto.equipo:
+                mensaje = "Respondimos " + OPCIONES[int(NO_QUIERO)]
+            else:
+                mensaje = "Respondieron " + OPCIONES[int(NO_QUIERO)]
         return mensaje
 
     """
